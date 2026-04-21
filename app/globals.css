@@ -1,0 +1,92 @@
+@import "leaflet/dist/leaflet.css";
+@import "tailwindcss";
+
+:root {
+  --background: #f4ecdf;
+  --foreground: #2f241c;
+  --canvas: #f4ecdf;
+  --surface: #fbf6ef;
+  --surface-strong: #eadbc5;
+  --card: #fffaf3;
+  --border: rgba(74, 51, 35, 0.14);
+  --text-muted: #725a49;
+  --accent: #9d4d2e;
+  --accent-strong: #7c3419;
+  --olive: #61644a;
+  --shadow-soft: 0 20px 60px rgba(61, 36, 20, 0.12);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-fraunces);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(157, 77, 46, 0.12), transparent 35%),
+    linear-gradient(180deg, #f6efe6 0%, #f4ecdf 48%, #efe2d3 100%);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+* {
+  border-color: var(--border);
+}
+
+::selection {
+  background: rgba(157, 77, 46, 0.2);
+  color: var(--foreground);
+}
+
+a,
+button {
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.display-font {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+.soft-shadow {
+  box-shadow: var(--shadow-soft);
+}
+
+.leaflet-container {
+  font: inherit;
+  background: #efe1d0;
+}
+
+.leaflet-container img,
+.leaflet-container .leaflet-tile,
+.leaflet-container .leaflet-marker-icon,
+.leaflet-container .leaflet-marker-shadow {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.leaflet-container .leaflet-control-attribution {
+  background: rgba(255, 250, 243, 0.92);
+  color: var(--text-muted);
+}
+
+.leaflet-container .leaflet-control-zoom a {
+  color: var(--foreground);
+  background: var(--card);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--card);
+  color: var(--foreground);
+}
