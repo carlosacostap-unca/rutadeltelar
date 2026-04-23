@@ -344,29 +344,10 @@ function normalizeExperience(record: PocketBaseRecord): Experience | null {
   };
 }
 
-function isArtisanRecord(record: PocketBaseRecord) {
-  const typeName = readDisplayString(record, ["expand.tipo.nombre"], "").toLowerCase();
-  const name = readDisplayString(record, ["nombre", "name", "title"], "").toLowerCase();
-  const description = readDisplayString(record, ["descripcion", "summary", "description"], "").toLowerCase();
-
-  if (typeName) {
-    return typeName.includes("artesan");
-  }
-
-  if (
-    /artesan|textil|telar|hiland|tejedor|tejido|lana|poncho|manta|alfombra|ruana|tinte|faja/.test(
-      `${name} ${description}`,
-    )
-  ) {
-    return true;
-  }
-
-  return (
-    readStringArray(record, ["tecnicas", "materiales", "productos_ofrecidos"])
-      .length > 0 ||
-    Boolean(getPathValue(record, "visitas_demostraciones")) ||
-    Boolean(name)
-  );
+function isActorRecord(record: PocketBaseRecord) {
+  // Acepta cualquier actor que tenga nombre, independientemente del tipo
+  const name = readDisplayString(record, ["nombre", "name", "title"], "");
+  return Boolean(name);
 }
 
 function inferActorCraft(record: PocketBaseRecord) {
@@ -395,7 +376,7 @@ function normalizeArtisan(record: PocketBaseRecord): Artisan | null {
   const name = readDisplayString(record, ["nombre", "name", "title"]);
   const slug = readString(record, ["slug", "handle"], slugify(name));
 
-  if (!isArtisanRecord(record)) {
+  if (!isActorRecord(record)) {
     return null;
   }
 
@@ -608,6 +589,15 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Error desconocido";
 }
 
+function deduplicateBySlug<T extends { slug: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.slug)) return false;
+    seen.add(item.slug);
+    return true;
+  });
+}
+
 function createMockResult<TItem>(
   items: TItem[],
   error?: string,
@@ -635,9 +625,11 @@ export async function getExperiencesResult(): Promise<DataResult<Experience>> {
       );
     }
 
-    const experiences = response.items
-      .map(normalizeExperience)
-      .filter((item): item is Experience => item !== null);
+    const experiences = deduplicateBySlug(
+      response.items
+        .map(normalizeExperience)
+        .filter((item): item is Experience => item !== null),
+    );
 
     if (experiences.length === 0) {
       return createMockResult(
@@ -684,9 +676,11 @@ export async function getArtisansResult(): Promise<DataResult<Artisan>> {
       );
     }
 
-    const artisans = response.items
-      .map(normalizeArtisan)
-      .filter((item): item is Artisan => item !== null);
+    const artisans = deduplicateBySlug(
+      response.items
+        .map(normalizeArtisan)
+        .filter((item): item is Artisan => item !== null),
+    );
 
     if (artisans.length === 0) {
       return createMockResult(
@@ -720,9 +714,11 @@ export async function getStationsResult(): Promise<DataResult<Station>> {
       );
     }
 
-    const stations = response.items
-      .map(normalizeStation)
-      .filter((item): item is Station => item !== null);
+    const stations = deduplicateBySlug(
+      response.items
+        .map(normalizeStation)
+        .filter((item): item is Station => item !== null),
+    );
 
     if (stations.length === 0) {
       return createMockResult(
@@ -767,9 +763,11 @@ export async function getHighlightSpotsResult(): Promise<DataResult<HighlightSpo
       );
     }
 
-    const spots = response.items
-      .map(normalizeHighlightSpot)
-      .filter((item): item is HighlightSpot => item !== null);
+    const spots = deduplicateBySlug(
+      response.items
+        .map(normalizeHighlightSpot)
+        .filter((item): item is HighlightSpot => item !== null),
+    );
 
     if (spots.length === 0) {
       return createMockResult(
@@ -1222,8 +1220,8 @@ function normalizeProduct(record: PocketBaseRecord): Product | null {
 export async function getProductsResult(): Promise<DataResult<Product>> {
   try {
     const response = await getPocketBaseList("products", {
-      // Accept all non-inactive records so partially-reviewed items are visible
-      filter: 'estado != "inactivo"',
+      // Accept only approved records
+      filter: 'estado = "aprobado"',
       expand: "categoria,subcategoria,estacion_id,estaciones_relacionadas,tecnicas,actores_relacionados",
       perPage: 100,
       sort: "nombre",
@@ -1233,9 +1231,11 @@ export async function getProductsResult(): Promise<DataResult<Product>> {
       return createMockResult(productMocks, "PocketBase no esta configurado para productos");
     }
 
-    const items = response.items
-      .map(normalizeProduct)
-      .filter((item): item is Product => item !== null);
+    const items = deduplicateBySlug(
+      response.items
+        .map(normalizeProduct)
+        .filter((item): item is Product => item !== null),
+    );
 
     if (items.length === 0) {
       return createMockResult(productMocks, "No se pudieron mapear productos reales");
