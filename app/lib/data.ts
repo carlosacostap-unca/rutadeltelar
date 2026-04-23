@@ -132,6 +132,22 @@ function cleanText(value: string) {
   return decodeHtmlEntities(value).replace(/\s+/g, " ").trim();
 }
 
+function readExpandedRelationNames(record: PocketBaseRecord, expandKey: string): string[] {
+  const expandData = record.expand as Record<string, unknown> | undefined;
+  const expanded = expandData?.[expandKey];
+  if (!Array.isArray(expanded)) return [];
+  return (expanded as Array<unknown>)
+    .map((item) => {
+      if (item && typeof item === "object") {
+        const obj = item as Record<string, unknown>;
+        const raw = obj.nombre ?? obj.name ?? obj.title;
+        return typeof raw === "string" ? cleanText(raw.trim()) : "";
+      }
+      return "";
+    })
+    .filter(Boolean);
+}
+
 function readString(
   record: PocketBaseRecord,
   keys: string[],
@@ -414,6 +430,7 @@ function normalizeArtisan(record: PocketBaseRecord): Artisan | null {
       "Ruta del Telar",
     ),
     craft,
+    actorType: readDisplayString(record, ["expand.tipo.nombre", "tipo"], "artesano"),
     bio: stripHtml(
       readString(
         record,
@@ -449,9 +466,38 @@ function normalizeArtisan(record: PocketBaseRecord): Artisan | null {
       ),
     ),
     contactPhone: readDisplayString(record, ["contacto_telefono"], ""),
+    contactEmail: readDisplayString(record, ["contacto_email"], "") || undefined,
     address: readDisplayString(record, ["ubicacion"], ""),
     latitude: readNumber(record, ["latitud"]),
     longitude: readNumber(record, ["longitud"]),
+    // Artesano / Productor
+    materials: readDisplayStringArray(record, ["materiales"]).length > 0
+      ? readDisplayStringArray(record, ["materiales"])
+      : undefined,
+    productosOfrecidos: readDisplayStringArray(record, ["productos_ofrecidos"]).length > 0
+      ? readDisplayStringArray(record, ["productos_ofrecidos"])
+      : undefined,
+    visitasDisponibles: readDisplayString(record, ["visitas_demostraciones", "disponibilidad"], "") || undefined,
+    // Productor
+    rubroProductivo: readDisplayString(record, ["rubro_productivo"], "") || undefined,
+    escalaProduccion: readDisplayString(record, ["escala_produccion"], "") || undefined,
+    modalidadVenta: readDisplayString(record, ["modalidad_venta", "modalidad_servicio"], "") || undefined,
+    // Hospedaje
+    tipoHospedaje: readDisplayString(record, ["tipo_hospedaje"], "") || undefined,
+    capacidad: readDisplayString(record, ["capacidad"], "") || undefined,
+    servicios: readDisplayString(record, ["servicios", "servicios_adicionales"], "") || undefined,
+    horarios: readDisplayString(record, ["horarios"], "") || undefined,
+    // Gastronómico
+    tipoPropuesta: readDisplayString(record, ["tipo_propuesta"], "") || undefined,
+    especialidades: readDisplayString(record, ["especialidades"], "") || undefined,
+    platosDestacados: readDisplayString(record, ["platos_destacados"], "") || undefined,
+    // Guía
+    idiomas: readDisplayStringArray(record, ["idiomas"]).length > 0
+      ? readDisplayStringArray(record, ["idiomas"])
+      : undefined,
+    recorridosOfrecidos: readDisplayString(record, ["recorridos_ofrecidos", "duracion_recorridos"], "") || undefined,
+    zonaCobertura: readDisplayString(record, ["zona_cobertura"], "") || undefined,
+    puntoEncuentro: readDisplayString(record, ["punto_encuentro"], "") || undefined,
   };
 }
 
@@ -473,6 +519,7 @@ function normalizeStation(record: PocketBaseRecord): Station | null {
     slug,
     name,
     locality: readDisplayString(record, ["localidad", "nombre"], "Ruta del Telar"),
+    department: readDisplayString(record, ["expand.departamento.nombre", "departamento"], "") || undefined,
     slogan: readDisplayString(record, ["eslogan"], "Nodo territorial de la ruta"),
     summary: stripHtml(
       readString(
@@ -482,6 +529,7 @@ function normalizeStation(record: PocketBaseRecord): Station | null {
       ),
     ),
     status: readString(record, ["estado"], "aprobado"),
+    hasInauguratedStation: Boolean(getPathValue(record, "posee_estacion_inaugurada")),
     imageUrl:
       getPrimaryImageUrl(record, ["foto_portada", "galeria_fotos", "fotos"]),
     galleryUrls: getFileUrlList(record, ["galeria_fotos", "fotos"]),
@@ -511,6 +559,7 @@ function normalizeHighlightSpot(record: PocketBaseRecord): HighlightSpot | null 
       ),
     ),
     type: readDisplayString(record, ["expand.tipo.nombre", "tipo"], "imperdible"),
+    eventDate: readString(record, ["fecha_hora_evento"], "") || undefined,
     location: readDisplayString(
       record,
       [
@@ -541,6 +590,15 @@ function normalizeHighlightSpot(record: PocketBaseRecord): HighlightSpot | null 
     ),
     relatedExperienceRecordIds: readIdArray(record, ["experiencias_relacionadas"]),
     relatedArtisanRecordIds: readIdArray(record, ["actores_relacionados"]),
+    relatedProductRecordIds: readIdArray(record, ["productos_relacionados"]),
+    galleryUrls: getFileUrlList(record, ["fotos"]),
+    horarios: readDisplayString(record, ["horarios"], "") || undefined,
+    accesibilidad: readDisplayString(record, ["accesibilidad"], "") || undefined,
+    estacionalidad: readDisplayString(record, ["estacionalidad"], "") || undefined,
+    duracionSugerida: readDisplayString(record, ["duracion_sugerida"], "") || undefined,
+    recomendaciones: readDisplayStringArray(record, ["recomendaciones"]).length > 0
+      ? readDisplayStringArray(record, ["recomendaciones"])
+      : undefined,
     latitude: readNumber(record, ["latitud"]),
     longitude: readNumber(record, ["longitud"]),
   };
@@ -697,7 +755,7 @@ export async function getHighlightSpotsResult(): Promise<DataResult<HighlightSpo
     const response = await getPocketBaseList("highlightSpots", {
       filter: 'estado = "aprobado"',
       expand:
-        "tipo,prioridad,estacion_id,actores_relacionados,experiencias_relacionadas",
+        "tipo,prioridad,estacion_id,actores_relacionados,experiencias_relacionadas,productos_relacionados",
       perPage: 100,
       sort: "-created",
     });
@@ -764,11 +822,12 @@ function sameRecordId(a?: string, b?: string) {
 }
 
 export async function getStationContextBySlug(slug: string) {
-  const [station, experiences, artisans, spots] = await Promise.all([
+  const [station, experiences, artisans, spots, products] = await Promise.all([
     getStationBySlug(slug),
     getExperiences(),
     getArtisans(),
     getHighlightSpots(),
+    getProducts(),
   ]);
 
   if (!station) {
@@ -789,15 +848,21 @@ export async function getStationContextBySlug(slug: string) {
       sameRecordId(item.stationRecordId, station.recordId) ||
       matchesStationTerritory(station, item.location),
     ),
+    products: products.filter((item) =>
+      sameRecordId(item.stationRecordId, station.recordId) ||
+      (item.stationSlug ? item.stationSlug === station.slug : false) ||
+      matchesStationTerritory(station, item.stationName ?? ""),
+    ),
   };
 }
 
 export async function getHighlightSpotContextBySlug(slug: string) {
-  const [spot, stations, experiences, artisans] = await Promise.all([
+  const [spot, stations, experiences, artisans, products] = await Promise.all([
     getHighlightSpotBySlug(slug),
     getStations(),
     getExperiences(),
     getArtisans(),
+    getProducts(),
   ]);
 
   if (!spot) {
@@ -822,12 +887,17 @@ export async function getHighlightSpotContextBySlug(slug: string) {
     sameRecordId(item.stationRecordId, spot.stationRecordId) ||
     normalizeText(item.place).includes(normalizeText(spot.location)),
   );
+  const relatedProducts = products.filter((item) =>
+    (item.recordId && spot.relatedProductRecordIds?.includes(item.recordId)) ||
+    sameRecordId(item.stationRecordId, spot.stationRecordId),
+  );
 
   return {
     spot,
     relatedStation,
     relatedExperiences,
     relatedArtisans,
+    relatedProducts,
   };
 }
 
@@ -878,11 +948,12 @@ export async function getExperienceContextBySlug(slug: string) {
 }
 
 export async function getArtisanContextBySlug(slug: string) {
-  const [artisan, stations, experiences, spots] = await Promise.all([
+  const [artisan, stations, experiences, spots, products] = await Promise.all([
     getArtisanBySlug(slug),
     getStations(),
     getExperiences(),
     getHighlightSpots(),
+    getProducts(),
   ]);
 
   if (!artisan) {
@@ -920,11 +991,20 @@ export async function getArtisanContextBySlug(slug: string) {
       : normalizeText(spot.location).includes(normalizeText(artisan.place)),
   );
 
+  const relatedProducts = products.filter((p) =>
+    (artisan.recordId && p.relatedActorRecordIds?.includes(artisan.recordId)) ||
+    (relatedStation
+      ? sameRecordId(p.stationRecordId, relatedStation.recordId) ||
+        (p.stationSlug ? p.stationSlug === relatedStation.slug : false)
+      : false),
+  );
+
   return {
     artisan,
     relatedStation,
     relatedExperiences,
     relatedHighlightSpots,
+    relatedProducts,
   };
 }
 
@@ -1072,6 +1152,35 @@ export async function getSuggestedJourneyBySlug(slug: string) {
 
 // ── Productos ────────────────────────────────────────────────────────────────
 
+function resolveProductStation(record: PocketBaseRecord): { name: string; slug: string; recordId: string } {
+  // Try legacy estacion_id first, then estaciones_relacionadas (array)
+  const legacyName = readDisplayString(record, ["expand.estacion_id.nombre"], "");
+  if (legacyName) {
+    return {
+      name: legacyName,
+      slug: readString(
+        record,
+        ["expand.estacion_id.slug"],
+        slugify(readString(record, ["expand.estacion_id.localidad", "expand.estacion_id.nombre"], "")),
+      ),
+      recordId: readString(record, ["estacion_id", "expand.estacion_id.id"], ""),
+    };
+  }
+  // Try first of estaciones_relacionadas
+  const relatedNames = readExpandedRelationNames(record, "estaciones_relacionadas");
+  if (relatedNames.length > 0) {
+    const expandData = record.expand as Record<string, unknown> | undefined;
+    const relatedStations = expandData?.["estaciones_relacionadas"] as Array<Record<string, unknown>> | undefined;
+    const first = relatedStations?.[0];
+    return {
+      name: relatedNames[0],
+      slug: readString({ ...(first ?? {}), id: first?.id ?? "", expand: {} }, ["slug"], slugify(relatedNames[0])),
+      recordId: String(first?.id ?? ""),
+    };
+  }
+  return { name: "", slug: "", recordId: "" };
+}
+
 function normalizeProduct(record: PocketBaseRecord): Product | null {
   const name = readDisplayString(record, ["nombre", "name", "title"]);
   const slug = readString(record, ["slug", "handle"], slugify(name));
@@ -1079,6 +1188,18 @@ function normalizeProduct(record: PocketBaseRecord): Product | null {
   if (!slug || !name) {
     return null;
   }
+
+  // Techniques: relation to tecnicas_producto, expanded as array of records with nombre
+  const techniquesFromExpand = readExpandedRelationNames(record, "tecnicas");
+  const techniques = uniqueStrings([
+    ...techniquesFromExpand,
+    // Fallback: category name as a pseudo-technique if no techniques found
+    ...(techniquesFromExpand.length === 0
+      ? [readDisplayString(record, ["expand.categoria.nombre"], "")]
+      : []),
+  ]).filter(Boolean);
+
+  const station = resolveProductStation(record);
 
   return {
     recordId: record.id,
@@ -1089,18 +1210,11 @@ function normalizeProduct(record: PocketBaseRecord): Product | null {
     ),
     category: readDisplayString(record, ["expand.categoria.nombre", "categoria"], "Artesanía"),
     subcategory: readDisplayString(record, ["expand.subcategoria.nombre", "subcategoria"], "") || undefined,
-    techniques: uniqueStrings([
-      ...readDisplayStringArray(record, ["tecnicas"]),
-      readDisplayString(record, ["expand.categoria.nombre"], ""),
-    ]).filter(Boolean),
+    techniques,
     imageUrl: getPrimaryImageUrl(record, ["fotos"]),
-    stationName: readDisplayString(record, ["expand.estacion_id.nombre", "expand.estaciones_relacionadas.0.nombre"], ""),
-    stationRecordId: readString(record, ["estacion_id"], ""),
-    stationSlug: readString(
-      record,
-      ["expand.estacion_id.slug"],
-      slugify(readString(record, ["expand.estacion_id.localidad", "expand.estacion_id.nombre"], "")),
-    ),
+    stationName: station.name || undefined,
+    stationRecordId: station.recordId || undefined,
+    stationSlug: station.slug || undefined,
     relatedActorRecordIds: readIdArray(record, ["actores_relacionados"]),
   };
 }
@@ -1108,8 +1222,9 @@ function normalizeProduct(record: PocketBaseRecord): Product | null {
 export async function getProductsResult(): Promise<DataResult<Product>> {
   try {
     const response = await getPocketBaseList("products", {
-      filter: 'estado = "aprobado"',
-      expand: "categoria,subcategoria,estacion_id,actores_relacionados",
+      // Accept all non-inactive records so partially-reviewed items are visible
+      filter: 'estado != "inactivo"',
+      expand: "categoria,subcategoria,estacion_id,estaciones_relacionadas,tecnicas,actores_relacionados",
       perPage: 100,
       sort: "nombre",
     });

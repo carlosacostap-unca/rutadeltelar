@@ -10,9 +10,11 @@ export type Station = {
   slug: string;
   name: string;
   locality: string;
+  department?: string;
   slogan: string;
   summary: string;
   status: string;
+  hasInauguratedStation?: boolean;
   imageUrl?: string;
   galleryUrls?: string[];
   latitude?: number;
@@ -24,28 +26,34 @@ export const stations = [
     slug: "amaicha-del-valle",
     name: "Estacion Amaicha del Valle",
     locality: "Amaicha del Valle",
+    department: "Andalgalá",
     slogan: "Territorio de trama viva",
     summary:
       "Una estacion clave para iniciar el recorrido, con talleres, comunidad y paisaje cultural.",
     status: "aprobado",
+    hasInauguratedStation: true,
   },
   {
     slug: "el-paso",
     name: "Estacion El Paso",
     locality: "El Paso",
+    department: "Belén",
     slogan: "Oficio, memoria y encuentro",
     summary:
       "Concentra actores locales, experiencias guiadas y puntos de interes para visitantes.",
     status: "aprobado",
+    hasInauguratedStation: false,
   },
   {
     slug: "santa-maria",
     name: "Estacion Santa Maria",
     locality: "Santa Maria",
+    department: "Santa María",
     slogan: "Paletas del valle",
     summary:
       "Una puerta de entrada a tecnicas, tintes y piezas con fuerte identidad regional.",
     status: "aprobado",
+    hasInauguratedStation: true,
   },
 ] satisfies Station[];
 
@@ -152,14 +160,22 @@ export type HighlightSpot = {
   subtitle: string;
   description: string;
   type: string;
+  eventDate?: string;
   location: string;
   priority: string;
   imageUrl?: string;
   stationName?: string;
   stationSlug?: string;
   stationRecordId?: string;
+  galleryUrls?: string[];
+  horarios?: string;
+  accesibilidad?: string;
+  estacionalidad?: string;
+  duracionSugerida?: string;
+  recomendaciones?: string[];
   relatedExperienceRecordIds?: string[];
   relatedArtisanRecordIds?: string[];
+  relatedProductRecordIds?: string[];
   latitude?: number;
   longitude?: number;
 };
@@ -182,6 +198,7 @@ export const highlightSpots = [
     description:
       "Una actividad donde se muestran procesos de tintes botanicos y su relacion con el entorno.",
     type: "evento",
+    eventDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
     location: "El Paso",
     priority: "alta",
   },
@@ -203,6 +220,7 @@ export type Artisan = {
   name: string;
   place: string;
   craft: string;
+  actorType?: string;
   bio: string;
   techniques: string[];
   years: string;
@@ -212,9 +230,32 @@ export type Artisan = {
   stationSlug?: string;
   stationRecordId?: string;
   contactPhone?: string;
+  contactEmail?: string;
   address?: string;
   latitude?: number;
   longitude?: number;
+  // Artesano
+  materials?: string[];
+  productosOfrecidos?: string[];
+  visitasDisponibles?: string;
+  // Productor
+  rubroProductivo?: string;
+  escalaProduccion?: string;
+  modalidadVenta?: string;
+  // Hospedaje
+  tipoHospedaje?: string;
+  capacidad?: string;
+  servicios?: string;
+  horarios?: string;
+  // Gastronómico
+  tipoPropuesta?: string;
+  especialidades?: string;
+  platosDestacados?: string;
+  // Guía
+  idiomas?: string[];
+  recorridosOfrecidos?: string;
+  zonaCobertura?: string;
+  puntoEncuentro?: string;
 };
 
 export const artisans = [

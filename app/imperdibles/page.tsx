@@ -1,29 +1,38 @@
-import {
-  getArtisansResult,
-  getHighlightSpotsResult,
-  getStationsResult,
-} from "@/app/lib/data";
+import { getHighlightSpotsResult } from "@/app/lib/data";
 import { DataSourceBadge } from "@/components/data-source-badge";
-import { HighlightSpotsBrowser } from "@/components/highlight-spots-browser";
+import { ImperdiblesClient } from "@/components/imperdibles-client";
 import { SectionHeading } from "@/components/section-heading";
 
 export default async function ImperdiblesPage() {
-  const [highlightSpotsResult, stationsResult, artisansResult] = await Promise.all([
-    getHighlightSpotsResult(),
-    getStationsResult(),
-    getArtisansResult(),
-  ]);
-  const highlightSpots = highlightSpotsResult.items;
-  const stations = stationsResult.items;
-  const artisans = artisansResult.items;
+  const highlightSpotsResult = await getHighlightSpotsResult();
+  const spots = highlightSpotsResult.items;
+
+  const now = new Date();
+  const in30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+  const hasUpcoming = spots.some((s) => {
+    if (s.type.toLowerCase() !== "evento" || !s.eventDate) return false;
+    const d = new Date(s.eventDate);
+    return d >= now && d <= in30;
+  });
+
+  // Tipos de imperdibles atemporales (sin "evento")
+  const types = [
+    ...new Set(
+      spots
+        .filter((s) => s.type.toLowerCase() !== "evento")
+        .map((s) => s.type)
+        .filter(Boolean),
+    ),
+  ].sort();
 
   return (
     <main className="flex flex-1 flex-col">
-      <header className="mb-8">
+      <header className="mb-6">
         <SectionHeading
           eyebrow="Imperdibles"
           title="Atractivos, actividades y eventos"
-          description="Este modulo responde directamente a la coleccion `imperdibles` del backend."
+          description="La agenda de eventos próximos y los atractivos atemporales que no podés perderte en la ruta."
         />
         <div className="mt-4">
           <DataSourceBadge
@@ -33,11 +42,8 @@ export default async function ImperdiblesPage() {
         </div>
       </header>
 
-      <HighlightSpotsBrowser
-        highlightSpots={highlightSpots}
-        stations={stations}
-        artisans={artisans}
-      />
+      <ImperdiblesClient spots={spots} types={types} hasUpcoming={hasUpcoming} />
     </main>
   );
 }
+

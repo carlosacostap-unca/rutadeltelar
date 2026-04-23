@@ -1,35 +1,35 @@
-import { highlights } from "@/app/lib/content";
 import {
-  getArtisansResult,
   getExperiencesResult,
-  getHighlightSpotsResult,
   getStationsResult,
 } from "@/app/lib/data";
-import { ExperiencesBrowser } from "@/components/experiences-browser";
+import { ExperienciasClient } from "@/components/experiencias-client";
 import { DataSourceBadge } from "@/components/data-source-badge";
 import { SectionHeading } from "@/components/section-heading";
-import { SurfaceCard } from "@/components/surface-card";
 
 export default async function ExplorarPage() {
-  const [experiencesResult, stationsResult, artisansResult, highlightSpotsResult] =
-    await Promise.all([
-      getExperiencesResult(),
-      getStationsResult(),
-      getArtisansResult(),
-      getHighlightSpotsResult(),
-    ]);
+  const [experiencesResult, stationsResult] = await Promise.all([
+    getExperiencesResult(),
+    getStationsResult(),
+  ]);
   const experiences = experiencesResult.items;
   const stations = stationsResult.items;
-  const artisans = artisansResult.items;
-  const highlightSpots = highlightSpotsResult.items;
+
+  // Opciones únicas de filtros
+  const categories = [...new Set(experiences.map((e) => e.tag).filter(Boolean))].sort();
+  const durations = [...new Set(experiences.map((e) => e.duration).filter(Boolean))].sort();
+
+  // Solo estaciones que tienen al menos una experiencia
+  const stationsWithExp = stations.filter((s) =>
+    experiences.some((e) => e.stationSlug === s.slug || e.stationRecordId === s.recordId),
+  );
 
   return (
     <main className="flex flex-1 flex-col">
-      <header className="mb-8">
+      <header className="mb-6">
         <SectionHeading
           eyebrow="Experiencias"
-          title="Recorridos y propuestas culturales"
-          description="Pantalla alineada con la coleccion `experiencias`, pensada para descubrir actividades dentro de cada estacion."
+          title="Quiero hacer algo"
+          description="Actividades, talleres y recorridos para conectar con el tejido como práctica viva. Filtrá por categoría, estación o duración."
         />
         <div className="mt-4">
           <DataSourceBadge
@@ -39,25 +39,13 @@ export default async function ExplorarPage() {
         </div>
       </header>
 
-      <ExperiencesBrowser
+      <ExperienciasClient
         experiences={experiences}
-        stations={stations}
-        artisans={artisans}
-        highlightSpots={highlightSpots}
+        stations={stationsWithExp}
+        categories={categories}
+        durations={durations}
       />
-
-      <section className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {highlights.map((item) => (
-          <SurfaceCard key={item.label} className="p-4">
-            <p className="display-font text-3xl text-[color:var(--accent)]">
-              {item.value}
-            </p>
-            <p className="mt-1 text-sm text-[color:var(--text-muted)]">
-              {item.label}
-            </p>
-          </SurfaceCard>
-        ))}
-      </section>
     </main>
   );
 }
+

@@ -46,62 +46,6 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    href: "/artesanas",
-    label: "Actores",
-    shortLabel: "Actores",
-    icon: (
-      <>
-        <circle
-          cx="9"
-          cy="7"
-          r="2.8"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.7"
-        />
-        <path
-          d="M3 20a6 6 0 0 1 12 0"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="1.7"
-        />
-        <circle cx="17" cy="8" r="2" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <path
-          d="M21 20a4 4 0 0 0-6.32-3.26"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="1.5"
-        />
-      </>
-    ),
-  },
-  {
-    href: "/productos",
-    label: "Productos",
-    shortLabel: "Productos",
-    icon: (
-      <>
-        <path
-          d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.7"
-        />
-        <path
-          d="M3 6h18M16 10a4 4 0 0 1-8 0"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="1.7"
-        />
-      </>
-    ),
-  },
-  {
     href: "/explorar",
     label: "Experiencias",
     shortLabel: "Experiencias",
@@ -135,6 +79,23 @@ const navItems: NavItem[] = [
       </>
     ),
   },
+  {
+    href: "/buscar",
+    label: "Buscar",
+    shortLabel: "Buscar",
+    icon: (
+      <>
+        <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="1.7" />
+        <path
+          d="m21 21-4.35-4.35"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeWidth="1.7"
+        />
+      </>
+    ),
+  },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -150,7 +111,7 @@ export function MobileBottomNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[color:var(--border)] bg-[rgba(252,249,245,0.85)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl md:hidden">
-      <div className="mx-auto grid max-w-lg grid-cols-6 gap-1 rounded-2xl border border-[color:var(--border)] bg-[rgba(255,255,255,0.88)] p-2 soft-shadow">
+      <div className="mx-auto grid max-w-lg grid-cols-5 gap-1 rounded-2xl border border-[color:var(--border)] bg-[rgba(255,255,255,0.88)] p-2 soft-shadow">
         {navItems.map((item) => {
           const active = isActive(pathname, item.href);
 

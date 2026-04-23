@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getStationContextBySlug, getStations } from "@/app/lib/data";
-import { SectionHeading } from "@/components/section-heading";
-import { StationsTerritoryMap } from "@/components/stations-territory-map";
+import { HomeCarousel } from "@/components/home-carousel";
+import { ShareButton } from "@/components/share-button";
+import { StationDetailMap } from "@/components/station-detail-map";
 import { SurfaceCard } from "@/components/surface-card";
 
 type StationDetailPageProps = {
@@ -15,277 +16,264 @@ export async function generateStaticParams() {
   return stations.map((station) => ({ slug: station.slug }));
 }
 
-function MetricCard({ label, value }: { label: string; value: string }) {
-  return (
-    <SurfaceCard className="p-4">
-      <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
-        {label}
-      </p>
-      <p className="display-font mt-2 text-3xl text-[color:var(--accent)]">
-        {value}
-      </p>
-    </SurfaceCard>
-  );
-}
 
-export default async function StationDetailPage({
-  params,
-}: StationDetailPageProps) {
+export default async function StationDetailPage({ params }: StationDetailPageProps) {
   const { slug } = await params;
-  const [context, stations] = await Promise.all([
-    getStationContextBySlug(slug),
-    getStations(),
-  ]);
+  const context = await getStationContextBySlug(slug);
 
   if (!context) {
     notFound();
   }
 
-  const { station, experiences, artisans, highlightSpots } = context;
+  const { station, artisans, products, experiences, highlightSpots } = context;
+  const allGallery = [
+    ...(station.imageUrl ? [station.imageUrl] : []),
+    ...(station.galleryUrls ?? []).filter((u) => u !== station.imageUrl),
+  ];
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="mb-6">
+      {/* Back + Compartir */}
+      <div className="mb-6 flex items-center justify-between gap-3">
         <Link
           href="/estaciones"
-          className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
+          className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
         >
-          Volver a estaciones
+          ← Estaciones
         </Link>
+        <ShareButton title={station.name} text={station.summary} />
       </div>
 
-      <section className="rounded-3xl bg-[linear-gradient(160deg,#2c1810_0%,#1a0e08_100%)] p-6 text-white sm:p-8">
-        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div>
-            <p className="text-xs uppercase tracking-wider text-white/60">
-              Estacion
-            </p>
-            <h1 className="display-font mt-3 text-4xl leading-tight sm:text-5xl">
-              {station.name}
-            </h1>
-            <p className="mt-3 text-sm uppercase tracking-wider text-white/60">
-              {station.locality}
-            </p>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/80">
-              {station.summary}
-            </p>
-          </div>
-
-          {station.imageUrl ? (
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10">
-              <Image
-                src={station.imageUrl}
-                alt={station.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 40vw"
-              />
+      {/* Hero gallery */}
+      <section className="mb-10">
+        {allGallery.length > 0 ? (
+          <div className="relative">
+            <div className="flex gap-3 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {allGallery.map((url, i) => (
+                <div
+                  key={url}
+                  className={`relative shrink-0 overflow-hidden rounded-3xl [scroll-snap-align:start] ${i === 0 ? "aspect-[16/9] w-full" : "aspect-[4/3] w-[280px]"}`}
+                >
+                  <Image
+                    src={url}
+                    alt={`${station.name} ${i + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 70vw"
+                    priority={i === 0}
+                  />
+                </div>
+              ))}
             </div>
-          ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/8 p-6">
-              <p className="text-sm leading-7 text-white/70">
-                Esta estacion todavia no tiene imagen destacada, pero ya esta
-                conectada con su contenido territorial.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      <section className="mt-8 grid gap-3 md:grid-cols-4">
-        <MetricCard label="Localidad" value={station.locality} />
-        <MetricCard label="Experiencias" value={String(experiences.length)} />
-        <MetricCard label="Actores" value={String(artisans.length)} />
-        <MetricCard label="Imperdibles" value={String(highlightSpots.length)} />
-      </section>
-
-      <section className="mt-12">
-        <StationsTerritoryMap stations={stations} activeSlug={station.slug} />
-      </section>
-
-      <section className="mt-12 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div>
-          <SectionHeading
-            eyebrow="Identidad"
-            title={station.slogan}
-            description="Una vista territorial que agrupa contenido y relaciones alrededor de la estacion."
-          />
-          <SurfaceCard className="mt-6 soft-shadow">
-            <p className="text-sm leading-7 text-[color:var(--text-muted)]">
-              {station.summary}
-            </p>
-          </SurfaceCard>
-        </div>
-
-        <div>
-          <SectionHeading
-            eyebrow="Territorio"
-            title="Senales del lugar"
-            description="Indicadores rapidos para ubicar la estacion dentro del recorrido."
-          />
-          <div className="mt-6 grid gap-3">
-            <SurfaceCard>
-              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
-                Eslogan
-              </p>
-              <p className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
-                {station.slogan}
-              </p>
-            </SurfaceCard>
-            <SurfaceCard>
-              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
-                Coordenadas
-              </p>
-              <p className="mt-2 text-sm text-[color:var(--foreground)]">
-                {station.latitude && station.longitude
-                  ? `${station.latitude.toFixed(4)}, ${station.longitude.toFixed(4)}`
-                  : "No disponibles"}
-              </p>
-            </SurfaceCard>
-            <SurfaceCard>
-              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
-                Estado editorial
-              </p>
-              <p className="mt-2 text-sm font-semibold text-[color:var(--foreground)]">
-                {station.status}
-              </p>
-            </SurfaceCard>
+            {station.hasInauguratedStation && (
+              <span className="absolute left-4 top-4 rounded-full bg-[color:var(--accent)] px-3 py-1 text-xs font-semibold text-white shadow">
+                Inaugurada
+              </span>
+            )}
           </div>
-        </div>
+        ) : (
+          <div className="flex aspect-[16/9] items-center justify-center rounded-3xl bg-[color:var(--surface)] text-5xl">
+            🗺️
+          </div>
+        )}
       </section>
 
-      {station.galleryUrls && station.galleryUrls.length > 0 ? (
-        <section className="mt-12">
-          <SectionHeading
-            eyebrow="Galeria"
-            title="Imagenes del territorio"
-            description="Archivos reales de PocketBase asociados a la estacion."
-          />
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {station.galleryUrls.map((imageUrl, index) => (
-              <div
-                key={imageUrl}
-                className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] soft-shadow"
-              >
-                <Image
-                  src={imageUrl}
-                  alt={`${station.name} ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1280px) 50vw, 33vw"
-                />
-              </div>
-            ))}
+      {/* Título y descripción */}
+      <section className="mb-10">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+          {station.department ? `${station.department} · ` : ""}{station.locality}
+        </p>
+        <h1 className="display-font mt-2 text-4xl leading-tight text-[color:var(--foreground)] sm:text-5xl">
+          {station.name}
+        </h1>
+        {station.slogan && (
+          <p className="mt-2 text-base font-medium italic text-[color:var(--accent)]">
+            {station.slogan}
+          </p>
+        )}
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--text-muted)]">
+          {station.summary}
+        </p>
+      </section>
+
+      {/* Mapa embebido */}
+      {station.latitude && station.longitude ? (
+        <section className="mb-10">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+            Ubicación
+          </h2>
+          <div className="overflow-hidden rounded-3xl border border-[color:var(--border)]">
+            <StationDetailMap lat={station.latitude} lng={station.longitude} label={station.name} />
           </div>
         </section>
       ) : null}
 
-      <section className="mt-12">
-        <SectionHeading
-          eyebrow="Experiencias"
-          title="Propuestas dentro de esta estacion"
-          description="Relacion derivada por territorio para que el visitante entienda que puede hacer aqui."
-        />
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {experiences.length > 0 ? (
-            experiences.map((item) => (
-              <SurfaceCard key={item.slug} className="soft-shadow">
-                <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
-                  {item.tag}
+      {/* Actores */}
+      {artisans.length > 0 && (
+        <HomeCarousel eyebrow="Comunidad" title="Actores en esta estación" href="/artesanas" verTodosLabel="Ver todos">
+          {artisans.map((actor) => (
+            <Link
+              key={actor.slug}
+              href={`/artesanas/${actor.slug}`}
+              className="group w-[200px] shrink-0 [scroll-snap-align:start]"
+            >
+              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
+                {actor.imageUrl ? (
+                  <div className="relative mb-3 h-14 w-14 overflow-hidden rounded-full border border-[color:var(--border)]">
+                    <Image src={actor.imageUrl} alt={actor.name} fill className="object-cover" sizes="56px" />
+                  </div>
+                ) : (
+                  <div className="display-font mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--surface)] text-xl text-[color:var(--accent-strong)]">
+                    {actor.name[0]}
+                  </div>
+                )}
+                {actor.actorType && (
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+                    {actor.actorType}
+                  </p>
+                )}
+                <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">
+                  {actor.name}
+                </h3>
+                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">
+                  {actor.craft}
                 </p>
-                <h2 className="display-font mt-3 text-3xl text-[color:var(--foreground)]">
-                  {item.title}
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-[color:var(--text-muted)]">
-                  {item.description}
-                </p>
-                <Link
-                  href={`/explorar/${item.slug}`}
-                  className="mt-4 inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)]"
-                >
-                  Ver detalle
-                </Link>
               </SurfaceCard>
-            ))
+            </Link>
+          ))}
+        </HomeCarousel>
+      )}
+
+      {/* Productos */}
+      {products.length > 0 && (
+        <HomeCarousel eyebrow="Artesanía" title="Productos de la estación" href="/productos" verTodosLabel="Ver todos">
+          {products.map((product) => (
+            <Link
+              key={product.slug}
+              href={`/productos/${product.slug}`}
+              className="group w-[200px] shrink-0 [scroll-snap-align:start]"
+            >
+              <SurfaceCard className="!p-0 h-full overflow-hidden transition group-hover:border-[color:var(--accent)]">
+                {product.imageUrl ? (
+                  <div className="relative aspect-square w-full overflow-hidden">
+                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover transition group-hover:scale-[1.03]" sizes="200px" />
+                  </div>
+                ) : (
+                  <div className="flex aspect-square items-center justify-center bg-[color:var(--surface)] text-3xl">
+                    🧵
+                  </div>
+                )}
+                <div className="p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+                    {product.subcategory ?? product.category}
+                  </p>
+                  <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)] line-clamp-2">
+                    {product.name}
+                  </h3>
+                </div>
+              </SurfaceCard>
+            </Link>
+          ))}
+        </HomeCarousel>
+      )}
+
+      {/* Experiencias */}
+      {experiences.length > 0 && (
+        <HomeCarousel eyebrow="Vivencias" title="Experiencias disponibles" href="/explorar" verTodosLabel="Ver todas">
+          {experiences.map((exp) => (
+            <Link
+              key={exp.slug}
+              href={`/explorar/${exp.slug}`}
+              className="group w-[260px] shrink-0 [scroll-snap-align:start]"
+            >
+              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
+                {exp.imageUrl ? (
+                  <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
+                    <Image src={exp.imageUrl} alt={exp.title} fill className="object-cover transition group-hover:scale-[1.03]" sizes="260px" />
+                  </div>
+                ) : (
+                  <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">🧭</div>
+                )}
+                <div className="mb-2 flex gap-2">
+                  <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] font-semibold text-[color:var(--accent-mid)]">{exp.tag}</span>
+                  <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] text-[color:var(--text-muted)]">{exp.duration}</span>
+                </div>
+                <h3 className="text-sm font-semibold leading-snug text-[color:var(--foreground)]">{exp.title}</h3>
+                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{exp.description}</p>
+              </SurfaceCard>
+            </Link>
+          ))}
+        </HomeCarousel>
+      )}
+
+      {/* Imperdibles */}
+      {highlightSpots.length > 0 && (
+        <HomeCarousel eyebrow="Destacados" title="Imperdibles de la estación" href="/imperdibles">
+          {highlightSpots.map((spot) => (
+            <Link
+              key={spot.slug}
+              href={`/imperdibles/${spot.slug}`}
+              className="group w-[240px] shrink-0 [scroll-snap-align:start]"
+            >
+              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
+                {spot.imageUrl ? (
+                  <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
+                    <Image src={spot.imageUrl} alt={spot.title} fill className="object-cover transition group-hover:scale-[1.03]" sizes="240px" />
+                  </div>
+                ) : (
+                  <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">⭐</div>
+                )}
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{spot.type}</p>
+                <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">{spot.title}</h3>
+                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{spot.subtitle}</p>
+              </SurfaceCard>
+            </Link>
+          ))}
+        </HomeCarousel>
+      )}
+
+      {/* Cómo llegar */}
+      <section className="mb-10">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+          Cómo llegar
+        </h2>
+        <SurfaceCard>
+          {station.latitude && station.longitude ? (
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs text-[color:var(--text-muted)]">Coordenadas</p>
+                <p className="mt-1 font-mono text-sm font-semibold text-[color:var(--foreground)]">
+                  {station.latitude.toFixed(5)}, {station.longitude.toFixed(5)}
+                </p>
+                <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+                  {station.locality}{station.department ? `, ${station.department}` : ""}
+                </p>
+              </div>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${station.latitude},${station.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-[color:var(--accent)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[color:var(--accent-strong)]"
+              >
+                Abrir en Maps
+              </a>
+            </div>
           ) : (
-            <SurfaceCard className="md:col-span-2 xl:col-span-3">
-              <p className="text-sm text-[color:var(--text-muted)]">
-                Todavia no encontramos experiencias relacionadas con esta
-                estacion.
-              </p>
-            </SurfaceCard>
+            <p className="text-sm text-[color:var(--text-muted)]">
+              Coordenadas no disponibles aún. Buscá{" "}
+              <span className="font-semibold">{station.name}</span> en{" "}
+              <a
+                href={`https://www.google.com/maps/search/${encodeURIComponent(station.name + " " + station.locality)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[color:var(--accent)] underline"
+              >
+                Google Maps
+              </a>
+              .
+            </p>
           )}
-        </div>
-      </section>
-
-      <section className="mt-12 grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <div>
-          <SectionHeading
-            eyebrow="Actores"
-            title="Perfiles vinculados"
-            description="Recorte artesanal derivado del territorio de esta estacion."
-          />
-          <div className="mt-6 grid gap-4">
-            {artisans.length > 0 ? (
-              artisans.slice(0, 3).map((item) => (
-                <SurfaceCard key={item.slug}>
-                  <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
-                    {item.place}
-                  </p>
-                  <h3 className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
-                    {item.name}
-                  </h3>
-                  <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-                    {item.craft}
-                  </p>
-                </SurfaceCard>
-              ))
-            ) : (
-              <SurfaceCard>
-                <p className="text-sm text-[color:var(--text-muted)]">
-                  No encontramos actores artesanales relacionados.
-                </p>
-              </SurfaceCard>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <SectionHeading
-            eyebrow="Imperdibles"
-            title="Lo que no conviene perderse"
-            description="Puntos destacados conectados con esta estacion."
-          />
-          <div className="mt-6 grid gap-4">
-            {highlightSpots.length > 0 ? (
-              highlightSpots.slice(0, 3).map((item) => (
-                <SurfaceCard key={item.slug}>
-                  <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
-                    {item.type}
-                  </p>
-                  <h3 className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-                    {item.subtitle}
-                  </p>
-                  <Link
-                    href={`/imperdibles/${item.slug}`}
-                    className="mt-4 inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)]"
-                  >
-                    Ver detalle
-                  </Link>
-                </SurfaceCard>
-              ))
-            ) : (
-              <SurfaceCard>
-                <p className="text-sm text-[color:var(--text-muted)]">
-                  No encontramos imperdibles relacionados.
-                </p>
-              </SurfaceCard>
-            )}
-          </div>
-        </div>
+        </SurfaceCard>
       </section>
     </main>
   );
