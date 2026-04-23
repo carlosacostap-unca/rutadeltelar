@@ -77,7 +77,7 @@ export function HighlightSpotsBrowser({
             {selectedHighlightSpots.slice(0, 3).map((spot) => (
               <SurfaceCard key={spot.slug} className="soft-shadow">
                 {spot.imageUrl ? (
-                  <div className="relative mb-4 aspect-[4/3] overflow-hidden rounded-[1.25rem] border border-[color:var(--border)]">
+                  <div className="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl border border-[color:var(--border)]">
                     <Image
                       src={spot.imageUrl}
                       alt={spot.title}
@@ -88,7 +88,7 @@ export function HighlightSpotsBrowser({
                   </div>
                 ) : null}
                 <div className="flex items-start justify-between gap-3">
-                  <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+                  <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
                     {spot.type}
                   </p>
                   <span className="rounded-full bg-[color:var(--surface-strong)] px-3 py-1 text-xs text-[color:var(--accent-strong)]">
@@ -123,7 +123,7 @@ export function HighlightSpotsBrowser({
           />
           <div className="mt-6 grid gap-4">
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Actores en la estacion
               </p>
               <p className="display-font mt-2 text-4xl text-[color:var(--accent)]">

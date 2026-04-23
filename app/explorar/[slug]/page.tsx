@@ -29,7 +29,7 @@ function DetailMetric({
 }) {
   return (
     <SurfaceCard className="p-4">
-      <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+      <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
         {label}
       </p>
       <p className="display-font mt-2 text-3xl text-[color:var(--accent)]">
@@ -81,10 +81,10 @@ export default async function ExperienceDetailPage({
         </Link>
       </div>
 
-      <section className="rounded-[2rem] bg-[linear-gradient(180deg,#4b2b1c_0%,#2f241c_100%)] p-6 text-white sm:p-8">
+      <section className="rounded-3xl bg-[linear-gradient(160deg,#2c1810_0%,#1a0e08_100%)] p-6 text-white sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-white/60">
+            <p className="text-xs uppercase tracking-wider text-white/60">
               Recorrido
             </p>
             <h1 className="display-font mt-3 text-4xl leading-tight sm:text-5xl">
@@ -96,7 +96,7 @@ export default async function ExperienceDetailPage({
           </div>
 
           {experience.imageUrl ? (
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-white/10">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10">
               <Image
                 src={experience.imageUrl}
                 alt={experience.title}
@@ -106,7 +106,7 @@ export default async function ExperienceDetailPage({
               />
             </div>
           ) : (
-            <div className="rounded-[1.75rem] border border-white/10 bg-white/8 p-6">
+            <div className="rounded-2xl border border-white/10 bg-white/8 p-6">
               <p className="text-sm leading-7 text-white/70">
                 Esta experiencia todavia no tiene imagen propia, pero ya esta
                 conectada con su contexto territorial y responsable.
@@ -144,7 +144,7 @@ export default async function ExperienceDetailPage({
           />
           <div className="mt-6 grid gap-3">
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Estacion
               </p>
               <p className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
@@ -160,7 +160,7 @@ export default async function ExperienceDetailPage({
               ) : null}
             </SurfaceCard>
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Responsable
               </p>
               <p className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
@@ -178,7 +178,7 @@ export default async function ExperienceDetailPage({
               ) : null}
             </SurfaceCard>
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Incluye
               </p>
               <div className="mt-4">
@@ -212,7 +212,7 @@ export default async function ExperienceDetailPage({
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {experience.stops.map((stop, index) => (
             <SurfaceCard key={stop} className="soft-shadow">
-              <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Parada 0{index + 1}
               </p>
               <h2 className="display-font mt-2 text-3xl text-[color:var(--foreground)]">
@@ -233,7 +233,7 @@ export default async function ExperienceDetailPage({
           {relatedHighlightSpots.length > 0 ? (
             relatedHighlightSpots.slice(0, 3).map((spot) => (
               <SurfaceCard key={spot.slug} className="soft-shadow">
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+                <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
                   {spot.location}
                 </p>
                 <h2 className="display-font mt-2 text-3xl text-[color:var(--foreground)]">

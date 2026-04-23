@@ -18,7 +18,7 @@ export async function generateStaticParams() {
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
     <SurfaceCard className="p-4">
-      <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+      <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
         {label}
       </p>
       <p className="display-font mt-2 text-3xl text-[color:var(--accent)]">
@@ -54,16 +54,16 @@ export default async function StationDetailPage({
         </Link>
       </div>
 
-      <section className="rounded-[2rem] bg-[linear-gradient(180deg,#4b2b1c_0%,#2f241c_100%)] p-6 text-white sm:p-8">
+      <section className="rounded-3xl bg-[linear-gradient(160deg,#2c1810_0%,#1a0e08_100%)] p-6 text-white sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-white/60">
+            <p className="text-xs uppercase tracking-wider text-white/60">
               Estacion
             </p>
             <h1 className="display-font mt-3 text-4xl leading-tight sm:text-5xl">
               {station.name}
             </h1>
-            <p className="mt-3 text-sm uppercase tracking-[0.24em] text-white/60">
+            <p className="mt-3 text-sm uppercase tracking-wider text-white/60">
               {station.locality}
             </p>
             <p className="mt-5 max-w-2xl text-sm leading-7 text-white/80">
@@ -72,7 +72,7 @@ export default async function StationDetailPage({
           </div>
 
           {station.imageUrl ? (
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-white/10">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10">
               <Image
                 src={station.imageUrl}
                 alt={station.name}
@@ -82,7 +82,7 @@ export default async function StationDetailPage({
               />
             </div>
           ) : (
-            <div className="rounded-[1.75rem] border border-white/10 bg-white/8 p-6">
+            <div className="rounded-2xl border border-white/10 bg-white/8 p-6">
               <p className="text-sm leading-7 text-white/70">
                 Esta estacion todavia no tiene imagen destacada, pero ya esta
                 conectada con su contenido territorial.
@@ -125,7 +125,7 @@ export default async function StationDetailPage({
           />
           <div className="mt-6 grid gap-3">
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Eslogan
               </p>
               <p className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
@@ -133,7 +133,7 @@ export default async function StationDetailPage({
               </p>
             </SurfaceCard>
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Coordenadas
               </p>
               <p className="mt-2 text-sm text-[color:var(--foreground)]">
@@ -143,7 +143,7 @@ export default async function StationDetailPage({
               </p>
             </SurfaceCard>
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Estado editorial
               </p>
               <p className="mt-2 text-sm font-semibold text-[color:var(--foreground)]">
@@ -190,7 +190,7 @@ export default async function StationDetailPage({
           {experiences.length > 0 ? (
             experiences.map((item) => (
               <SurfaceCard key={item.slug} className="soft-shadow">
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+                <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
                   {item.tag}
                 </p>
                 <h2 className="display-font mt-3 text-3xl text-[color:var(--foreground)]">
@@ -229,7 +229,7 @@ export default async function StationDetailPage({
             {artisans.length > 0 ? (
               artisans.slice(0, 3).map((item) => (
                 <SurfaceCard key={item.slug}>
-                  <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+                  <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                     {item.place}
                   </p>
                   <h3 className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
@@ -260,7 +260,7 @@ export default async function StationDetailPage({
             {highlightSpots.length > 0 ? (
               highlightSpots.slice(0, 3).map((item) => (
                 <SurfaceCard key={item.slug}>
-                  <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+                  <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
                     {item.type}
                   </p>
                   <h3 className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">

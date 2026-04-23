@@ -2,7 +2,8 @@ type PocketBaseCollectionKey =
   | "experiences"
   | "artisans"
   | "stations"
-  | "highlightSpots";
+  | "highlightSpots"
+  | "products";
 
 type PocketBaseConfig = {
   baseUrl?: string;
@@ -55,6 +56,8 @@ export function getPocketBaseConfig(): PocketBaseConfig {
       stations: process.env.POCKETBASE_COLLECTION_STATIONS ?? "estaciones",
       highlightSpots:
         process.env.POCKETBASE_COLLECTION_HIGHLIGHT_SPOTS ?? "imperdibles",
+      products:
+        process.env.POCKETBASE_COLLECTION_PRODUCTS ?? "productos",
     },
   };
 }

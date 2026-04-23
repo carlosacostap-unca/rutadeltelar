@@ -72,7 +72,7 @@ export function StationsBrowser({
               description="El mapa y esta ficha quedan sincronizados para explorar una estacion a la vez."
             />
             <SurfaceCard className="mt-6 soft-shadow">
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
                 {selectedStation.locality}
               </p>
               <p className="display-font mt-3 text-3xl text-[color:var(--foreground)]">
@@ -92,7 +92,7 @@ export function StationsBrowser({
 
           <div className="grid gap-4">
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Actores cercanos
               </p>
               <p className="display-font mt-2 text-4xl text-[color:var(--accent)]">
@@ -100,7 +100,7 @@ export function StationsBrowser({
               </p>
             </SurfaceCard>
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Imperdibles cercanos
               </p>
               <p className="display-font mt-2 text-4xl text-[color:var(--accent)]">
@@ -119,10 +119,10 @@ export function StationsBrowser({
             <SurfaceCard
               key={station.slug}
               className={`soft-shadow ${
-                isSelected ? "border-[color:var(--accent)] bg-[rgba(157,77,46,0.06)]" : ""
+                isSelected ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.06)]" : ""
               }`}
             >
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
                 {station.locality}
               </p>
               <h2 className="display-font mt-3 text-3xl text-[color:var(--foreground)]">

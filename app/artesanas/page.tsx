@@ -15,8 +15,8 @@ export default async function ArtesanasPage() {
       <header className="mb-8">
         <SectionHeading
           eyebrow="Actores"
-          title="Actores artesanales de la ruta"
-          description="Este modulo toma la coleccion `actores` y destaca el recorte artesanal para visitantes."
+          title="Actores de la ruta"
+          description="Artesanos, tejedores, productores, hospedajes, emprendimientos gastronómicos y guías que integran la Ruta del Telar. Cada actor representa una forma de vivir el territorio."
         />
         <div className="mt-4">
           <DataSourceBadge
@@ -69,7 +69,7 @@ export default async function ArtesanasPage() {
               {item.craft}
             </p>
             <div className="mt-5 flex items-center justify-between">
-              <span className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+              <span className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
                 {item.years}
               </span>
               <Link

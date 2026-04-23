@@ -19,7 +19,7 @@ export default async function RecorridosPage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {journeys.map((journey) => (
           <SurfaceCard key={journey.slug} className="soft-shadow">
-            <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+            <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
               {journey.station.locality}
             </p>
             <h2 className="display-font mt-3 text-3xl text-[color:var(--foreground)]">

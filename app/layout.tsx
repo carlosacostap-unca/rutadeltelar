@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist } from "next/font/google";
+import { Be_Vietnam_Pro, Noto_Serif } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const beVietnamPro = Be_Vietnam_Pro({
+  weight: ["400", "500", "600"],
+  variable: "--font-be-vietnam",
   subsets: ["latin"],
 });
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const notoSerif = Noto_Serif({
+  weight: ["400", "600", "700"],
+  variable: "--font-noto-serif",
   subsets: ["latin"],
 });
 
@@ -28,7 +30,7 @@ export default function RootLayout({
     <html
       lang="es"
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${beVietnamPro.variable} ${notoSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <AppShell>{children}</AppShell>

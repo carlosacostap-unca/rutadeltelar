@@ -34,40 +34,14 @@ const navItems: NavItem[] = [
     icon: (
       <>
         <path
-          d="M5 5h6l2 4h6v10h-6l-2-4H5z"
+          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
           fill="none"
           stroke="currentColor"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="1.7"
         />
-        <circle cx="9" cy="9" r="1.3" fill="currentColor" />
-      </>
-    ),
-  },
-  {
-    href: "/explorar",
-    label: "Experiencias",
-    shortLabel: "Experiencias",
-    icon: (
-      <>
-        <rect
-          x="4"
-          y="5"
-          width="16"
-          height="15"
-          rx="2.5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.7"
-        />
-        <path
-          d="M8 3v4M16 3v4M4 9h16"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="1.7"
-        />
+        <circle cx="12" cy="9" r="2.2" fill="none" stroke="currentColor" strokeWidth="1.7" />
       </>
     ),
   },
@@ -78,18 +52,68 @@ const navItems: NavItem[] = [
     icon: (
       <>
         <circle
-          cx="12"
-          cy="8"
-          r="3.2"
+          cx="9"
+          cy="7"
+          r="2.8"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.7"
         />
         <path
-          d="M5.5 20a6.5 6.5 0 0 1 13 0"
+          d="M3 20a6 6 0 0 1 12 0"
           fill="none"
           stroke="currentColor"
           strokeLinecap="round"
+          strokeWidth="1.7"
+        />
+        <circle cx="17" cy="8" r="2" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        <path
+          d="M21 20a4 4 0 0 0-6.32-3.26"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeWidth="1.5"
+        />
+      </>
+    ),
+  },
+  {
+    href: "/productos",
+    label: "Productos",
+    shortLabel: "Productos",
+    icon: (
+      <>
+        <path
+          d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.7"
+        />
+        <path
+          d="M3 6h18M16 10a4 4 0 0 1-8 0"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeWidth="1.7"
+        />
+      </>
+    ),
+  },
+  {
+    href: "/explorar",
+    label: "Experiencias",
+    shortLabel: "Experiencias",
+    icon: (
+      <>
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.7" />
+        <path
+          d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           strokeWidth="1.7"
         />
       </>
@@ -125,8 +149,8 @@ export function MobileBottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[color:var(--border)] bg-[rgba(251,246,239,0.92)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur md:hidden">
-      <div className="mx-auto grid max-w-lg grid-cols-5 gap-2 rounded-[1.75rem] border border-[color:var(--border)] bg-[rgba(255,250,243,0.95)] p-2 soft-shadow">
+    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[color:var(--border)] bg-[rgba(252,249,245,0.85)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl md:hidden">
+      <div className="mx-auto grid max-w-lg grid-cols-6 gap-1 rounded-2xl border border-[color:var(--border)] bg-[rgba(255,255,255,0.88)] p-2 soft-shadow">
         {navItems.map((item) => {
           const active = isActive(pathname, item.href);
 
@@ -134,10 +158,10 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center rounded-2xl px-2 py-2 text-center ${
+              className={`flex flex-col items-center justify-center rounded-xl px-2 py-2 text-center transition-colors ${
                 active
-                  ? "bg-[color:var(--accent)] text-white"
-                  : "text-[color:var(--text-muted)]"
+                  ? "bg-[color:var(--accent)] text-white shadow-sm"
+                  : "text-[color:var(--text-muted)] hover:text-[color:var(--foreground)]"
               }`}
             >
               <svg
@@ -147,7 +171,7 @@ export function MobileBottomNav() {
               >
                 {item.icon}
               </svg>
-              <span className="text-[11px] font-semibold tracking-[0.06em]">
+              <span className="text-[10px] font-semibold tracking-wider">
                 {item.shortLabel}
               </span>
             </Link>

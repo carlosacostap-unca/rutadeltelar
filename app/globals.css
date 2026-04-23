@@ -1,26 +1,49 @@
 @import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
 
+/* ── Ancestral Loom — design tokens ─────────────────────────────── */
 :root {
-  --background: #f4ecdf;
-  --foreground: #2f241c;
-  --canvas: #f4ecdf;
-  --surface: #fbf6ef;
-  --surface-strong: #eadbc5;
-  --card: #fffaf3;
-  --border: rgba(74, 51, 35, 0.14);
-  --text-muted: #725a49;
-  --accent: #9d4d2e;
-  --accent-strong: #7c3419;
-  --olive: #61644a;
-  --shadow-soft: 0 20px 60px rgba(61, 36, 20, 0.12);
+  /* Surfaces */
+  --background:      #fcf9f5;
+  --canvas:          #fcf9f5;
+  --surface:         #f6f3ef;   /* surface-container-low  */
+  --surface-dim:     #dcdad6;
+  --surface-strong:  #eae8e4;   /* surface-container-high */
+  --card:            #ffffff;   /* surface-container-lowest */
+
+  /* Content */
+  --foreground:      #1c1c1a;   /* on-surface             */
+  --text-muted:      #54433d;   /* on-surface-variant     */
+
+  /* Borders */
+  --border:          rgba(217, 193, 186, 0.72);  /* outline-variant tinted  */
+  --border-strong:   #87736c;                    /* outline                 */
+
+  /* Primary — Terracotta */
+  --accent:          #8a452b;   /* primary                */
+  --accent-mid:      #a85d41;   /* primary-container      */
+  --accent-strong:   #74341b;   /* on-primary-fixed-variant */
+
+  /* Secondary — Indigo Night */
+  --secondary:       #4c6078;
+  --secondary-dim:   #35485f;
+
+  /* Tertiary — Sandy Ochre */
+  --tertiary:        #77512e;
+
+  /* Misc */
+  --surface-tint:    #914b30;
+  --error:           #ba1a1a;
+
+  /* Shadows — soft ambient glow */
+  --shadow-soft: 0 2px 24px rgba(138, 69, 43, 0.09), 0 1px 4px rgba(28, 28, 26, 0.05);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-display: var(--font-fraunces);
+  --font-sans:        var(--font-be-vietnam);
+  --font-display:     var(--font-noto-serif);
 }
 
 html {
@@ -29,10 +52,11 @@ html {
 
 body {
   background:
-    radial-gradient(circle at top, rgba(157, 77, 46, 0.12), transparent 35%),
-    linear-gradient(180deg, #f6efe6 0%, #f4ecdf 48%, #efe2d3 100%);
+    radial-gradient(ellipse at top center, rgba(145, 75, 48, 0.05) 0%, transparent 55%),
+    linear-gradient(180deg, #fcf9f5 0%, #f6f3ef 100%);
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-be-vietnam), 'Be Vietnam Pro', system-ui, sans-serif;
 }
 
 * {
@@ -40,7 +64,7 @@ body {
 }
 
 ::selection {
-  background: rgba(157, 77, 46, 0.2);
+  background: rgba(138, 69, 43, 0.18);
   color: var(--foreground);
 }
 
@@ -54,17 +78,19 @@ button {
     box-shadow 160ms ease;
 }
 
+/* Display / editorial font — Noto Serif */
 .display-font {
-  font-family: var(--font-fraunces), Georgia, serif;
+  font-family: var(--font-noto-serif), 'Noto Serif', Georgia, serif;
 }
 
 .soft-shadow {
   box-shadow: var(--shadow-soft);
 }
 
+/* ── Leaflet overrides ───────────────────────────────────────────── */
 .leaflet-container {
   font: inherit;
-  background: #efe1d0;
+  background: var(--surface-strong);
 }
 
 .leaflet-container img,
@@ -76,7 +102,7 @@ button {
 }
 
 .leaflet-container .leaflet-control-attribution {
-  background: rgba(255, 250, 243, 0.92);
+  background: rgba(255, 255, 255, 0.92);
   color: var(--text-muted);
 }
 

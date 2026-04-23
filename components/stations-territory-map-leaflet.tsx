@@ -86,7 +86,7 @@ function PopupAction({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex rounded-full border border-[rgba(74,51,35,0.14)] bg-[rgba(255,250,243,0.92)] px-3 py-1.5 text-xs font-semibold text-[#2f241c]"
+      className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-1.5 text-xs font-semibold text-[color:var(--foreground)]"
     >
       {label}
     </button>
@@ -196,7 +196,7 @@ export function StationsTerritoryMapLeaflet({
   }, [geolocatedArtisans, geolocatedHighlightSpots, geolocatedStations]);
 
   return (
-    <div className="overflow-hidden rounded-[1.75rem] border border-[color:var(--border)]">
+    <div className="overflow-hidden rounded-2xl border border-[color:var(--border)]">
       <MapContainer
         center={center}
         zoom={geolocatedStations.length <= 1 ? 10 : 8}

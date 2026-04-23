@@ -2,14 +2,17 @@ import {
   artisans as artisanMocks,
   experiences as experienceMocks,
   highlightSpots as highlightSpotMocks,
+  products as productMocks,
   getArtisanBySlug as getMockArtisanBySlug,
   getExperienceBySlug as getMockExperienceBySlug,
   getHighlightSpotBySlug as getMockHighlightSpotBySlug,
+  getProductBySlug as getMockProductBySlug,
   getStationBySlug as getMockStationBySlug,
   stations as stationMocks,
   type Artisan,
   type Experience,
   type HighlightSpot,
+  type Product,
   type Station,
 } from "@/app/lib/content";
 import {
@@ -1066,3 +1069,102 @@ export async function getSuggestedJourneyBySlug(slug: string) {
   const journeys = await getSuggestedJourneys();
   return journeys.find((journey) => journey.slug === slug) ?? null;
 }
+
+// ── Productos ────────────────────────────────────────────────────────────────
+
+function normalizeProduct(record: PocketBaseRecord): Product | null {
+  const name = readDisplayString(record, ["nombre", "name", "title"]);
+  const slug = readString(record, ["slug", "handle"], slugify(name));
+
+  if (!slug || !name) {
+    return null;
+  }
+
+  return {
+    recordId: record.id,
+    slug,
+    name,
+    description: stripHtml(
+      readString(record, ["descripcion", "description"], "Producto disponible en la Ruta del Telar."),
+    ),
+    category: readDisplayString(record, ["expand.categoria.nombre", "categoria"], "Artesanía"),
+    subcategory: readDisplayString(record, ["expand.subcategoria.nombre", "subcategoria"], "") || undefined,
+    techniques: uniqueStrings([
+      ...readDisplayStringArray(record, ["tecnicas"]),
+      readDisplayString(record, ["expand.categoria.nombre"], ""),
+    ]).filter(Boolean),
+    imageUrl: getPrimaryImageUrl(record, ["fotos"]),
+    stationName: readDisplayString(record, ["expand.estacion_id.nombre", "expand.estaciones_relacionadas.0.nombre"], ""),
+    stationRecordId: readString(record, ["estacion_id"], ""),
+    stationSlug: readString(
+      record,
+      ["expand.estacion_id.slug"],
+      slugify(readString(record, ["expand.estacion_id.localidad", "expand.estacion_id.nombre"], "")),
+    ),
+    relatedActorRecordIds: readIdArray(record, ["actores_relacionados"]),
+  };
+}
+
+export async function getProductsResult(): Promise<DataResult<Product>> {
+  try {
+    const response = await getPocketBaseList("products", {
+      filter: 'estado = "aprobado"',
+      expand: "categoria,subcategoria,estacion_id,actores_relacionados",
+      perPage: 100,
+      sort: "nombre",
+    });
+
+    if (!response) {
+      return createMockResult(productMocks, "PocketBase no esta configurado para productos");
+    }
+
+    const items = response.items
+      .map(normalizeProduct)
+      .filter((item): item is Product => item !== null);
+
+    if (items.length === 0) {
+      return createMockResult(productMocks, "No se pudieron mapear productos reales");
+    }
+
+    return { items, source: "pocketbase" };
+  } catch (error) {
+    return createMockResult(productMocks, getErrorMessage(error));
+  }
+}
+
+export async function getProducts() {
+  const result = await getProductsResult();
+  return result.items;
+}
+
+export async function getProductBySlug(slug: string) {
+  const items = await getProducts();
+  return items.find((p) => p.slug === slug) ?? getMockProductBySlug(slug);
+}
+
+export async function getProductContextBySlug(slug: string) {
+  const [product, stations, artisans] = await Promise.all([
+    getProductBySlug(slug),
+    getStations(),
+    getArtisans(),
+  ]);
+
+  if (!product) return null;
+
+  const relatedStation =
+    stations.find(
+      (s) =>
+        sameRecordId(s.recordId, product.stationRecordId) ||
+        (product.stationSlug ? s.slug === product.stationSlug : false),
+    ) ?? null;
+
+  const relatedActors = artisans.filter((a) =>
+    (a.recordId && product.relatedActorRecordIds?.includes(a.recordId)) ||
+    (relatedStation
+      ? sameRecordId(a.stationRecordId, relatedStation.recordId)
+      : false),
+  );
+
+  return { product, relatedStation, relatedActors };
+}
+

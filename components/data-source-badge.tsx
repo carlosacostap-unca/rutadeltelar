@@ -17,11 +17,11 @@ export function DataSourceBadge({
     <div
       className={`inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border px-3 py-2 text-xs ${
         isPocketBase
-          ? "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--olive)]"
-          : "border-[rgba(157,77,46,0.2)] bg-[rgba(157,77,46,0.08)] text-[color:var(--accent-strong)]"
+          ? "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--secondary)]"
+          : "border-[rgba(138,69,43,0.2)] bg-[rgba(138,69,43,0.07)] text-[color:var(--accent-strong)]"
       }`}
     >
-      <span className="font-semibold uppercase tracking-[0.16em]">
+      <span className="font-semibold uppercase tracking-wider">
         {isPocketBase ? "Datos conectados" : "Fallback local"}
       </span>
       {error ? <span className="truncate">({error})</span> : null}

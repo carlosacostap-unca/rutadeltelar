@@ -1,155 +1,258 @@
+import Image from "next/image";
 import Link from "next/link";
-import {
-  highlights,
-  quickActions,
-} from "@/app/lib/content";
 import {
   getArtisansResult,
   getExperiencesResult,
   getHighlightSpotsResult,
-  getSuggestedJourneys,
+  getProductsResult,
   getStationsResult,
 } from "@/app/lib/data";
-import { DataSourceBadge } from "@/components/data-source-badge";
-import { HomeTerritorySection } from "@/components/home-territory-section";
-import { SectionHeading } from "@/components/section-heading";
+import { HomeCarousel } from "@/components/home-carousel";
 import { SurfaceCard } from "@/components/surface-card";
 
 export default async function Home() {
   const [
-    experiencesResult,
-    artisansResult,
     stationsResult,
+    artisansResult,
+    productsResult,
+    experiencesResult,
     highlightSpotsResult,
-    suggestedJourneys,
   ] = await Promise.all([
-    getExperiencesResult(),
-    getArtisansResult(),
     getStationsResult(),
+    getArtisansResult(),
+    getProductsResult(),
+    getExperiencesResult(),
     getHighlightSpotsResult(),
-    getSuggestedJourneys(),
   ]);
-  const experiences = experiencesResult.items;
-  const artisans = artisansResult.items;
+
   const stations = stationsResult.items;
+  const artisans = artisansResult.items;
+  const products = productsResult.items;
+  const experiences = experiencesResult.items;
   const highlightSpots = highlightSpotsResult.items;
-  const featuredExperience = experiences[0];
-  const featuredJourney = suggestedJourneys[0];
 
   return (
     <main className="flex flex-1 flex-col">
-      <header className="mb-8 flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs uppercase tracking-[0.26em] text-[color:var(--text-muted)]">
-            Ruta del Telar
-          </p>
-          <h1 className="display-font mt-2 text-4xl text-[color:var(--foreground)] sm:text-5xl">
-            Inicio
+      {/* Hero — sin botones */}
+      <section className="mb-14">
+        <div className="overflow-hidden rounded-3xl bg-[linear-gradient(160deg,#a85d41_0%,#8a452b_100%)] px-6 py-8 sm:px-10 sm:py-12">
+          <h1 className="display-font text-5xl leading-tight text-white sm:text-6xl">
+            La Ruta
+            <br />
+            del Telar
           </h1>
-        </div>
-        <div className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm text-[color:var(--text-muted)]">
-          Modo visitante
-        </div>
-      </header>
-
-      <div className="mb-6 flex flex-wrap gap-3">
-        <DataSourceBadge
-          source={experiencesResult.source}
-          error={experiencesResult.error}
-        />
-        <DataSourceBadge
-          source={artisansResult.source}
-          error={artisansResult.error}
-        />
-        <DataSourceBadge
-          source={stationsResult.source}
-          error={stationsResult.error}
-        />
-        <DataSourceBadge
-          source={highlightSpotsResult.source}
-          error={highlightSpotsResult.error}
-        />
-      </div>
-
-      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <SurfaceCard className="soft-shadow overflow-hidden bg-[linear-gradient(180deg,#a35331_0%,#7b371d_100%)] text-white">
-          <p className="text-xs uppercase tracking-[0.24em] text-white/70">
-            Experiencia recomendada
+          <p className="mt-5 max-w-lg text-sm leading-7 text-white/80">
+            Un itinerario cultural que une comunidades tejedoras de Catamarca. Cada estación guarda sus artesanos, sus técnicas y sus formas de recibir al visitante — un tejido que une paisaje, memoria
+            y comunidad.
           </p>
-          <h2 className="display-font mt-3 max-w-lg text-4xl leading-tight sm:text-5xl">
-            Entre telares, paisaje y memoria viva.
-          </h2>
-          <p className="mt-4 max-w-lg text-sm leading-7 text-white/80">
-            Una portada pensada desde la estructura real del backend: estaciones,
-            experiencias, imperdibles y actores para que la visita se entienda
-            como recorrido territorial.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href={
-                featuredJourney
-                  ? `/recorridos/${featuredJourney.slug}`
-                  : featuredExperience
-                    ? `/explorar/${featuredExperience.slug}`
-                    : "/explorar"
-              }
-              className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-[color:var(--accent-strong)] hover:-translate-y-0.5"
-            >
-              Abrir recorrido sugerido
-            </Link>
-            <Link
-              href="/estaciones"
-              className="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:-translate-y-0.5"
-            >
-              Ver estaciones
-            </Link>
-          </div>
-        </SurfaceCard>
+        </div>
+      </section>
 
-        <div className="grid grid-cols-2 gap-3">
-          {highlights.map((item) => (
-            <SurfaceCard key={item.label} className="soft-shadow p-4">
-              <p className="display-font text-3xl text-[color:var(--accent)]">
-                {item.value}
+      {/* Carrusel: Estaciones */}
+      <HomeCarousel eyebrow="Territorio" title="Estaciones" href="/estaciones" verTodosLabel="Ver todas">
+        {stations.map((station) => (
+          <Link
+            key={station.slug}
+            href={`/estaciones/${station.slug}`}
+            className="group w-[260px] shrink-0 [scroll-snap-align:start]"
+          >
+            <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
+              {station.imageUrl ? (
+                <div className="relative mb-4 aspect-[3/2] overflow-hidden rounded-xl">
+                  <Image
+                    src={station.imageUrl}
+                    alt={station.name}
+                    fill
+                    className="object-cover transition group-hover:scale-[1.03]"
+                    sizes="260px"
+                  />
+                </div>
+              ) : (
+                <div className="mb-4 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-4xl">
+                  🗺️
+                </div>
+              )}
+              <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+                {station.locality}
               </p>
-              <p className="mt-1 text-sm text-[color:var(--text-muted)]">
-                {item.label}
+              <h3 className="mt-1 text-base font-semibold leading-snug text-[color:var(--foreground)]">
+                {station.name}
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-[color:var(--text-muted)] line-clamp-2">
+                {station.slogan}
               </p>
             </SurfaceCard>
-          ))}
-        </div>
-      </section>
+          </Link>
+        ))}
+      </HomeCarousel>
 
-      <section className="mt-14">
-        <SectionHeading
-          eyebrow="Accesos rapidos"
-          title="Atajos pensados para uso real"
-          description="Cada bloque ya funciona como punto de entrada a un modulo del producto."
-        />
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {quickActions.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <SurfaceCard className="h-full">
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
-                  Ir ahora
-                </p>
-                <h3 className="mt-3 text-lg font-semibold text-[color:var(--foreground)]">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
-                  {item.description}
-                </p>
-              </SurfaceCard>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Carrusel: Actores */}
+      <HomeCarousel eyebrow="Comunidad" title="Actores" href="/artesanas">
+        {artisans.map((actor) => (
+          <Link
+            key={actor.slug}
+            href={`/artesanas/${actor.slug}`}
+            className="group w-[220px] shrink-0 [scroll-snap-align:start]"
+          >
+            <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
+              {actor.imageUrl ? (
+                <div className="relative mb-4 h-16 w-16 overflow-hidden rounded-full border border-[color:var(--border)]">
+                  <Image
+                    src={actor.imageUrl}
+                    alt={actor.name}
+                    fill
+                    className="object-cover"
+                    sizes="64px"
+                  />
+                </div>
+              ) : (
+                <div className="display-font mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[color:var(--surface)] text-2xl text-[color:var(--accent-strong)]">
+                  {actor.name.slice(0, 1)}
+                </div>
+              )}
+              <h3 className="text-base font-semibold text-[color:var(--foreground)]">
+                {actor.name}
+              </h3>
+              <p className="mt-0.5 text-xs font-medium text-[color:var(--accent-mid)]">
+                {actor.craft}
+              </p>
+              <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+                {actor.place}
+              </p>
+            </SurfaceCard>
+          </Link>
+        ))}
+      </HomeCarousel>
 
-      <HomeTerritorySection
-        stations={stations}
-        artisans={artisans}
-        highlightSpots={highlightSpots}
-      />
+      {/* Carrusel: Productos */}
+      <HomeCarousel eyebrow="Artesanía" title="Productos" href="/productos">
+        {products.map((product) => (
+          <Link
+            key={product.slug}
+            href={`/productos/${product.slug}`}
+            className="group w-[240px] shrink-0 [scroll-snap-align:start]"
+          >
+            <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
+              {product.imageUrl ? (
+                <div className="relative mb-4 aspect-[4/3] overflow-hidden rounded-xl">
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition group-hover:scale-[1.03]"
+                    sizes="240px"
+                  />
+                </div>
+              ) : (
+                <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-xl bg-[color:var(--surface)] text-4xl">
+                  🧵
+                </div>
+              )}
+              <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+                {product.subcategory ?? product.category}
+              </p>
+              <h3 className="mt-1 text-base font-semibold leading-snug text-[color:var(--foreground)]">
+                {product.name}
+              </h3>
+              {product.techniques.length > 0 && (
+                <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+                  {product.techniques.slice(0, 2).join(" · ")}
+                </p>
+              )}
+            </SurfaceCard>
+          </Link>
+        ))}
+      </HomeCarousel>
+
+      {/* Carrusel: Experiencias */}
+      <HomeCarousel
+        eyebrow="Vivencias"
+        title="Experiencias"
+        href="/explorar"
+        verTodosLabel="Ver todas"
+      >
+        {experiences.map((exp) => (
+          <Link
+            key={exp.slug}
+            href={`/explorar/${exp.slug}`}
+            className="group w-[260px] shrink-0 [scroll-snap-align:start]"
+          >
+            <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
+              {exp.imageUrl ? (
+                <div className="relative mb-4 aspect-[3/2] overflow-hidden rounded-xl">
+                  <Image
+                    src={exp.imageUrl}
+                    alt={exp.title}
+                    fill
+                    className="object-cover transition group-hover:scale-[1.03]"
+                    sizes="260px"
+                  />
+                </div>
+              ) : (
+                <div className="mb-4 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-4xl">
+                  🧭
+                </div>
+              )}
+              <div className="mb-3 flex flex-wrap gap-2">
+                <span className="rounded-full bg-[color:var(--surface)] px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+                  {exp.tag}
+                </span>
+                <span className="rounded-full bg-[color:var(--surface)] px-3 py-1 text-[10px] text-[color:var(--text-muted)]">
+                  {exp.duration}
+                </span>
+              </div>
+              <h3 className="text-base font-semibold text-[color:var(--foreground)]">
+                {exp.title}
+              </h3>
+              <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+                {exp.location}
+              </p>
+            </SurfaceCard>
+          </Link>
+        ))}
+      </HomeCarousel>
+
+      {/* Carrusel: Imperdibles */}
+      <HomeCarousel
+        eyebrow="Destacados"
+        title="Imperdibles"
+        href="/imperdibles"
+      >
+        {highlightSpots.map((spot) => (
+          <Link
+            key={spot.slug}
+            href={`/imperdibles/${spot.slug}`}
+            className="group w-[260px] shrink-0 [scroll-snap-align:start]"
+          >
+            <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
+              {spot.imageUrl ? (
+                <div className="relative mb-4 aspect-[3/2] overflow-hidden rounded-xl">
+                  <Image
+                    src={spot.imageUrl}
+                    alt={spot.title}
+                    fill
+                    className="object-cover transition group-hover:scale-[1.03]"
+                    sizes="260px"
+                  />
+                </div>
+              ) : (
+                <div className="mb-4 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-4xl">
+                  ⭐
+                </div>
+              )}
+              <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+                {spot.type}
+              </p>
+              <h3 className="mt-1 text-base font-semibold leading-snug text-[color:var(--foreground)]">
+                {spot.title}
+              </h3>
+              <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+                {spot.location}
+              </p>
+            </SurfaceCard>
+          </Link>
+        ))}
+      </HomeCarousel>
     </main>
   );
 }

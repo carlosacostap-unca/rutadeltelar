@@ -45,21 +45,21 @@ export default async function HighlightSpotDetailPage({
         </Link>
       </div>
 
-      <section className="rounded-[2rem] bg-[linear-gradient(180deg,#a35331_0%,#7b371d_100%)] p-6 text-white sm:p-8">
+      <section className="rounded-3xl bg-[linear-gradient(160deg,#a85d41_0%,#8a452b_100%)] p-6 text-white sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.18em]">
+              <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs uppercase tracking-wider">
                 {spot.type}
               </span>
-              <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.18em]">
+              <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs uppercase tracking-wider">
                 Prioridad {spot.priority}
               </span>
             </div>
             <h1 className="display-font mt-4 text-4xl leading-tight sm:text-5xl">
               {spot.title}
             </h1>
-            <p className="mt-3 text-sm font-semibold uppercase tracking-[0.22em] text-white/70">
+            <p className="mt-3 text-sm font-semibold uppercase tracking-wider text-white/70">
               {spot.location}
             </p>
             <p className="mt-5 max-w-2xl text-sm leading-7 text-white/80">
@@ -68,7 +68,7 @@ export default async function HighlightSpotDetailPage({
           </div>
 
           {spot.imageUrl ? (
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-white/10">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10">
               <Image
                 src={spot.imageUrl}
                 alt={spot.title}
@@ -78,7 +78,7 @@ export default async function HighlightSpotDetailPage({
               />
             </div>
           ) : (
-            <div className="rounded-[1.75rem] border border-white/10 bg-white/8 p-6">
+            <div className="rounded-2xl border border-white/10 bg-white/8 p-6">
               <p className="text-sm leading-7 text-white/70">
                 Este imperdible no tiene imagen cargada, pero puede heredar una
                 visual del territorio cuando exista en su estacion.
@@ -110,7 +110,7 @@ export default async function HighlightSpotDetailPage({
           />
           <div className="mt-6 grid gap-3">
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Estacion relacionada
               </p>
               <p className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
@@ -126,7 +126,7 @@ export default async function HighlightSpotDetailPage({
               ) : null}
             </SurfaceCard>
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Actores cercanos
               </p>
               <p className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
@@ -134,7 +134,7 @@ export default async function HighlightSpotDetailPage({
               </p>
             </SurfaceCard>
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Experiencias cercanas
               </p>
               <p className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
@@ -170,7 +170,7 @@ export default async function HighlightSpotDetailPage({
             {relatedExperiences.length > 0 ? (
               relatedExperiences.slice(0, 3).map((item) => (
                 <SurfaceCard key={item.slug}>
-                  <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+                  <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
                     {item.location}
                   </p>
                   <h3 className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">
@@ -207,7 +207,7 @@ export default async function HighlightSpotDetailPage({
             {relatedArtisans.length > 0 ? (
               relatedArtisans.slice(0, 3).map((item) => (
                 <SurfaceCard key={item.slug}>
-                  <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+                  <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                     {item.place}
                   </p>
                   <h3 className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">

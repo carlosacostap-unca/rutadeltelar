@@ -79,7 +79,7 @@ export function HomeTerritorySection({
           <div className="mt-6 grid gap-4">
             {selectedStation ? (
               <SurfaceCard>
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent)]">
                   {selectedStation.locality}
                 </p>
                 <h3 className="mt-3 text-lg font-semibold text-[color:var(--foreground)]">
@@ -121,7 +121,7 @@ export function HomeTerritorySection({
           <div className="mt-6 grid gap-4">
             {selectedHighlightSpots.slice(0, 2).map((item) => (
               <SurfaceCard key={item.slug}>
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+                <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                   {item.location}
                 </p>
                 <h3 className="display-font mt-2 text-3xl text-[color:var(--foreground)]">
@@ -161,7 +161,7 @@ export function HomeTerritorySection({
         <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_1fr]">
           {selectedArtisans.slice(0, 2).map((item) => (
             <SurfaceCard key={item.slug}>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 {item.place}
               </p>
               <h3 className="display-font mt-2 text-3xl text-[color:var(--foreground)]">
@@ -178,7 +178,7 @@ export function HomeTerritorySection({
               </Link>
             </SurfaceCard>
           ))}
-          <div className="rounded-[1.75rem] border border-[color:var(--border)] bg-[color:var(--card)] p-5">
+          <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-5">
             <p className="text-sm leading-7 text-[color:var(--text-muted)]">
               Selecciona otra estacion en el mapa para actualizar estos actores y
               los imperdibles sugeridos sin salir de la home.

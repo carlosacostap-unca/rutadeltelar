@@ -8,7 +8,7 @@ type SurfaceCardProps = {
 export function SurfaceCard({ children, className = "" }: SurfaceCardProps) {
   return (
     <article
-      className={`rounded-[1.75rem] border border-[color:var(--border)] bg-[color:var(--card)] p-5 ${className}`.trim()}
+      className={`rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-5 ${className}`.trim()}
     >
       {children}
     </article>

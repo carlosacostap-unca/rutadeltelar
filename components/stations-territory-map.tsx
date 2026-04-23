@@ -36,7 +36,7 @@ const StationsTerritoryMapLeaflet = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[420px] items-center justify-center rounded-[1.75rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,#f5ecdf_0%,#efe1d0_100%)] text-sm text-[color:var(--text-muted)]">
+      <div className="flex h-[420px] items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[linear-gradient(180deg,var(--surface)_0%,var(--surface-strong)_100%)] text-sm text-[color:var(--text-muted)]">
         Cargando mapa...
       </div>
     ),
@@ -103,7 +103,7 @@ export function StationsTerritoryMap({
       key: "artisans" as const,
       label: "Actores",
       count: counts.artisans,
-      colorClass: "bg-[color:var(--olive)]",
+      colorClass: "bg-[color:var(--secondary)]",
       helper: "Perfiles geolocalizados",
     },
     {
@@ -116,10 +116,10 @@ export function StationsTerritoryMap({
   ];
 
   return (
-    <div className="rounded-[2rem] border border-[color:var(--border)] bg-[color:var(--card)] p-4 soft-shadow sm:p-6">
+    <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-4 soft-shadow sm:p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
             Mapa territorial
           </p>
           <p className="display-font mt-2 text-3xl text-[color:var(--foreground)]">
@@ -137,7 +137,7 @@ export function StationsTerritoryMap({
               onClick={() => setFocusMode("all")}
               className={`rounded-full border px-4 py-2 text-sm ${
                 focusMode === "all"
-                  ? "border-[color:var(--accent)] bg-[rgba(157,77,46,0.08)] text-[color:var(--foreground)]"
+                  ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)] text-[color:var(--foreground)]"
                   : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
               }`}
             >
@@ -149,7 +149,7 @@ export function StationsTerritoryMap({
               onClick={() => setFocusMode("active")}
               className={`rounded-full border px-4 py-2 text-sm ${
                 focusMode === "active"
-                  ? "border-[color:var(--accent)] bg-[rgba(157,77,46,0.08)] text-[color:var(--foreground)]"
+                  ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)] text-[color:var(--foreground)]"
                   : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
               }`}
             >
@@ -173,7 +173,7 @@ export function StationsTerritoryMap({
               }
               className={`rounded-full border px-4 py-2 text-sm ${
                 active
-                  ? "border-[color:var(--accent)] bg-[rgba(157,77,46,0.08)] text-[color:var(--foreground)]"
+                  ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)] text-[color:var(--foreground)]"
                   : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
               }`}
             >
@@ -183,7 +183,7 @@ export function StationsTerritoryMap({
         })}
       </div>
 
-      <div className="mb-4 grid gap-3 rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 md:grid-cols-3">
+      <div className="mb-4 grid gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 md:grid-cols-3">
         {layerItems.map((item) => (
           <div key={`legend-${item.key}`} className="flex items-start gap-3">
             <span
@@ -221,9 +221,9 @@ export function StationsTerritoryMap({
             <Link
               key={station.slug}
               href={`/estaciones/${station.slug}`}
-              className={`rounded-[1.25rem] border px-4 py-3 text-sm ${
+              className={`rounded-xl border px-4 py-3 text-sm ${
                 isActive
-                  ? "border-[color:var(--accent)] bg-[rgba(157,77,46,0.08)]"
+                  ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)]"
                   : "border-[color:var(--border)] bg-[color:var(--surface)]"
               }`}
             >

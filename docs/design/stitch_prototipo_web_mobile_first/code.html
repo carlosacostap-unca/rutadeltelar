@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Station Detail - Belén</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Noto+Serif:ital,wght@0,400..700;1,400..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "secondary-container": "#cde1fe",
+                      "on-surface-variant": "#54433d",
+                      "primary": "#8a452b",
+                      "primary-fixed-dim": "#ffb59b",
+                      "on-surface": "#1c1c1a",
+                      "error-container": "#ffdad6",
+                      "tertiary": "#77512e",
+                      "inverse-primary": "#ffb59b",
+                      "surface-container-high": "#eae8e4",
+                      "on-primary-fixed-variant": "#74341b",
+                      "on-background": "#1c1c1a",
+                      "background": "#fcf9f5",
+                      "primary-fixed": "#ffdbcf",
+                      "on-error": "#ffffff",
+                      "surface-container-low": "#f6f3ef",
+                      "on-primary": "#ffffff",
+                      "surface-tint": "#914b30",
+                      "inverse-on-surface": "#f3f0ec",
+                      "surface-container": "#f0ede9",
+                      "surface-dim": "#dcdad6",
+                      "outline": "#87736c",
+                      "surface-container-highest": "#e5e2de",
+                      "tertiary-fixed-dim": "#f0bc91",
+                      "on-tertiary-fixed-variant": "#623f1e",
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed": "#d1e4ff",
+                      "on-secondary-fixed-variant": "#35485f",
+                      "tertiary-container": "#926944",
+                      "on-error-container": "#93000a",
+                      "secondary": "#4c6078",
+                      "surface": "#fcf9f5",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed": "#ffdcc1",
+                      "on-tertiary-fixed": "#2e1600",
+                      "surface-variant": "#e5e2de",
+                      "surface-bright": "#fcf9f5",
+                      "on-secondary-fixed": "#061d32",
+                      "on-secondary-container": "#51647d",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-container": "#fff6f1",
+                      "inverse-surface": "#31302e",
+                      "secondary-fixed-dim": "#b4c8e4",
+                      "on-primary-container": "#fff5f2",
+                      "primary-container": "#a85d41",
+                      "outline-variant": "#d9c1ba",
+                      "on-primary-fixed": "#380d00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-md": "24px",
+                      "stack-lg": "48px",
+                      "unit": "4px",
+                      "stack-sm": "8px",
+                      "gutter": "16px",
+                      "margin-mobile": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "notoSerif"
+                      ],
+                      "body-lg": [
+                              "beVietnamPro"
+                      ],
+                      "body-md": [
+                              "beVietnamPro"
+                      ],
+                      "headline-md": [
+                              "notoSerif"
+                      ],
+                      "headline-xl": [
+                              "notoSerif"
+                      ],
+                      "label-sm": [
+                              "beVietnamPro"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-xl": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:hidden">
+<!-- TopAppBar -->
+<header class="bg-stone-50/90 dark:bg-stone-950/90 backdrop-blur-md text-orange-800 dark:text-orange-200 font-serif text-stone-900 dark:text-stone-50 uppercase tracking-widest fixed full-width top-0 z-50 border-b border-stone-200/30 dark:border-stone-800/30 flex justify-between items-center w-full px-6 py-4">
+<button class="scale-95 active:scale-90 transition-transform flex items-center justify-center">
+<span class="material-symbols-outlined hover:text-orange-700 transition-colors duration-300">menu</span>
+</button>
+<h1 class="text-xl font-serif italic text-orange-900 dark:text-orange-100 font-bold">Ruta del Telar</h1>
+<button class="scale-95 active:scale-90 transition-transform flex items-center justify-center">
+<span class="material-symbols-outlined hover:text-orange-700 transition-colors duration-300">map</span>
+</button>
+</header>
+<main class="flex-1 pt-[72px] pb-[100px] flex flex-col">
+<!-- Hero Image -->
+<section class="relative w-full aspect-[4/5] overflow-hidden rounded-b-3xl shadow-[0_8px_30px_rgba(138,69,43,0.1)]">
+<img class="w-full h-full object-cover" data-alt="Panoramic view of Belen town nestled in a dry, mountainous valley under a clear blue sky, warm sunlight hitting the terracotta roofs and dusty streets" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEKGAA_UTBKXUtcP6oi7yDWrGWZcUgeTft3I_x6YUSBUk6vEUQjOoVpUS-w0rStqSEvOjDdMKCnO6Z1tiH29TeU9j2_QowYHBIlp49DV-_XPKvkKiBTbVLFocZOx0x216jxy5_sxed6PGb9jCsUqSCj9hreZeGTy23Jy84upjcLGaj4VrOWC8rw-9h_OsxAi3ML3v_yOc5RWUqz26EyZCdmzFGG1af2KoZJnwHWjuD_jPxira_83_FGCqi1k3F03aGIbJFVGdO6JU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#1c1c1a]/80 via-[#1c1c1a]/20 to-transparent flex flex-col justify-end p-margin-mobile">
+<span class="font-label-sm text-primary-fixed uppercase mb-2 opacity-90 tracking-widest">Estación Principal</span>
+<h2 class="font-headline-xl text-on-primary mb-1">Belén</h2>
+<p class="font-body-md text-surface-variant max-w-sm">La cuna del poncho y corazón vivo del tejido artesanal en Catamarca.</p>
+</div>
+</section>
+<!-- Sobre la Estación -->
+<section class="px-margin-mobile py-stack-lg">
+<h3 class="font-headline-md text-on-surface mb-stack-sm">Sobre la Estación</h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed">
+                Rodeada de áridos cerros y un cielo inmensamente azul, Belén custodia los secretos más antiguos del telar criollo. Aquí, el tiempo parece medirse por el rítmico golpe del peine sobre la urdimbre, transformando las finas fibras de vicuña y oveja en obras de arte que abrigan generaciones.
+            </p>
+</section>
+<!-- Artesanos Locales (Horizontal Scroll) -->
+<section class="py-stack-md pl-margin-mobile overflow-hidden">
+<h3 class="font-headline-md text-on-surface mb-stack-sm pr-margin-mobile">Artesanos Locales</h3>
+<div class="flex overflow-x-auto gap-gutter pb-6 pr-margin-mobile snap-x hide-scrollbar" style="scrollbar-width: none;">
+<!-- Artisan 1 -->
+<div class="min-w-[180px] bg-surface-container-low rounded-2xl p-5 shadow-[0_4px_20px_rgba(138,69,43,0.05)] snap-center flex flex-col items-center border border-surface-variant/50">
+<img class="w-24 h-24 rounded-full object-cover mb-4 border-2 border-surface-container-highest" data-alt="Portrait of an indigenous older woman with warm smile, sun-kissed skin, wearing a simple textured shawl, soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuwyZmOF8w_rWnNx5GlgXnzjBiYheIqRX2g64QOFbuoA2nc3aagneHw1eF72RrvO8N9uPQvqAnav98gXe2RcR8OPkTjNtig408AJnrOhEJRSCG1l4wP5DQ-HepJso4uNkHi9Y1eKfKQZYdt20YSJhNqVdeecWnT6QqhEV9ZHEbrevqL3VY3_IJw-cKvC7RJFi_az35PsVmfLJJVraErcVXs17buqAt2xeqG2iuj5ZT971uxWt2shxFAd96gnzFmfAAdgsvhcof3wU"/>
+<span class="font-label-sm text-primary uppercase mb-1 tracking-widest text-center w-full">Maestra</span>
+<h4 class="font-headline-md text-on-surface text-center text-lg">Doña Ramona</h4>
+</div>
+<!-- Artisan 2 -->
+<div class="min-w-[180px] bg-surface-container-low rounded-2xl p-5 shadow-[0_4px_20px_rgba(138,69,43,0.05)] snap-center flex flex-col items-center border border-surface-variant/50">
+<img class="w-24 h-24 rounded-full object-cover mb-4 border-2 border-surface-container-highest" data-alt="Portrait of a male artisan with weathered hands, focused expression, standing in front of a rustic wooden loom" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBaiFYlXMT7Nv4eVOEqXyvmi-kVE-uAhfgngD-Fnc6T_Rm142URNbPNUDE3t82UvBXguIieBEid-wElyWjevszKzzWixGMeT3EzJDkNj92ijp9WHCW8fucjAh3sX7xqmsF3pBPin5Nw-7UWIdeMj4Pa-wKHaj4gqUSaS0AcUCi3XZlovoGqkt1SisPZ2rVOZ2_TzV_up5DP0dT20DfS6WSlnctoMms74H40IEpyzHSTdo4qFq0F5GzKD8b0JC_5YZe244osrLbJDg"/>
+<span class="font-label-sm text-primary uppercase mb-1 tracking-widest text-center w-full">Tintorero</span>
+<h4 class="font-headline-md text-on-surface text-center text-lg">Don Eusebio</h4>
+</div>
+<!-- Artisan 3 -->
+<div class="min-w-[180px] bg-surface-container-low rounded-2xl p-5 shadow-[0_4px_20px_rgba(138,69,43,0.05)] snap-center flex flex-col items-center border border-surface-variant/50">
+<div class="w-24 h-24 rounded-full bg-surface-container-highest flex items-center justify-center mb-4 text-on-surface-variant">
+<span class="material-symbols-outlined text-4xl">groups</span>
+</div>
+<span class="font-label-sm text-primary uppercase mb-1 tracking-widest text-center w-full">Cooperativa</span>
+<h4 class="font-headline-md text-on-surface text-center text-lg">Arañitas Hilanderas</h4>
+</div>
+</div>
+</section>
+<!-- Productos Típicos (Bento Grid) -->
+<section class="px-margin-mobile py-stack-md">
+<h3 class="font-headline-md text-on-surface mb-stack-sm">Productos Típicos</h3>
+<div class="grid grid-cols-2 gap-unit">
+<div class="col-span-2 relative aspect-[2/1] rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Close up texture of a tightly woven poncho with intricate geometric patterns in terracotta, cream, and deep brown earthy tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkgVOENSP05fLJjBFl3mLDmhlnD7FMqslJUMCRS7J1YmyswDKN8eSodWfS5hzFSJnqxLr6yVBrDBxMcPFUomTyN0FSk2ahfEb1-c2NzW_LPmJ5OWByI_l31vpR8M69Chho-OAcfGN02QPK78UxzbyL15PDr8hUcpfr8Jk6HZ3jQxkRZZMxDg46cFvXpV9ZhFJTlBkipu35UFKq0Eihxl8LN1aDkM9SHcug-9HdPIHaTVkWRkagicq3UdokHRKnj8ITDsNOjkp_gGc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#1c1c1a]/70 to-transparent flex items-end p-4">
+<span class="font-headline-md text-on-primary">Ponchos de Vicuña</span>
+</div>
+</div>
+<div class="relative aspect-square rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Stacks of thick, handwoven wool blankets folded neatly, showing vibrant natural dyes in ochre and indigo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG7Z24DUUdP5cbmMlrFaA8ugogpBPdlxOJk0QKl0nlaqiJfGyu0GdGmfodk97JOdJ_9u-agILNQCxNz8LFfqPZ7B_Cj6bqTimL3NlgxEYwrj2dDJw5d7-5QFlSjnYOTh1RkZ9YqJ6DT9EGBX_2WGcZ3ldDAEbPlwoVzG5QpfhkP0o--7LkH1kcg5lyqGOlJo2-mJSvZoI8o4M2Ohvi29WHhtx2CA6_I0niYxzzKMcG4LFj3abaeAmOtbRX0wytrPW1EKkhc8TIJy0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#1c1c1a]/70 to-transparent flex items-end p-4">
+<span class="font-body-lg text-on-primary font-medium">Mantas</span>
+</div>
+</div>
+<div class="relative aspect-square rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Skeins of natural wool yarn hanging, bathed in warm sunlight, showing variations of un-dyed cream and beige" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAM6u0EM2kW--20f2wT82T--Om73wqxbt7ddOF2b6tXTgFrSU0zZevxuK_I6CrQjNH7Npn4Y-I2CWuaMv-lfCAne2lzzNRihSXEHInaeGoN0RsgFInmTCGbtzVA7QUEqP-npFJwy1u2MdS9wsuG7mPb2yA0NP8oUWctKxUv5khY55pKGaAgYPAR9SShpZmbNo5dn-8FKz3DviiX-9c78f_4w13TareVpUR32PWZBngILRAehptOj9f8-ivqVDKW2G4YgeW7Pg0sJwI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#1c1c1a]/70 to-transparent flex items-end p-4">
+<span class="font-body-lg text-on-primary font-medium">Hilados</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Mapa de la Estación -->
+<section class="px-margin-mobile py-stack-lg">
+<div class="flex justify-between items-end mb-stack-sm">
+<h3 class="font-headline-md text-on-surface">Mapa de la Estación</h3>
+<span class="font-label-sm text-primary uppercase tracking-widest cursor-pointer">Ver completo</span>
+</div>
+<div class="bg-surface-container-low rounded-[2rem] p-3 shadow-[0_8px_30px_rgba(138,69,43,0.06)] border border-surface-variant/30">
+<div class="relative w-full aspect-[4/3] rounded-[1.5rem] overflow-hidden">
+<img class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="Stylized overhead view of a small town grid nestled in a dry valley, warm sepia tones suggesting a vintage map aesthetic" data-location="Belén, Catamarca" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfA9A10JBdecQovvPKEDnNFeCc8kG3yBTdYY_NCW9cj-Jhqd6Si9-GnATwRcayZA8WOdJT8LVa2lbQVLoDZK4y8hgmBjqn7rl53w9703KDKslJPdn4mo9x0TFcKw6My0xuJcV-VRth-nfMBrSYXbGeZvAoANSkUcAixJqxxcgfDyHC7oZlp5_OyM57tOQTXA0KqFTl08Jq3PfFuIuios5DxPH49bL9EP0Khstqm3at8P3YS8WtCv9lQ1B7fsvE-eNDF9w5xEvJqBI"/>
+<!-- Decorative POI Markers -->
+<div class="absolute top-[30%] left-[40%] flex flex-col items-center animate-pulse">
+<div class="w-4 h-4 bg-primary rounded-full border-2 border-on-primary shadow-md"></div>
+</div>
+<div class="absolute top-[60%] left-[65%] flex flex-col items-center">
+<div class="w-3 h-3 bg-tertiary rounded-full border-2 border-on-primary shadow-sm"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA -->
+<div class="px-margin-mobile pb-stack-lg mt-auto">
+<button class="w-full bg-primary text-on-primary font-body-lg font-semibold py-4 px-6 rounded-full shadow-[0_8px_20px_rgba(138,69,43,0.3)] flex justify-center items-center gap-3 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">directions</span>
+                Cómo llegar a Belén
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-stone-50/80 dark:bg-stone-900/80 backdrop-blur-lg font-serif text-[10px] tracking-tighter fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-3 pb-8 z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(168,93,65,0.08)]">
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 opacity-70 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined mb-1">explore</span>
+<span>Explore</span>
+</div>
+<!-- ACTIVE TAB: Stations -->
+<div class="flex flex-col items-center justify-center text-orange-900 dark:text-orange-100 font-bold scale-110">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">storefront</span>
+<span>Stations</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 opacity-70 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined mb-1">map</span>
+<span>Map</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 opacity-70 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined mb-1">auto_stories</span>
+<span>Journal</span>
+</div>
+</nav>
+</body></html>

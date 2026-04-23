@@ -22,7 +22,7 @@ export default function AgendaPage() {
       <section className="grid gap-4 md:grid-cols-3">
         {reservationStates.map((item) => (
           <SurfaceCard key={item.label} className="p-4">
-            <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+            <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
               {item.label}
             </p>
             <p className="display-font mt-2 text-4xl text-[color:var(--accent)]">
@@ -37,7 +37,7 @@ export default function AgendaPage() {
           <SurfaceCard key={item.title} className="soft-shadow">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[color:var(--accent)]">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent)]">
                   {item.day}
                 </p>
                 <h2 className="mt-3 text-xl font-semibold text-[color:var(--foreground)]">

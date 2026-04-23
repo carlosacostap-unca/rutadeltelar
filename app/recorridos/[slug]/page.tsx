@@ -43,16 +43,16 @@ export default async function SuggestedJourneyPage({
         </Link>
       </div>
 
-      <section className="rounded-[2rem] bg-[linear-gradient(180deg,#4b2b1c_0%,#2f241c_100%)] p-6 text-white sm:p-8">
+      <section className="rounded-3xl bg-[linear-gradient(160deg,#2c1810_0%,#1a0e08_100%)] p-6 text-white sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-white/60">
+            <p className="text-xs uppercase tracking-wider text-white/60">
               Recorrido sugerido
             </p>
             <h1 className="display-font mt-3 text-4xl leading-tight sm:text-5xl">
               {journey.title}
             </h1>
-            <p className="mt-3 text-sm uppercase tracking-[0.24em] text-white/60">
+            <p className="mt-3 text-sm uppercase tracking-wider text-white/60">
               {journey.station.locality} · {journey.duration}
             </p>
             <p className="mt-5 max-w-2xl text-sm leading-7 text-white/80">
@@ -61,7 +61,7 @@ export default async function SuggestedJourneyPage({
           </div>
 
           {journey.station.imageUrl ? (
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-white/10">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10">
               <Image
                 src={journey.station.imageUrl}
                 alt={journey.station.name}
@@ -71,7 +71,7 @@ export default async function SuggestedJourneyPage({
               />
             </div>
           ) : (
-            <div className="rounded-[1.75rem] border border-white/10 bg-white/8 p-6">
+            <div className="rounded-2xl border border-white/10 bg-white/8 p-6">
               <p className="text-sm leading-7 text-white/70">
                 Este recorrido se construye desde la estacion, sus experiencias
                 y los puntos destacados del territorio.
@@ -83,7 +83,7 @@ export default async function SuggestedJourneyPage({
 
       <section className="mt-8 grid gap-3 md:grid-cols-4">
         <SurfaceCard className="p-4">
-          <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+          <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
             Estacion
           </p>
           <p className="display-font mt-2 text-3xl text-[color:var(--accent)]">
@@ -91,7 +91,7 @@ export default async function SuggestedJourneyPage({
           </p>
         </SurfaceCard>
         <SurfaceCard className="p-4">
-          <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+          <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
             Experiencias
           </p>
           <p className="display-font mt-2 text-3xl text-[color:var(--accent)]">
@@ -99,7 +99,7 @@ export default async function SuggestedJourneyPage({
           </p>
         </SurfaceCard>
         <SurfaceCard className="p-4">
-          <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+          <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
             Actores
           </p>
           <p className="display-font mt-2 text-3xl text-[color:var(--accent)]">
@@ -107,7 +107,7 @@ export default async function SuggestedJourneyPage({
           </p>
         </SurfaceCard>
         <SurfaceCard className="p-4">
-          <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+          <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
             Imperdibles
           </p>
           <p className="display-font mt-2 text-3xl text-[color:var(--accent)]">
@@ -142,7 +142,7 @@ export default async function SuggestedJourneyPage({
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {journey.steps.map((step, index) => (
             <SurfaceCard key={`${step.title}-${index}`} className="soft-shadow">
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
                 Momento 0{index + 1}
               </p>
               <h2 className="display-font mt-3 text-3xl text-[color:var(--foreground)]">

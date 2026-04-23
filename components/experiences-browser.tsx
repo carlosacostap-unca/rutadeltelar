@@ -54,8 +54,8 @@ export function ExperiencesBrowser({
 
   return (
     <>
-      <section className="rounded-[2rem] bg-[linear-gradient(180deg,#4b2b1c_0%,#2f241c_100%)] p-6 text-white sm:p-8">
-        <p className="text-xs uppercase tracking-[0.24em] text-white/60">
+      <section className="rounded-3xl bg-[linear-gradient(160deg,#2c1810_0%,#1a0e08_100%)] p-6 text-white sm:p-8">
+        <p className="text-xs uppercase tracking-wider text-white/60">
           Mapa sensible
         </p>
         <h2 className="display-font mt-3 text-4xl leading-tight">
@@ -105,7 +105,7 @@ export function ExperiencesBrowser({
           <div className="mt-6 grid gap-4">
             {selectedExperiences.slice(0, 3).map((item) => (
               <SurfaceCard key={item.slug}>
-                <span className="inline-flex rounded-full bg-[color:var(--surface-strong)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--accent-strong)]">
+                <span className="inline-flex rounded-full bg-[color:var(--surface-strong)] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-strong)]">
                   {item.tag}
                 </span>
                 <h3 className="display-font mt-4 text-3xl leading-tight text-[color:var(--foreground)]">
@@ -137,7 +137,7 @@ export function ExperiencesBrowser({
           />
           <div className="mt-6 grid gap-4">
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Actores en la estacion
               </p>
               <p className="display-font mt-2 text-4xl text-[color:var(--accent)]">
@@ -145,7 +145,7 @@ export function ExperiencesBrowser({
               </p>
             </SurfaceCard>
             <SurfaceCard>
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              <p className="text-xs uppercase tracking-wider text-[color:var(--text-muted)]">
                 Imperdibles en la estacion
               </p>
               <p className="display-font mt-2 text-4xl text-[color:var(--accent)]">
