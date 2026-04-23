@@ -1174,8 +1174,8 @@ function resolveProductStation(record: PocketBaseRecord): { name: string; slug: 
     const first = relatedStations?.[0];
     return {
       name: relatedNames[0],
-      slug: readString({ ...(first ?? {}), id: first?.id ?? "", expand: {} }, ["slug"], slugify(relatedNames[0])),
-      recordId: String(first?.id ?? ""),
+      slug: typeof first?.slug === "string" && first.slug ? first.slug : slugify(relatedNames[0]),
+      recordId: typeof first?.id === "string" ? first.id : String(first?.id ?? ""),
     };
   }
   return { name: "", slug: "", recordId: "" };

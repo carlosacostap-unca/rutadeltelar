@@ -207,7 +207,3 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
 }
 
 
-type ExperienceDetailPageProps = {
-  params: Promise<{ slug: string }>;
-};
-
