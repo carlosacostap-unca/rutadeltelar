@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type HighlightSpot } from "@/app/lib/content";
+import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
 type Props = {
@@ -163,7 +163,7 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
                             </div>
                             {event.imageUrl && (
                               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
-                                <Image
+                                <PbImage
                                   src={event.imageUrl}
                                   alt={event.title}
                                   fill
@@ -218,12 +218,17 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
                 <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
                   {spot.imageUrl ? (
                     <div className="relative mb-4 aspect-[3/2] overflow-hidden rounded-xl">
-                      <Image
+                      <PbImage
                         src={spot.imageUrl}
                         alt={spot.title}
                         fill
                         className="object-cover transition group-hover:scale-[1.03]"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        fallback={
+                          <div className="mb-4 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-5xl">
+                            ⭐
+                          </div>
+                        }
                       />
                     </div>
                   ) : (

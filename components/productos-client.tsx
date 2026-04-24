@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Product, type Station } from "@/app/lib/content";
+import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
 type Props = {
@@ -237,12 +237,17 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <SurfaceCard className="soft-shadow h-full overflow-hidden !p-0 transition group-hover:border-[color:var(--accent)]">
               {product.imageUrl ? (
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image
+                  <PbImage
                     src={product.imageUrl}
                     alt={product.name}
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                    fallback={
+                      <div className="flex aspect-[4/3] items-center justify-center bg-[color:var(--surface)] text-5xl">
+                        🧵
+                      </div>
+                    }
                   />
                 </div>
               ) : (

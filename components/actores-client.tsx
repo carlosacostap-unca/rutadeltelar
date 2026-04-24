@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Artisan, type Station } from "@/app/lib/content";
+import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
 type Props = {
@@ -181,12 +181,17 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
               <div className="mb-4 flex items-center gap-3">
                 {item.imageUrl ? (
                   <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-[color:var(--border)]">
-                    <Image
+                    <PbImage
                       src={item.imageUrl}
                       alt={item.name}
                       fill
                       className="object-cover"
                       sizes="48px"
+                      fallback={
+                        <div className="display-font flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--surface)] text-lg text-[color:var(--accent-strong)]">
+                          {item.name[0]}
+                        </div>
+                      }
                     />
                   </div>
                 ) : (
