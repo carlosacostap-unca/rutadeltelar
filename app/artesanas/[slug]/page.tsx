@@ -1,9 +1,12 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { type Artisan } from "@/app/lib/content";
 import { getArtisanContextBySlug, getArtisans } from "@/app/lib/data";
+import { createPageMetadata } from "@/app/lib/metadata";
 import { ContactButtons } from "@/components/contact-buttons";
+import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
@@ -15,6 +18,29 @@ type ArtisanDetailPageProps = {
 export async function generateStaticParams() {
   const artisans = await getArtisans();
   return artisans.map((artisan) => ({ slug: artisan.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: ArtisanDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const context = await getArtisanContextBySlug(slug);
+
+  if (!context) {
+    return createPageMetadata({
+      title: "Actor no encontrado",
+      path: `/artesanas/${slug}`,
+    });
+  }
+
+  const { artisan } = context;
+
+  return createPageMetadata({
+    title: artisan.name,
+    description: artisan.bio || artisan.craft,
+    path: `/artesanas/${artisan.slug}`,
+    imageUrl: artisan.imageUrl,
+  });
 }
 
 // Helpers
@@ -153,14 +179,26 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
   return (
     <main className="flex flex-1 flex-col">
       {/* Back + Compartir */}
-      <div className="mb-6 flex items-center justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/artesanas"
           className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
         >
           ← Actores
         </Link>
-        <ShareButton title={artisan.name} text={artisan.craft} />
+        <div className="flex items-center gap-2">
+          <FavoriteButton
+            item={{
+              type: "actor",
+              slug: artisan.slug,
+              title: artisan.name,
+              subtitle: artisan.craft,
+              href: `/artesanas/${artisan.slug}`,
+              imageUrl: artisan.imageUrl,
+            }}
+          />
+          <ShareButton title={artisan.name} text={artisan.craft} />
+        </div>
       </div>
 
       {/* Cabecera */}

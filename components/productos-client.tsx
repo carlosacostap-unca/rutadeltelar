@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Product, type Station } from "@/app/lib/content";
+import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -25,7 +26,7 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+      className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition ${
         active
           ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
           : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
@@ -123,7 +124,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Categoría
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
               <FilterChip
                 active={category === "todas"}
                 onClick={() => handleCategoryChange("todas")}
@@ -149,7 +150,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Subcategoría
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
               <FilterChip
                 active={subcategory === "todas"}
                 onClick={() => setSubcategory("todas")}
@@ -175,7 +176,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Estación
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
               <FilterChip
                 active={stationSlug === "todas"}
                 onClick={() => setStationSlug("todas")}
@@ -244,15 +245,21 @@ export function ProductosClient({ products, stations, categories }: Props) {
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                     fallback={
-                      <div className="flex aspect-[4/3] items-center justify-center bg-[color:var(--surface)] text-5xl">
+                      <div className="aspect-[4/3] overflow-hidden">
+                        <MediaFallback label="Producto" />
+                        {/*
                         🧵
+                        */}
                       </div>
                     }
                   />
                 </div>
               ) : (
-                <div className="flex aspect-[4/3] items-center justify-center bg-[color:var(--surface)] text-5xl">
+                <div className="aspect-[4/3] overflow-hidden">
+                  <MediaFallback label="Producto" />
+                  {/*
                   🧵
+                  */}
                 </div>
               )}
               <div className="p-4">

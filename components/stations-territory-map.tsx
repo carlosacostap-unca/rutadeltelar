@@ -36,7 +36,7 @@ const StationsTerritoryMapLeaflet = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[420px] items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[linear-gradient(180deg,var(--surface)_0%,var(--surface-strong)_100%)] text-sm text-[color:var(--text-muted)]">
+      <div className="flex h-[360px] items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[linear-gradient(180deg,var(--surface)_0%,var(--surface-strong)_100%)] text-sm text-[color:var(--text-muted)] sm:h-[460px]">
         Cargando mapa...
       </div>
     ),
@@ -116,7 +116,7 @@ export function StationsTerritoryMap({
   ];
 
   return (
-    <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-4 soft-shadow sm:p-6">
+    <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-3 soft-shadow sm:p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
@@ -128,14 +128,14 @@ export function StationsTerritoryMap({
         </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
         {activeSlug ? (
           <>
             <button
               type="button"
               aria-pressed={focusMode === "all"}
               onClick={() => setFocusMode("all")}
-              className={`rounded-full border px-4 py-2 text-sm ${
+              className={`shrink-0 rounded-full border px-4 py-2 text-sm ${
                 focusMode === "all"
                   ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)] text-[color:var(--foreground)]"
                   : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
@@ -147,7 +147,7 @@ export function StationsTerritoryMap({
               type="button"
               aria-pressed={focusMode === "active"}
               onClick={() => setFocusMode("active")}
-              className={`rounded-full border px-4 py-2 text-sm ${
+              className={`shrink-0 rounded-full border px-4 py-2 text-sm ${
                 focusMode === "active"
                   ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)] text-[color:var(--foreground)]"
                   : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
@@ -171,7 +171,7 @@ export function StationsTerritoryMap({
                   [item.key]: !current[item.key],
                 }))
               }
-              className={`rounded-full border px-4 py-2 text-sm ${
+              className={`shrink-0 rounded-full border px-4 py-2 text-sm ${
                 active
                   ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)] text-[color:var(--foreground)]"
                   : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"

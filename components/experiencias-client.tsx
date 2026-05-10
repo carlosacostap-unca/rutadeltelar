@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Experience, type Station } from "@/app/lib/content";
+import { MediaFallback } from "@/components/media-fallback";
+import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
 type Props = {
@@ -37,7 +38,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
             Categoría
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
             <FilterChip active={category === "todas"} onClick={() => setCategory("todas")}>
               Todas
             </FilterChip>
@@ -55,7 +56,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Estación
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
               <FilterChip active={stationSlug === "todas"} onClick={() => setStationSlug("todas")}>
                 Todas
               </FilterChip>
@@ -78,7 +79,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Duración
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
               <FilterChip active={duration === "todas"} onClick={() => setDuration("todas")}>
                 Cualquiera
               </FilterChip>
@@ -103,17 +104,21 @@ export function ExperienciasClient({ experiences, stations, categories, duration
             <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
               {exp.imageUrl ? (
                 <div className="relative mb-4 aspect-[3/2] overflow-hidden rounded-xl">
-                  <Image
+                  <PbImage
                     src={exp.imageUrl}
                     alt={exp.title}
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    fallback={<MediaFallback label="Experiencia" />}
                   />
                 </div>
               ) : (
-                <div className="mb-4 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-5xl">
+                <div className="mb-4 aspect-[3/2] overflow-hidden rounded-xl">
+                  <MediaFallback label="Experiencia" />
+                  {/*
                   🧭
+                  */}
                 </div>
               )}
               <div className="mb-3 flex flex-wrap gap-2">
@@ -162,7 +167,7 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full border px-4 py-1.5 text-sm transition ${
+      className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${
         active
           ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
           : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)] hover:border-[color:var(--accent-mid)]"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { type Artisan, type HighlightSpot, type Station } from "@/app/lib/content";
+import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -85,11 +86,11 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
 
       {/* Filtro por departamento */}
       {departments.length > 0 && (
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="mb-6 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
           <button
             type="button"
             onClick={() => setDept("todas")}
-            className={`rounded-full border px-4 py-1.5 text-sm transition ${
+            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${
               dept === "todas"
                 ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
                 : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
@@ -102,7 +103,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
               key={d}
               type="button"
               onClick={() => setDept(d)}
-              className={`rounded-full border px-4 py-1.5 text-sm transition ${
+              className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${
                 dept === d
                   ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
                   : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
@@ -137,16 +138,15 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
                       fill
                       className="object-cover transition group-hover:scale-[1.03]"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      fallback={
-                        <div className="flex h-full items-center justify-center bg-[linear-gradient(160deg,#c4896a_0%,#8a452b_100%)] text-xs font-semibold uppercase tracking-wider text-white">
-                          Estacion
-                        </div>
-                      }
+                      fallback={<MediaFallback label="Estacion" />}
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center bg-[linear-gradient(160deg,#c4896a_0%,#8a452b_100%)] text-5xl">
+                    <>
+                      <MediaFallback label="Estacion" />
+                    {/*
                       🗺️
-                    </div>
+                    */}
+                    </>
                   )}
                   {station.hasInauguratedStation && (
                     <span className="absolute left-3 top-3 rounded-full bg-[color:var(--accent)] px-3 py-0.5 text-xs font-semibold text-white shadow">

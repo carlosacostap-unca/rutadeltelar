@@ -67,13 +67,13 @@ export function MapaClient({ stations, artisans, highlightSpots }: Props) {
   return (
     <>
       {/* Filtros de capa */}
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
         {LAYERS.map((layer) => (
           <button
             key={layer.id}
             type="button"
             onClick={() => toggle(layer.id)}
-            className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition ${
+            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-semibold transition ${
               active.has(layer.id)
                 ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
                 : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
@@ -88,7 +88,7 @@ export function MapaClient({ stations, artisans, highlightSpots }: Props) {
       </div>
 
       {/* Mapa */}
-      <div className="overflow-hidden rounded-3xl border border-[color:var(--border)]">
+      <div>
         <StationsTerritoryMap
           stations={active.has("stations") ? stations : []}
           artisans={active.has("artisans") ? artisans : []}

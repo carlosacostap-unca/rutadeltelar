@@ -1,10 +1,13 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getHighlightSpotContextBySlug,
   getHighlightSpots,
 } from "@/app/lib/data";
+import { createPageMetadata } from "@/app/lib/metadata";
+import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
 import { IcsDownloadButton } from "@/components/ics-download-button";
 import { ShareButton } from "@/components/share-button";
@@ -17,6 +20,29 @@ type HighlightSpotDetailPageProps = {
 export async function generateStaticParams() {
   const spots = await getHighlightSpots();
   return spots.map((spot) => ({ slug: spot.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: HighlightSpotDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const context = await getHighlightSpotContextBySlug(slug);
+
+  if (!context) {
+    return createPageMetadata({
+      title: "Imperdible no encontrado",
+      path: `/imperdibles/${slug}`,
+    });
+  }
+
+  const { spot } = context;
+
+  return createPageMetadata({
+    title: spot.title,
+    description: spot.description || spot.subtitle,
+    path: `/imperdibles/${spot.slug}`,
+    imageUrl: spot.imageUrl,
+  });
 }
 
 function formatEventDateLocal(iso: string) {
@@ -50,14 +76,26 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
   return (
     <main className="flex flex-1 flex-col">
       {/* Back + Compartir */}
-      <div className="mb-6 flex items-center justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/imperdibles"
           className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
         >
           ← Imperdibles
         </Link>
-        <ShareButton title={spot.title} text={spot.subtitle} />
+        <div className="flex items-center gap-2">
+          <FavoriteButton
+            item={{
+              type: "imperdible",
+              slug: spot.slug,
+              title: spot.title,
+              subtitle: spot.location,
+              href: `/imperdibles/${spot.slug}`,
+              imageUrl: spot.imageUrl,
+            }}
+          />
+          <ShareButton title={spot.title} text={spot.subtitle} />
+        </div>
       </div>
 
       {/* Galería */}

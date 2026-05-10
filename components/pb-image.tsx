@@ -20,11 +20,18 @@ export function PbImage({ fallback, className, alt, ...props }: PbImageProps) {
   }
 
   return (
-    <Image
-      {...props}
-      alt={alt}
-      className={className}
-      onError={() => setFailed(true)}
-    />
+    <>
+      {props.fill && fallback ? (
+        <div aria-hidden="true" className="absolute inset-0">
+          {fallback}
+        </div>
+      ) : null}
+      <Image
+        {...props}
+        alt={alt}
+        className={className}
+        onError={() => setFailed(true)}
+      />
+    </>
   );
 }

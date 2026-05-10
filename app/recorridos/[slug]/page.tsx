@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -6,7 +7,10 @@ import {
   getSuggestedJourneyBySlug,
   getSuggestedJourneys,
 } from "@/app/lib/data";
+import { createPageMetadata } from "@/app/lib/metadata";
+import { FavoriteButton } from "@/components/favorite-button";
 import { SectionHeading } from "@/components/section-heading";
+import { ShareButton } from "@/components/share-button";
 import { StationsTerritoryMap } from "@/components/stations-territory-map";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -17,6 +21,27 @@ type SuggestedJourneyPageProps = {
 export async function generateStaticParams() {
   const journeys = await getSuggestedJourneys();
   return journeys.map((journey) => ({ slug: journey.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: SuggestedJourneyPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const journey = await getSuggestedJourneyBySlug(slug);
+
+  if (!journey) {
+    return createPageMetadata({
+      title: "Recorrido no encontrado",
+      path: `/recorridos/${slug}`,
+    });
+  }
+
+  return createPageMetadata({
+    title: journey.title,
+    description: journey.description,
+    path: `/recorridos/${journey.slug}`,
+    imageUrl: journey.station.imageUrl,
+  });
 }
 
 export default async function SuggestedJourneyPage({
@@ -34,13 +59,26 @@ export default async function SuggestedJourneyPage({
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/recorridos"
           className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
         >
           Volver a recorridos
         </Link>
+        <div className="flex items-center gap-2">
+          <FavoriteButton
+            item={{
+              type: "recorrido",
+              slug: journey.slug,
+              title: journey.title,
+              subtitle: journey.duration,
+              href: `/recorridos/${journey.slug}`,
+              imageUrl: journey.station.imageUrl,
+            }}
+          />
+          <ShareButton title={journey.title} text={journey.description} />
+        </div>
       </div>
 
       <section className="rounded-3xl bg-[linear-gradient(160deg,#2c1810_0%,#1a0e08_100%)] p-6 text-white sm:p-8">

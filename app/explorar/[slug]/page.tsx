@@ -1,10 +1,13 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getExperienceContextBySlug,
   getExperiences,
 } from "@/app/lib/data";
+import { createPageMetadata } from "@/app/lib/metadata";
+import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
@@ -16,6 +19,29 @@ type ExperienceDetailPageProps = {
 export async function generateStaticParams() {
   const experiences = await getExperiences();
   return experiences.map((experience) => ({ slug: experience.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: ExperienceDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const context = await getExperienceContextBySlug(slug);
+
+  if (!context) {
+    return createPageMetadata({
+      title: "Experiencia no encontrada",
+      path: `/explorar/${slug}`,
+    });
+  }
+
+  const { experience } = context;
+
+  return createPageMetadata({
+    title: experience.title,
+    description: experience.summary || experience.description,
+    path: `/explorar/${experience.slug}`,
+    imageUrl: experience.imageUrl,
+  });
 }
 
 export default async function ExperienceDetailPage({ params }: ExperienceDetailPageProps) {
@@ -31,14 +57,26 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
   return (
     <main className="flex flex-1 flex-col">
       {/* Back + Compartir */}
-      <div className="mb-6 flex items-center justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/explorar"
           className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
         >
           ← Experiencias
         </Link>
-        <ShareButton title={experience.title} text={experience.summary} />
+        <div className="flex items-center gap-2">
+          <FavoriteButton
+            item={{
+              type: "experiencia",
+              slug: experience.slug,
+              title: experience.title,
+              subtitle: experience.location,
+              href: `/explorar/${experience.slug}`,
+              imageUrl: experience.imageUrl,
+            }}
+          />
+          <ShareButton title={experience.title} text={experience.summary} />
+        </div>
       </div>
 
       {/* Hero: foto + título */}

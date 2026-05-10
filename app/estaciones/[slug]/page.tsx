@@ -1,7 +1,10 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getStationContextBySlug, getStations } from "@/app/lib/data";
+import { createPageMetadata } from "@/app/lib/metadata";
+import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
 import { ShareButton } from "@/components/share-button";
 import { StationDetailMap } from "@/components/station-detail-map";
@@ -14,6 +17,29 @@ type StationDetailPageProps = {
 export async function generateStaticParams() {
   const stations = await getStations();
   return stations.map((station) => ({ slug: station.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: StationDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const context = await getStationContextBySlug(slug);
+
+  if (!context) {
+    return createPageMetadata({
+      title: "Estacion no encontrada",
+      path: `/estaciones/${slug}`,
+    });
+  }
+
+  const { station } = context;
+
+  return createPageMetadata({
+    title: station.name,
+    description: station.summary,
+    path: `/estaciones/${station.slug}`,
+    imageUrl: station.imageUrl,
+  });
 }
 
 
@@ -34,14 +60,26 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
   return (
     <main className="flex flex-1 flex-col">
       {/* Back + Compartir */}
-      <div className="mb-6 flex items-center justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/estaciones"
           className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
         >
           ← Estaciones
         </Link>
-        <ShareButton title={station.name} text={station.summary} />
+        <div className="flex items-center gap-2">
+          <FavoriteButton
+            item={{
+              type: "estacion",
+              slug: station.slug,
+              title: station.name,
+              subtitle: station.locality,
+              href: `/estaciones/${station.slug}`,
+              imageUrl: station.imageUrl,
+            }}
+          />
+          <ShareButton title={station.name} text={station.summary} />
+        </div>
       </div>
 
       {/* Hero gallery */}

@@ -7,6 +7,7 @@ import {
   getStationsResult,
 } from "@/app/lib/data";
 import { HomeCarousel } from "@/components/home-carousel";
+import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -62,6 +63,20 @@ export default async function Home() {
               Un recorrido cultural por comunidades artesanas de Catamarca donde
               el telar es identidad, oficio y territorio vivo.
             </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/explorar"
+                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[color:var(--accent-strong)] transition hover:-translate-y-0.5"
+              >
+                Explorar
+              </Link>
+              <Link
+                href="/favoritos"
+                className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
+              >
+                Favoritos
+              </Link>
+            </div>
           </div>
           {/* decoración textil abstracta */}
           <div
@@ -166,16 +181,15 @@ export default async function Home() {
                       fill
                       className="object-cover transition group-hover:scale-[1.04]"
                       sizes="(max-width: 640px) 50vw, 33vw"
-                      fallback={
-                        <div className="flex h-full items-center justify-center bg-[linear-gradient(160deg,#c4896a_0%,#8a452b_100%)] text-xs font-semibold uppercase tracking-wider text-white">
-                          Estacion
-                        </div>
-                      }
+                      fallback={<MediaFallback label="Estacion" />}
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center bg-[linear-gradient(160deg,#c4896a_0%,#8a452b_100%)] text-4xl">
+                    <>
+                      <MediaFallback label="Estacion" />
+                    {/*
                       🗺️
-                    </div>
+                    */}
+                    </>
                   )}
                   {station.hasInauguratedStation && (
                     <span className="absolute left-2 top-2 rounded-full bg-[color:var(--accent)] px-2 py-0.5 text-[10px] font-semibold text-white">
@@ -208,17 +222,21 @@ export default async function Home() {
             <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
               {product.imageUrl ? (
                 <div className="relative mb-3 aspect-square overflow-hidden rounded-xl">
-                  <Image
+                  <PbImage
                     src={product.imageUrl}
                     alt={product.name}
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="220px"
+                    fallback={<MediaFallback label="Producto" />}
                   />
                 </div>
               ) : (
-                <div className="mb-3 flex aspect-square items-center justify-center rounded-xl bg-[color:var(--surface)] text-4xl">
+                <div className="mb-3 aspect-square overflow-hidden rounded-xl">
+                  <MediaFallback label="Producto" />
+                  {/*
                   🧵
+                  */}
                 </div>
               )}
               <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">

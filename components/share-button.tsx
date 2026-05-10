@@ -5,17 +5,24 @@ import { useState } from "react";
 type ShareButtonProps = {
   title: string;
   text?: string;
+  label?: string;
+  url?: string;
 };
 
-export function ShareButton({ title, text }: ShareButtonProps) {
+export function ShareButton({
+  title,
+  text,
+  label = "Compartir",
+  url,
+}: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {
-    const url = window.location.href;
+    const shareUrl = url ?? window.location.href;
 
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title, text, url });
+        await navigator.share({ title, text, url: shareUrl });
         return;
       } catch {
         // usuario canceló o no compatible — fallback a clipboard
@@ -23,7 +30,7 @@ export function ShareButton({ title, text }: ShareButtonProps) {
     }
 
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -35,6 +42,7 @@ export function ShareButton({ title, text }: ShareButtonProps) {
     <button
       type="button"
       onClick={handleShare}
+      aria-label={`${label}: ${title}`}
       className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)] active:scale-95"
     >
       {copied ? (
@@ -51,7 +59,7 @@ export function ShareButton({ title, text }: ShareButtonProps) {
             <polyline points="16 6 12 2 8 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
             <line x1="12" y1="2" x2="12" y2="15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
           </svg>
-          Compartir
+          {label}
         </>
       )}
     </button>

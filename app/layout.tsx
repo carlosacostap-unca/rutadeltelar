@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Noto_Serif } from "next/font/google";
+import { getSiteUrl } from "@/app/lib/metadata";
 import { AppShell } from "@/components/app-shell";
 import "./globals.css";
 
@@ -16,9 +17,21 @@ const notoSerif = Noto_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Ruta del Telar",
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: "Ruta del Telar",
+    template: "%s | Ruta del Telar",
+  },
   description:
-    "Aplicacion web mobile-first para descubrir experiencias, talleres y comunidades textiles de la Ruta del Telar.",
+    "Descubri estaciones, experiencias, talleres y comunidades textiles de Catamarca.",
+  openGraph: {
+    title: "Ruta del Telar",
+    description:
+      "Descubri estaciones, experiencias, talleres y comunidades textiles de Catamarca.",
+    locale: "es_AR",
+    siteName: "Ruta del Telar",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

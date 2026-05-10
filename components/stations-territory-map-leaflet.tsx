@@ -204,7 +204,7 @@ export function StationsTerritoryMapLeaflet({
         boundsOptions={{ padding: [28, 28] }}
         scrollWheelZoom={false}
         zoomControl
-        className="h-[420px] w-full"
+        className="h-[360px] w-full sm:h-[460px]"
       >
         <MapResizer />
         <TileLayer
