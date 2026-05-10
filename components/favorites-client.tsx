@@ -50,9 +50,9 @@ export function FavoritesClient() {
   if (favorites.length === 0) {
     return (
       <SurfaceCard className="py-14 text-center">
-        <p className="display-font text-3xl text-[color:var(--foreground)]">
+        <h2 className="display-font text-3xl text-[color:var(--foreground)]">
           Todavia no guardaste favoritos
-        </p>
+        </h2>
         <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[color:var(--text-muted)]">
           Podes guardar estaciones, productos, experiencias y recorridos desde
           sus paginas de detalle.
