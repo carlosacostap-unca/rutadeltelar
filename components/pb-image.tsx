@@ -12,7 +12,7 @@ type PbImageProps = Omit<ImageProps, "onError"> & {
  * Envuelve next/image con manejo de error para imágenes de PocketBase.
  * Si la imagen devuelve 404 u otro error, oculta el img y muestra el fallback.
  */
-export function PbImage({ fallback, className, ...props }: PbImageProps) {
+export function PbImage({ fallback, className, alt, ...props }: PbImageProps) {
   const [failed, setFailed] = useState(false);
 
   if (failed) {
@@ -22,6 +22,7 @@ export function PbImage({ fallback, className, ...props }: PbImageProps) {
   return (
     <Image
       {...props}
+      alt={alt}
       className={className}
       onError={() => setFailed(true)}
     />

@@ -23,10 +23,10 @@ export type Station = {
 
 export const stations = [
   {
-    slug: "amaicha-del-valle",
-    name: "Estacion Amaicha del Valle",
-    locality: "Amaicha del Valle",
-    department: "Andalgalá",
+    slug: "belen-catamarca",
+    name: "Estacion Belen",
+    locality: "Belen",
+    department: "Belen",
     slogan: "Territorio de trama viva",
     summary:
       "Una estacion clave para iniciar el recorrido, con talleres, comunidad y paisaje cultural.",
@@ -34,10 +34,10 @@ export const stations = [
     hasInauguratedStation: true,
   },
   {
-    slug: "el-paso",
-    name: "Estacion El Paso",
-    locality: "El Paso",
-    department: "Belén",
+    slug: "laguna-blanca",
+    name: "Estacion Laguna Blanca",
+    locality: "Laguna Blanca",
+    department: "Belen",
     slogan: "Oficio, memoria y encuentro",
     summary:
       "Concentra actores locales, experiencias guiadas y puntos de interes para visitantes.",
@@ -45,10 +45,10 @@ export const stations = [
     hasInauguratedStation: false,
   },
   {
-    slug: "santa-maria",
-    name: "Estacion Santa Maria",
-    locality: "Santa Maria",
-    department: "Santa María",
+    slug: "antofagasta-de-la-sierra",
+    name: "Estacion Antofagasta de la Sierra",
+    locality: "Antofagasta de la Sierra",
+    department: "Antofagasta de la Sierra",
     slogan: "Paletas del valle",
     summary:
       "Una puerta de entrada a tecnicas, tintes y piezas con fuerte identidad regional.",
@@ -86,7 +86,7 @@ export const experiences = [
       "Un recorrido corto para descubrir talleres, tintes naturales y compra directa.",
     tag: "90 min",
     duration: "1 h 30 min",
-    location: "Amaicha del Valle",
+    location: "Belen",
     intensity: "Suave",
     summary:
       "Ideal para una primera aproximacion al universo textil, con foco en proceso, materiales y charla con artesanas.",
@@ -104,7 +104,7 @@ export const experiences = [
       "Agenda experiencias con demostraciones, relatos locales y piezas en proceso.",
     tag: "Guiado",
     duration: "2 h",
-    location: "El Paso",
+    location: "Laguna Blanca",
     intensity: "Media",
     summary:
       "Una salida pensada para ver el telar en accion, escuchar relatos y conocer la relacion entre oficio, familia y territorio.",
@@ -139,12 +139,12 @@ export const agenda = [
   {
     day: "Hoy",
     title: "Visita al taller de Juana",
-    meta: "17:30 hs • Amaicha",
+    meta: "17:30 hs • Belen",
   },
   {
     day: "Manana",
     title: "Demostracion de tintes",
-    meta: "10:00 hs • El Paso",
+    meta: "10:00 hs • Laguna Blanca",
   },
   {
     day: "Sabado",
@@ -199,7 +199,7 @@ export const highlightSpots = [
       "Una actividad donde se muestran procesos de tintes botanicos y su relacion con el entorno.",
     type: "evento",
     eventDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-    location: "El Paso",
+    location: "Laguna Blanca",
     priority: "alta",
   },
   {
@@ -209,7 +209,7 @@ export const highlightSpots = [
     description:
       "Punto recomendado para conectar recorrido territorial y narrativa de la Ruta del Telar.",
     type: "atractivo",
-    location: "Amaicha del Valle",
+    location: "Belen",
     priority: "media",
   },
 ] satisfies HighlightSpot[];
@@ -262,7 +262,7 @@ export const artisans = [
   {
     slug: "juana-mamani",
     name: "Juana Mamaní",
-    place: "Amaicha del Valle",
+    place: "Belen",
     craft: "Telar criollo y mantas",
     bio: "Trabaja con telar criollo desde hace mas de veinte anos y transmite el oficio en encuentros comunitarios con visitantes y nuevas tejedoras.",
     techniques: ["Trama gruesa", "Guardas tradicionales", "Terminaciones a mano"],
@@ -272,7 +272,7 @@ export const artisans = [
   {
     slug: "rosa-chaile",
     name: "Rosa Chaile",
-    place: "El Paso",
+    place: "Laguna Blanca",
     craft: "Hilado a mano y piezas finas",
     bio: "Su trabajo une hilado fino, paciencia y una seleccion precisa de fibras para piezas livianas, textiles de abrigo y encargos especiales.",
     techniques: ["Hilado manual", "Torcion fina", "Piezas de uso cotidiano"],
@@ -282,7 +282,7 @@ export const artisans = [
   {
     slug: "lucia-tolaba",
     name: "Lucia Tolaba",
-    place: "Santa Maria",
+    place: "Antofagasta de la Sierra",
     craft: "Tintes botanicos y ruanas",
     bio: "Investiga y practica tintes botanicos con plantas locales, logrando una paleta propia que combina tradicion y experimentacion.",
     techniques: ["Tintes botanicos", "Ruanas", "Paletas estacionales"],
@@ -351,15 +351,15 @@ export type Product = {
 
 export const products = [
   {
-    slug: "manta-guarda-amaicha",
+    slug: "manta-guarda-belen",
     name: "Manta con guarda local",
     description:
-      "Tejida en telar criollo con lana natural teñida con añil y nogal. Guarda geométrica transmitida de generación en generación en la zona de Amaicha.",
+      "Tejida en telar criollo con lana natural teñida con añil y nogal. Guarda geométrica transmitida de generación en generación en la zona de Belen.",
     category: "Tejido",
     subcategory: "Mantas y ponchos",
     techniques: ["Telar criollo", "Guarda geométrica", "Tinte natural"],
-    stationName: "Estacion Amaicha del Valle",
-    stationSlug: "amaicha-del-valle",
+    stationName: "Estacion Belen",
+    stationSlug: "belen-catamarca",
   },
   {
     slug: "chal-fibra-natural",
@@ -369,8 +369,8 @@ export const products = [
     category: "Tejido",
     subcategory: "Accesorios",
     techniques: ["Hilado manual", "Torsión fina"],
-    stationName: "Estacion El Paso",
-    stationSlug: "el-paso",
+    stationName: "Estacion Laguna Blanca",
+    stationSlug: "laguna-blanca",
   },
   {
     slug: "ruana-tonos-tierra",
@@ -380,8 +380,8 @@ export const products = [
     category: "Tejido",
     subcategory: "Mantas y ponchos",
     techniques: ["Tintes botánicos", "Paleta estacional"],
-    stationName: "Estacion Santa Maria",
-    stationSlug: "santa-maria",
+    stationName: "Estacion Antofagasta de la Sierra",
+    stationSlug: "antofagasta-de-la-sierra",
   },
   {
     slug: "alfombra-lana-cruda",
@@ -391,8 +391,8 @@ export const products = [
     category: "Tejido",
     subcategory: "Textiles del hogar",
     techniques: ["Telar horizontal", "Lana sin teñir"],
-    stationName: "Estacion Amaicha del Valle",
-    stationSlug: "amaicha-del-valle",
+    stationName: "Estacion Belen",
+    stationSlug: "belen-catamarca",
   },
   {
     slug: "bolso-cuero-tejido",
@@ -402,8 +402,8 @@ export const products = [
     category: "Artesanía mixta",
     subcategory: "Accesorios",
     techniques: ["Tejido y cuero", "Producción por encargo"],
-    stationName: "Estacion El Paso",
-    stationSlug: "el-paso",
+    stationName: "Estacion Laguna Blanca",
+    stationSlug: "laguna-blanca",
   },
   {
     slug: "faja-tradicional",
@@ -413,12 +413,11 @@ export const products = [
     category: "Tejido",
     subcategory: "Accesorios",
     techniques: ["Guardas simbólicas", "Técnica ancestral"],
-    stationName: "Estacion Santa Maria",
-    stationSlug: "santa-maria",
+    stationName: "Estacion Antofagasta de la Sierra",
+    stationSlug: "antofagasta-de-la-sierra",
   },
 ] satisfies Product[];
 
 export function getProductBySlug(slug: string): Product | undefined {
   return products.find((product) => product.slug === slug);
 }
-

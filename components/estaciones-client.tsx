@@ -162,7 +162,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
                     {station.locality}
                   </p>
                   <p className="mt-2 text-xs italic leading-relaxed text-[color:var(--text-muted)]">
-                    "{station.slogan}"
+                    &quot;{station.slogan}&quot;
                   </p>
                 </div>
               </SurfaceCard>
