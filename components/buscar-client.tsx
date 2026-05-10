@@ -203,7 +203,7 @@ export function BuscarClient(data: SearchData) {
         <input
           type="search"
           autoFocus
-          placeholder="Buscar estaciones, actores, productos, experiencias, imperdibles…"
+          placeholder="Buscar en la ruta..."
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           className="w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] py-3 pl-11 pr-4 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--accent)] focus:outline-none"

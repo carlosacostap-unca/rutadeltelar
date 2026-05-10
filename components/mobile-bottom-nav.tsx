@@ -48,7 +48,7 @@ const navItems: NavItem[] = [
   {
     href: "/explorar",
     label: "Experiencias",
-    shortLabel: "Experiencias",
+    shortLabel: "Explorar",
     icon: (
       <>
         <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.7" />
@@ -66,7 +66,7 @@ const navItems: NavItem[] = [
   {
     href: "/imperdibles",
     label: "Imperdibles",
-    shortLabel: "Imperdibles",
+    shortLabel: "Imperd.",
     icon: (
       <>
         <path
@@ -119,6 +119,7 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-label={item.label}
               className={`flex flex-col items-center justify-center rounded-xl px-2 py-2 text-center transition-colors ${
                 active
                   ? "bg-[color:var(--accent)] text-white shadow-sm"
@@ -132,7 +133,7 @@ export function MobileBottomNav() {
               >
                 {item.icon}
               </svg>
-              <span className="text-[10px] font-semibold tracking-wider">
+              <span className="text-[10px] font-semibold tracking-normal">
                 {item.shortLabel}
               </span>
             </Link>

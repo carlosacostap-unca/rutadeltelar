@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { type Artisan, type HighlightSpot, type Station } from "@/app/lib/content";
+import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
 const StationsTerritoryMap = dynamic(
@@ -131,12 +131,17 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
               <SurfaceCard className="soft-shadow h-full overflow-hidden !p-0 transition group-hover:border-[color:var(--accent)]">
                 <div className="relative aspect-[16/9] w-full overflow-hidden rounded-t-2xl">
                   {station.imageUrl ? (
-                    <Image
+                    <PbImage
                       src={station.imageUrl}
                       alt={station.name}
                       fill
                       className="object-cover transition group-hover:scale-[1.03]"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      fallback={
+                        <div className="flex h-full items-center justify-center bg-[linear-gradient(160deg,#c4896a_0%,#8a452b_100%)] text-xs font-semibold uppercase tracking-wider text-white">
+                          Estacion
+                        </div>
+                      }
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center bg-[linear-gradient(160deg,#c4896a_0%,#8a452b_100%)] text-5xl">

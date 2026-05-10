@@ -7,6 +7,7 @@ import {
   getStationsResult,
 } from "@/app/lib/data";
 import { HomeCarousel } from "@/components/home-carousel";
+import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
 function formatEventDate(iso: string) {
@@ -159,12 +160,17 @@ export default async function Home() {
               <SurfaceCard className="soft-shadow overflow-hidden !p-0 transition group-hover:border-[color:var(--accent)]">
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl">
                   {station.imageUrl ? (
-                    <Image
+                    <PbImage
                       src={station.imageUrl}
                       alt={station.name}
                       fill
                       className="object-cover transition group-hover:scale-[1.04]"
                       sizes="(max-width: 640px) 50vw, 33vw"
+                      fallback={
+                        <div className="flex h-full items-center justify-center bg-[linear-gradient(160deg,#c4896a_0%,#8a452b_100%)] text-xs font-semibold uppercase tracking-wider text-white">
+                          Estacion
+                        </div>
+                      }
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center bg-[linear-gradient(160deg,#c4896a_0%,#8a452b_100%)] text-4xl">
