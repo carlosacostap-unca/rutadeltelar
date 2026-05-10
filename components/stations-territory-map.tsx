@@ -128,7 +128,7 @@ export function StationsTerritoryMap({
         </div>
       </div>
 
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
         {activeSlug ? (
           <>
             <button

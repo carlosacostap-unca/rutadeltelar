@@ -190,7 +190,7 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
         <>
           {/* Filtro por tipo */}
           {types.length > 0 && (
-            <div className="mb-5 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+            <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
               <FilterChip
                 active={typeFilter === "todos"}
                 onClick={() => setTypeFilter("todos")}

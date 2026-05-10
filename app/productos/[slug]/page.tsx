@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getProductContextBySlug, getProducts } from "@/app/lib/data";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { FavoriteButton } from "@/components/favorite-button";
+import { MediaFallback } from "@/components/media-fallback";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -90,8 +91,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             />
           </div>
         ) : (
-          <div className="flex aspect-square items-center justify-center rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] text-7xl">
-            🧵
+          <div className="aspect-square overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow">
+            <MediaFallback label="Producto" />
           </div>
         )}
 

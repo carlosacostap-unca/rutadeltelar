@@ -38,7 +38,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
             Categoría
           </p>
-          <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
             <FilterChip active={category === "todas"} onClick={() => setCategory("todas")}>
               Todas
             </FilterChip>
@@ -56,7 +56,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Estación
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
               <FilterChip active={stationSlug === "todas"} onClick={() => setStationSlug("todas")}>
                 Todas
               </FilterChip>
@@ -79,7 +79,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Duración
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
               <FilterChip active={duration === "todas"} onClick={() => setDuration("todas")}>
                 Cualquiera
               </FilterChip>

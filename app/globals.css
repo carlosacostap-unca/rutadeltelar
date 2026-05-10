@@ -87,6 +87,16 @@ button {
   box-shadow: var(--shadow-soft);
 }
 
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
 /* ── Leaflet overrides ───────────────────────────────────────────── */
 .leaflet-container {
   font: inherit;

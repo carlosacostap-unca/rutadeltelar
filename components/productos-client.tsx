@@ -124,7 +124,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Categoría
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
               <FilterChip
                 active={category === "todas"}
                 onClick={() => handleCategoryChange("todas")}
@@ -150,7 +150,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Subcategoría
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
               <FilterChip
                 active={subcategory === "todas"}
                 onClick={() => setSubcategory("todas")}
@@ -176,7 +176,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Estación
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
               <FilterChip
                 active={stationSlug === "todas"}
                 onClick={() => setStationSlug("todas")}

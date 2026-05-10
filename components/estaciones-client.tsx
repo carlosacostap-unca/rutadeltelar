@@ -86,7 +86,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
 
       {/* Filtro por departamento */}
       {departments.length > 0 && (
-        <div className="mb-6 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+        <div className="mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
           <button
             type="button"
             onClick={() => setDept("todas")}

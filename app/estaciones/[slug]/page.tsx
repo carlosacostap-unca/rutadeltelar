@@ -6,6 +6,7 @@ import { getStationContextBySlug, getStations } from "@/app/lib/data";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
+import { MediaFallback } from "@/components/media-fallback";
 import { ShareButton } from "@/components/share-button";
 import { StationDetailMap } from "@/components/station-detail-map";
 import { SurfaceCard } from "@/components/surface-card";
@@ -110,8 +111,8 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
             )}
           </div>
         ) : (
-          <div className="flex aspect-[16/9] items-center justify-center rounded-3xl bg-[color:var(--surface)] text-5xl">
-            🗺️
+          <div className="aspect-[16/9] overflow-hidden rounded-3xl border border-[color:var(--border)]">
+            <MediaFallback label="Estacion" />
           </div>
         )}
       </section>

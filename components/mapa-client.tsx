@@ -67,7 +67,7 @@ export function MapaClient({ stations, artisans, highlightSpots }: Props) {
   return (
     <>
       {/* Filtros de capa */}
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
         {LAYERS.map((layer) => (
           <button
             key={layer.id}

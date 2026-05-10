@@ -10,6 +10,7 @@ import { createPageMetadata } from "@/app/lib/metadata";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
 import { IcsDownloadButton } from "@/components/ics-download-button";
+import { MediaFallback } from "@/components/media-fallback";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -119,8 +120,8 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
             ))}
           </div>
         ) : (
-          <div className="flex aspect-[16/9] items-center justify-center rounded-3xl bg-[color:var(--surface)] text-5xl">
-            ⭐
+          <div className="aspect-[16/9] overflow-hidden rounded-3xl border border-[color:var(--border)]">
+            <MediaFallback label="Imperdible" />
           </div>
         )}
       </section>

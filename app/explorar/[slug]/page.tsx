@@ -9,6 +9,7 @@ import {
 import { createPageMetadata } from "@/app/lib/metadata";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
+import { MediaFallback } from "@/components/media-fallback";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -93,8 +94,8 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
             />
           </div>
         ) : (
-          <div className="flex aspect-[4/3] items-center justify-center rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] text-7xl">
-            🧭
+          <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow">
+            <MediaFallback label="Experiencia" />
           </div>
         )}
 
