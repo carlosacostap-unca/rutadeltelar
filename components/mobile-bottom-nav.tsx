@@ -110,7 +110,10 @@ export function MobileBottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[color:var(--border)] bg-[rgba(252,249,245,0.85)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl md:hidden">
+    <nav
+      aria-label="Navegacion principal"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-[color:var(--border)] bg-[rgba(252,249,245,0.85)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl md:hidden"
+    >
       <div className="mx-auto grid max-w-lg grid-cols-5 gap-1 rounded-2xl border border-[color:var(--border)] bg-[rgba(255,255,255,0.88)] p-2 soft-shadow">
         {navItems.map((item) => {
           const active = isActive(pathname, item.href);
@@ -120,6 +123,7 @@ export function MobileBottomNav() {
               key={item.href}
               href={item.href}
               aria-label={item.label}
+              aria-current={active ? "page" : undefined}
               className={`flex flex-col items-center justify-center rounded-xl px-2 py-2 text-center transition-colors ${
                 active
                   ? "bg-[color:var(--accent)] text-white shadow-sm"

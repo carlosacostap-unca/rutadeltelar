@@ -24,6 +24,7 @@ function FilterChip({
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
         active
@@ -84,7 +85,11 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
     <>
       {/* Búsqueda */}
       <div className="mb-5">
+        <label htmlFor="actors-search" className="sr-only">
+          Buscar actores por nombre u oficio
+        </label>
         <input
+          id="actors-search"
           type="search"
           placeholder="Buscar por nombre u oficio…"
           value={search}
@@ -100,12 +105,19 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Tipo de actor
             </p>
-            <div className="flex flex-wrap gap-2">
-              <FilterChip active={tipo === "todos"} onClick={() => setTipo("todos")}>
+            <div role="group" aria-label="Filtrar actores por tipo" className="flex flex-wrap gap-2">
+              <FilterChip
+                active={tipo === "todos"}
+                onClick={() => setTipo("todos")}
+              >
                 Todos
               </FilterChip>
               {tipos.map((t) => (
-                <FilterChip key={t} active={tipo === t} onClick={() => setTipo(t)}>
+                <FilterChip
+                  key={t}
+                  active={tipo === t}
+                  onClick={() => setTipo(t)}
+                >
                   {t}
                 </FilterChip>
               ))}
@@ -118,7 +130,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Estación
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div role="group" aria-label="Filtrar actores por estacion" className="flex flex-wrap gap-2">
               <FilterChip
                 active={stationSlug === "todas"}
                 onClick={() => setStationSlug("todas")}
@@ -151,7 +163,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
               <button
                 type="button"
                 onClick={f.clear}
-                aria-label="Quitar filtro"
+                aria-label={`Quitar filtro: ${f.label}`}
                 className="hover:text-[color:var(--accent-strong)]"
               >
                 ✕
@@ -169,7 +181,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
       )}
 
       {/* Conteo */}
-      <p className="mb-4 text-sm text-[color:var(--text-muted)]">
+      <p className="mb-4 text-sm text-[color:var(--text-muted)]" role="status" aria-live="polite">
         {filtered.length} actor{filtered.length !== 1 ? "es" : ""}
       </p>
 

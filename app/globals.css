@@ -78,6 +78,31 @@ button {
     box-shadow 160ms ease;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(28, 28, 26, 0.86);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(138, 69, 43, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Display / editorial font — Noto Serif */
 .display-font {
   font-family: var(--font-noto-serif), 'Noto Serif', Georgia, serif;

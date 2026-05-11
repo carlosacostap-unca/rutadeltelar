@@ -25,6 +25,7 @@ function FilterChip({
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition ${
         active
@@ -107,7 +108,11 @@ export function ProductosClient({ products, stations, categories }: Props) {
     <>
       {/* Búsqueda */}
       <div className="mb-5">
+        <label htmlFor="products-search" className="sr-only">
+          Buscar productos por nombre, tecnica o descripcion
+        </label>
         <input
+          id="products-search"
           type="search"
           placeholder="Buscar por nombre, técnica o descripción…"
           value={search}
@@ -124,7 +129,11 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Categoría
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+            <div
+              role="group"
+              aria-label="Filtrar productos por categoria"
+              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+            >
               <FilterChip
                 active={category === "todas"}
                 onClick={() => handleCategoryChange("todas")}
@@ -150,7 +159,11 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Subcategoría
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+            <div
+              role="group"
+              aria-label="Filtrar productos por subcategoria"
+              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+            >
               <FilterChip
                 active={subcategory === "todas"}
                 onClick={() => setSubcategory("todas")}
@@ -176,7 +189,11 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Estación
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+            <div
+              role="group"
+              aria-label="Filtrar productos por estacion"
+              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+            >
               <FilterChip
                 active={stationSlug === "todas"}
                 onClick={() => setStationSlug("todas")}
@@ -209,7 +226,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
               <button
                 type="button"
                 onClick={f.clear}
-                aria-label="Quitar filtro"
+                aria-label={`Quitar filtro: ${f.label}`}
                 className="hover:text-[color:var(--accent-strong)]"
               >
                 ✕
@@ -227,7 +244,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
       )}
 
       {/* Conteo */}
-      <p className="mb-4 text-sm text-[color:var(--text-muted)]">
+      <p className="mb-4 text-sm text-[color:var(--text-muted)]" role="status" aria-live="polite">
         {filtered.length} producto{filtered.length !== 1 ? "s" : ""}
       </p>
 

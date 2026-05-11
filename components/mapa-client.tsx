@@ -66,11 +66,16 @@ export function MapaClient({ stations, artisans, highlightSpots }: Props) {
   return (
     <>
       {/* Filtros de capa */}
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+      <div
+        role="group"
+        aria-label="Capas visibles del mapa"
+        className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+      >
         {LAYERS.map((layer) => (
           <button
             key={layer.id}
             type="button"
+            aria-pressed={active.has(layer.id)}
             onClick={() => toggle(layer.id)}
             className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-semibold transition ${
               active.has(layer.id)
@@ -81,7 +86,7 @@ export function MapaClient({ stations, artisans, highlightSpots }: Props) {
             {layer.label}
           </button>
         ))}
-        <span className="ml-auto self-center text-xs text-[color:var(--text-muted)]">
+        <span className="ml-auto self-center text-xs text-[color:var(--text-muted)]" role="status" aria-live="polite">
           {totalWithCoords} puntos en mapa
         </span>
       </div>

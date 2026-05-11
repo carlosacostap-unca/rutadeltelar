@@ -188,6 +188,9 @@ export function BuscarClient(data: SearchData) {
     <>
       {/* Campo de búsqueda */}
       <div className="relative mb-8">
+        <label htmlFor="global-search" className="sr-only">
+          Buscar en toda la ruta
+        </label>
         <svg
           className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--text-muted)]"
           viewBox="0 0 24 24"
@@ -201,6 +204,7 @@ export function BuscarClient(data: SearchData) {
           <path d="m21 21-4.35-4.35" />
         </svg>
         <input
+          id="global-search"
           type="search"
           autoFocus
           placeholder="Buscar en la ruta..."
@@ -222,7 +226,7 @@ export function BuscarClient(data: SearchData) {
 
       {/* Resultados */}
       {query.trim() && (
-        <p className="mb-6 text-sm text-[color:var(--text-muted)]">
+        <p className="mb-6 text-sm text-[color:var(--text-muted)]" role="status" aria-live="polite">
           {totalResults > 0
             ? `${totalResults} resultado${totalResults !== 1 ? "s" : ""} para "${query}"`
             : `Sin resultados para "${query}"`}

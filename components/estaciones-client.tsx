@@ -51,16 +51,25 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
     <>
       {/* Barra de búsqueda + toggle vista */}
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <label htmlFor="stations-search" className="sr-only">
+          Buscar estaciones por nombre o localidad
+        </label>
         <input
+          id="stations-search"
           type="search"
           placeholder="Buscar por nombre o localidad…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2.5 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--accent)] focus:outline-none"
         />
-        <div className="flex rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-1">
+        <div
+          role="group"
+          aria-label="Vista de estaciones"
+          className="flex rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-1"
+        >
           <button
             type="button"
+            aria-pressed={view === "lista"}
             onClick={() => setView("lista")}
             className={`flex-1 rounded-xl px-4 py-1.5 text-sm font-semibold transition ${
               view === "lista"
@@ -72,6 +81,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
           </button>
           <button
             type="button"
+            aria-pressed={view === "mapa"}
             onClick={() => setView("mapa")}
             className={`flex-1 rounded-xl px-4 py-1.5 text-sm font-semibold transition ${
               view === "mapa"
@@ -86,9 +96,14 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
 
       {/* Filtro por departamento */}
       {departments.length > 0 && (
-        <div className="mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+        <div
+          role="group"
+          aria-label="Filtrar estaciones por departamento"
+          className="mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+        >
           <button
             type="button"
+            aria-pressed={dept === "todas"}
             onClick={() => setDept("todas")}
             className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${
               dept === "todas"
@@ -102,6 +117,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
             <button
               key={d}
               type="button"
+              aria-pressed={dept === d}
               onClick={() => setDept(d)}
               className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${
                 dept === d
@@ -122,6 +138,10 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
           highlightSpots={highlightSpots}
         />
       ) : (
+        <>
+        <p className="sr-only" aria-live="polite">
+          {filtered.length} estaciones disponibles.
+        </p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((station) => (
             <Link
@@ -180,6 +200,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
             </div>
           )}
         </div>
+        </>
       )}
     </>
   );

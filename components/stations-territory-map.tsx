@@ -119,7 +119,11 @@ export function StationsTerritoryMap({
         </div>
       </div>
 
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+      <div
+        role="group"
+        aria-label="Controles del mapa territorial"
+        className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+      >
         {activeSlug ? (
           <>
             <button

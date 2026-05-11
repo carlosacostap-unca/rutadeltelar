@@ -38,12 +38,23 @@ export function ExperienciasClient({ experiences, stations, categories, duration
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
             Categoría
           </p>
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
-            <FilterChip active={category === "todas"} onClick={() => setCategory("todas")}>
+          <div
+            role="group"
+            aria-label="Filtrar experiencias por categoria"
+            className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+          >
+            <FilterChip
+              active={category === "todas"}
+              onClick={() => setCategory("todas")}
+            >
               Todas
             </FilterChip>
             {categories.map((c) => (
-              <FilterChip key={c} active={category === c} onClick={() => setCategory(c)}>
+              <FilterChip
+                key={c}
+                active={category === c}
+                onClick={() => setCategory(c)}
+              >
                 {c}
               </FilterChip>
             ))}
@@ -56,8 +67,15 @@ export function ExperienciasClient({ experiences, stations, categories, duration
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Estación
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
-              <FilterChip active={stationSlug === "todas"} onClick={() => setStationSlug("todas")}>
+            <div
+              role="group"
+              aria-label="Filtrar experiencias por estacion"
+              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+            >
+              <FilterChip
+                active={stationSlug === "todas"}
+                onClick={() => setStationSlug("todas")}
+              >
                 Todas
               </FilterChip>
               {stations.map((s) => (
@@ -79,12 +97,23 @@ export function ExperienciasClient({ experiences, stations, categories, duration
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
               Duración
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
-              <FilterChip active={duration === "todas"} onClick={() => setDuration("todas")}>
+            <div
+              role="group"
+              aria-label="Filtrar experiencias por duracion"
+              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+            >
+              <FilterChip
+                active={duration === "todas"}
+                onClick={() => setDuration("todas")}
+              >
                 Cualquiera
               </FilterChip>
               {durations.map((d) => (
-                <FilterChip key={d} active={duration === d} onClick={() => setDuration(d)}>
+                <FilterChip
+                  key={d}
+                  active={duration === d}
+                  onClick={() => setDuration(d)}
+                >
                   {d}
                 </FilterChip>
               ))}
@@ -94,7 +123,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
       </div>
 
       {/* Resultados */}
-      <p className="mb-4 text-sm text-[color:var(--text-muted)]">
+      <p className="mb-4 text-sm text-[color:var(--text-muted)]" role="status" aria-live="polite">
         {filtered.length} experiencia{filtered.length !== 1 ? "s" : ""}
       </p>
 
@@ -166,6 +195,7 @@ function FilterChip({
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${
         active

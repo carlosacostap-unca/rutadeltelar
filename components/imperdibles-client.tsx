@@ -82,9 +82,14 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
   return (
     <>
       {/* Toggle Agenda / Destacados */}
-      <div className="mb-6 flex rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-1">
+      <div
+        role="group"
+        aria-label="Vista de imperdibles"
+        className="mb-6 flex rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-1"
+      >
         <button
           type="button"
+          aria-pressed={view === "agenda"}
           onClick={() => setView("agenda")}
           className={`flex-1 rounded-xl px-4 py-2 text-sm font-semibold transition ${
             view === "agenda"
@@ -101,6 +106,7 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
         </button>
         <button
           type="button"
+          aria-pressed={view === "destacados"}
           onClick={() => setView("destacados")}
           className={`flex-1 rounded-xl px-4 py-2 text-sm font-semibold transition ${
             view === "destacados"
@@ -190,7 +196,11 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
         <>
           {/* Filtro por tipo */}
           {types.length > 0 && (
-            <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+            <div
+              role="group"
+              aria-label="Filtrar imperdibles por tipo"
+              className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+            >
               <FilterChip
                 active={typeFilter === "todos"}
                 onClick={() => setTypeFilter("todos")}
@@ -288,6 +298,7 @@ function FilterChip({
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${
         active
