@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getStationContextBySlug, getStations } from "@/app/lib/data";
+import { hasValidCoordinates } from "@/app/lib/geo";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
@@ -136,7 +137,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
       </section>
 
       {/* Mapa embebido */}
-      {station.latitude && station.longitude ? (
+      {hasValidCoordinates(station) ? (
         <section className="mb-10">
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
             Ubicación
@@ -277,7 +278,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
           Cómo llegar
         </h2>
         <SurfaceCard>
-          {station.latitude && station.longitude ? (
+          {hasValidCoordinates(station) ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-xs text-[color:var(--text-muted)]">Coordenadas</p>

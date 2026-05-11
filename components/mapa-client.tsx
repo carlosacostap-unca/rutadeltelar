@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { type Artisan, type HighlightSpot, type Station } from "@/app/lib/content";
+import { hasValidCoordinates } from "@/app/lib/geo";
 import { SurfaceCard } from "@/components/surface-card";
 
 type Props = {
@@ -54,13 +55,11 @@ export function MapaClient({ stations, artisans, highlightSpots }: Props) {
   const totalWithCoords = useMemo(() => {
     let n = 0;
     if (active.has("stations"))
-      n += stations.filter(
-        (s) => s.latitude && s.longitude,
-      ).length;
+      n += stations.filter(hasValidCoordinates).length;
     if (active.has("artisans"))
-      n += artisans.filter((a) => a.latitude && a.longitude).length;
+      n += artisans.filter(hasValidCoordinates).length;
     if (active.has("highlightSpots"))
-      n += highlightSpots.filter((s) => s.latitude && s.longitude).length;
+      n += highlightSpots.filter(hasValidCoordinates).length;
     return n;
   }, [active, stations, artisans, highlightSpots]);
 

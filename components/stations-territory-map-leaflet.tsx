@@ -17,6 +17,7 @@ import {
   type HighlightSpot,
   type Station,
 } from "@/app/lib/content";
+import { hasValidCoordinates } from "@/app/lib/geo";
 
 type StationsTerritoryMapLeafletProps = {
   stations: Station[];
@@ -31,29 +32,15 @@ type StationsTerritoryMapLeafletProps = {
 };
 
 function getGeolocatedStations(stations: Station[]) {
-  return stations.filter(
-    (station): station is Station & { latitude: number; longitude: number } =>
-      typeof station.latitude === "number" &&
-      typeof station.longitude === "number",
-  );
+  return stations.filter(hasValidCoordinates);
 }
 
 function getGeolocatedArtisans(artisans: Artisan[]) {
-  return artisans.filter(
-    (artisan): artisan is Artisan & { latitude: number; longitude: number } =>
-      typeof artisan.latitude === "number" &&
-      typeof artisan.longitude === "number" &&
-      !(artisan.latitude === 0 && artisan.longitude === 0),
-  );
+  return artisans.filter(hasValidCoordinates);
 }
 
 function getGeolocatedHighlightSpots(highlightSpots: HighlightSpot[]) {
-  return highlightSpots.filter(
-    (spot): spot is HighlightSpot & { latitude: number; longitude: number } =>
-      typeof spot.latitude === "number" &&
-      typeof spot.longitude === "number" &&
-      !(spot.latitude === 0 && spot.longitude === 0),
-  );
+  return highlightSpots.filter(hasValidCoordinates);
 }
 
 function MapResizer() {

@@ -7,7 +7,14 @@ export function DataSourceBadge({
   source,
   error,
 }: DataSourceBadgeProps) {
+  const shouldShow =
+    process.env.NODE_ENV === "development" ||
+    process.env.NEXT_PUBLIC_SHOW_DATA_SOURCE_BADGE === "true";
   const isPocketBase = source === "pocketbase";
+
+  if (!shouldShow) {
+    return null;
+  }
 
   if (isPocketBase && !error) {
     return null;

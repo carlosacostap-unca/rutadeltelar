@@ -15,6 +15,7 @@ import {
   type Product,
   type Station,
 } from "@/app/lib/content";
+import { toValidIsoDate } from "@/app/lib/dates";
 import {
   getPocketBaseList,
   getPocketBaseFileUrl,
@@ -540,7 +541,7 @@ function normalizeHighlightSpot(record: PocketBaseRecord): HighlightSpot | null 
       ),
     ),
     type: readDisplayString(record, ["expand.tipo.nombre", "tipo"], "imperdible"),
-    eventDate: readString(record, ["fecha_hora_evento"], "") || undefined,
+    eventDate: toValidIsoDate(readString(record, ["fecha_hora_evento"], "")),
     location: readDisplayString(
       record,
       [
@@ -1282,4 +1283,3 @@ export async function getProductContextBySlug(slug: string) {
 
   return { product, relatedStation, relatedActors };
 }
-

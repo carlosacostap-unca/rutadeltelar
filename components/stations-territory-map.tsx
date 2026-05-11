@@ -8,6 +8,7 @@ import {
   type HighlightSpot,
   type Station,
 } from "@/app/lib/content";
+import { hasValidCoordinates } from "@/app/lib/geo";
 
 type StationsTerritoryMapProps = {
   stations: Station[];
@@ -17,16 +18,6 @@ type StationsTerritoryMapProps = {
   artisans?: Artisan[];
   highlightSpots?: HighlightSpot[];
 };
-
-function hasValidCoordinates(
-  item: { latitude?: number; longitude?: number },
-) {
-  return (
-    typeof item.latitude === "number" &&
-    typeof item.longitude === "number" &&
-    !(item.latitude === 0 && item.longitude === 0)
-  );
-}
 
 const StationsTerritoryMapLeaflet = dynamic(
   () =>
