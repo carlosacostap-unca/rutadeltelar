@@ -9,6 +9,8 @@ import {
   type Station,
 } from "@/app/lib/content";
 import { hasValidCoordinates } from "@/app/lib/geo";
+import { DeferredRender } from "@/components/deferred-render";
+import { MapLoadingPlaceholder } from "@/components/map-loading-placeholder";
 
 type StationsTerritoryMapProps = {
   stations: Station[];
@@ -26,11 +28,7 @@ const StationsTerritoryMapLeaflet = dynamic(
     ),
   {
     ssr: false,
-    loading: () => (
-      <div className="flex h-[360px] items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[linear-gradient(180deg,var(--surface)_0%,var(--surface-strong)_100%)] text-sm text-[color:var(--text-muted)] sm:h-[460px]">
-        Cargando mapa...
-      </div>
-    ),
+    loading: () => <MapLoadingPlaceholder label="Cargando mapa..." />,
   },
 );
 
@@ -196,17 +194,19 @@ export function StationsTerritoryMap({
         ))}
       </div>
 
-      <StationsTerritoryMapLeaflet
-        stations={filteredStations}
-        activeSlug={activeSlug}
-        selectedSlug={selectedSlug}
-        onSelectStation={onSelectStation}
-        artisans={filteredArtisans}
-        highlightSpots={filteredHighlightSpots}
-        showStations={visibleLayers.stations}
-        showArtisans={visibleLayers.artisans}
-        showHighlightSpots={visibleLayers.highlightSpots}
-      />
+      <DeferredRender fallback={<MapLoadingPlaceholder label="Mapa listo al acercarte..." />}>
+        <StationsTerritoryMapLeaflet
+          stations={filteredStations}
+          activeSlug={activeSlug}
+          selectedSlug={selectedSlug}
+          onSelectStation={onSelectStation}
+          artisans={filteredArtisans}
+          highlightSpots={filteredHighlightSpots}
+          showStations={visibleLayers.stations}
+          showArtisans={visibleLayers.artisans}
+          showHighlightSpots={visibleLayers.highlightSpots}
+        />
+      </DeferredRender>
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         {stations.map((station) => {

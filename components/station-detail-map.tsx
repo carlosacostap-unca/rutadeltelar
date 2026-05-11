@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { DeferredRender } from "@/components/deferred-render";
+import { MapLoadingPlaceholder } from "@/components/map-loading-placeholder";
 
 type Props = {
   lat: number;
@@ -10,13 +12,13 @@ type Props = {
 
 const MapInner = dynamic(() => import("@/components/station-detail-map-leaflet"), {
   ssr: false,
-  loading: () => (
-    <div className="flex h-[280px] items-center justify-center bg-[color:var(--surface)] text-sm text-[color:var(--text-muted)]">
-      Cargando mapa…
-    </div>
-  ),
+  loading: () => <MapLoadingPlaceholder compact label="Cargando mapa..." />,
 });
 
 export function StationDetailMap({ lat, lng, label }: Props) {
-  return <MapInner lat={lat} lng={lng} label={label} />;
+  return (
+    <DeferredRender fallback={<MapLoadingPlaceholder compact label="Mapa listo al acercarte..." />}>
+      <MapInner lat={lat} lng={lng} label={label} />
+    </DeferredRender>
+  );
 }

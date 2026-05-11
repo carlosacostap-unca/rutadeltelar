@@ -30,6 +30,7 @@ export function PbImage({ fallback, className, alt, ...props }: PbImageProps) {
         {...props}
         alt={alt}
         className={className}
+        decoding={props.decoding ?? "async"}
         onError={() => setFailed(true)}
       />
     </>
