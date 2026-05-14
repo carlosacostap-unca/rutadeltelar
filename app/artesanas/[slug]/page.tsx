@@ -244,6 +244,27 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
         </div>
       </section>
 
+      {artisan.galleryUrls && artisan.galleryUrls.length > 0 && (
+        <section className="mb-10">
+          <div className="flex gap-3 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {artisan.galleryUrls.map((url, index) => (
+              <div
+                key={url}
+                className="relative aspect-[4/3] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-[color:var(--border)] [scroll-snap-align:start]"
+              >
+                <Image
+                  src={url}
+                  alt={`${artisan.name} galeria ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="220px"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Ficha por subtipo */}
       <section className="mb-10">
         <ActorFicha actor={artisan} />

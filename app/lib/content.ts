@@ -70,6 +70,7 @@ export type Experience = {
   includes: string[];
   stops: string[];
   imageUrl?: string;
+  galleryUrls?: string[];
   stationName?: string;
   stationSlug?: string;
   stationRecordId?: string;
@@ -226,6 +227,7 @@ export type Artisan = {
   years: string;
   featuredPiece: string;
   imageUrl?: string;
+  galleryUrls?: string[];
   stationName?: string;
   stationSlug?: string;
   stationRecordId?: string;
@@ -343,6 +345,7 @@ export type Product = {
   subcategory?: string;
   techniques: string[];
   imageUrl?: string;
+  galleryUrls?: string[];
   stationName?: string;
   stationSlug?: string;
   stationRecordId?: string;

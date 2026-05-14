@@ -17,6 +17,11 @@ import {
 } from "@/app/lib/content";
 import { toValidIsoDate } from "@/app/lib/dates";
 import {
+  getEntityCoverImage,
+  getEntityGalleryImages,
+  type EntityMediaFields,
+} from "@/app/lib/multimedia";
+import {
   getPocketBaseList,
   getPocketBaseFileUrl,
   type PocketBaseRecord,
@@ -223,23 +228,28 @@ function uniqueStrings(values: string[]) {
   return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
 }
 
-function getFileNames(record: PocketBaseRecord, keys: string[]) {
-  const values = uniqueStrings(readStringArray(record, keys));
-  return values.filter((value) => !value.startsWith("http"));
-}
-
 function readIdArray(record: PocketBaseRecord, keys: string[]) {
   return uniqueStrings(readStringArray(record, keys));
 }
 
-function getFileUrlList(record: PocketBaseRecord, keys: string[]) {
-  return getFileNames(record, keys)
-    .map((fileName) => getPocketBaseFileUrl(record, fileName))
-    .filter((value): value is string => Boolean(value));
+function getFileUrl(record: PocketBaseRecord, fileName: string) {
+  if (/^https?:\/\//i.test(fileName)) {
+    return fileName;
+  }
+
+  return getPocketBaseFileUrl(record, fileName);
 }
 
-function getPrimaryImageUrl(record: PocketBaseRecord, keys: string[]) {
-  return getFileUrlList(record, keys)[0];
+function getEntityCoverImageUrl(record: PocketBaseRecord & EntityMediaFields) {
+  const fileName = getEntityCoverImage(record);
+
+  return fileName ? getFileUrl(record, fileName) : undefined;
+}
+
+function getEntityGalleryImageUrls(record: PocketBaseRecord & EntityMediaFields) {
+  return getEntityGalleryImages(record)
+    .map((fileName) => getFileUrl(record, fileName))
+    .filter((value): value is string => Boolean(value));
 }
 
 function resolveExperienceIncludes(record: PocketBaseRecord) {
@@ -321,9 +331,8 @@ function normalizeExperience(record: PocketBaseRecord): Experience | null {
     ),
     includes: resolveExperienceIncludes(record),
     stops: resolveExperienceStops(record),
-    imageUrl:
-      getPrimaryImageUrl(record, ["fotos"]) ||
-      getPrimaryImageUrl(record, ["expand.estacion_id.foto_portada", "expand.estacion_id.galeria_fotos"]),
+    imageUrl: getEntityCoverImageUrl(record),
+    galleryUrls: getEntityGalleryImageUrls(record),
     stationName: readDisplayString(record, ["expand.estacion_id.nombre"], ""),
     stationRecordId: readString(record, ["estacion_id", "expand.estacion_id.id"], ""),
     stationSlug: readString(
@@ -433,7 +442,8 @@ function normalizeArtisan(record: PocketBaseRecord): Artisan | null {
         ["featuredPiece", "featured_piece", "piece"],
         "Pieza destacada",
       ),
-    imageUrl: getPrimaryImageUrl(record, ["fotos"]),
+    imageUrl: getEntityCoverImageUrl(record),
+    galleryUrls: getEntityGalleryImageUrls(record),
     stationName: readDisplayString(record, ["expand.estacion_id.nombre"], ""),
     stationRecordId: readString(
       record,
@@ -512,9 +522,8 @@ function normalizeStation(record: PocketBaseRecord): Station | null {
     ),
     status: readString(record, ["estado"], "aprobado"),
     hasInauguratedStation: Boolean(getPathValue(record, "posee_estacion_inaugurada")),
-    imageUrl:
-      getPrimaryImageUrl(record, ["foto_portada", "galeria_fotos", "fotos"]),
-    galleryUrls: getFileUrlList(record, ["galeria_fotos", "fotos"]),
+    imageUrl: getEntityCoverImageUrl(record),
+    galleryUrls: getEntityGalleryImageUrls(record),
     latitude: readNumber(record, ["latitud"]),
     longitude: readNumber(record, ["longitud"]),
   };
@@ -556,9 +565,7 @@ function normalizeHighlightSpot(record: PocketBaseRecord): HighlightSpot | null 
       ["expand.prioridad.nombre", "prioridad"],
       "media",
     ),
-    imageUrl:
-      getPrimaryImageUrl(record, ["fotos"]) ||
-      getPrimaryImageUrl(record, ["expand.estacion_id.foto_portada", "expand.estacion_id.galeria_fotos"]),
+    imageUrl: getEntityCoverImageUrl(record),
     stationName: readDisplayString(record, ["expand.estacion_id.nombre"], ""),
     stationRecordId: readString(
       record,
@@ -573,7 +580,7 @@ function normalizeHighlightSpot(record: PocketBaseRecord): HighlightSpot | null 
     relatedExperienceRecordIds: readIdArray(record, ["experiencias_relacionadas"]),
     relatedArtisanRecordIds: readIdArray(record, ["actores_relacionados"]),
     relatedProductRecordIds: readIdArray(record, ["productos_relacionados"]),
-    galleryUrls: getFileUrlList(record, ["fotos"]),
+    galleryUrls: getEntityGalleryImageUrls(record),
     horarios: readDisplayString(record, ["horarios"], "") || undefined,
     accesibilidad: readDisplayString(record, ["accesibilidad"], "") || undefined,
     estacionalidad: readDisplayString(record, ["estacionalidad"], "") || undefined,
@@ -1210,7 +1217,8 @@ function normalizeProduct(record: PocketBaseRecord): Product | null {
     category: readDisplayString(record, ["expand.categoria.nombre", "categoria"], "Artesanía"),
     subcategory: readDisplayString(record, ["expand.subcategoria.nombre", "subcategoria"], "") || undefined,
     techniques,
-    imageUrl: getPrimaryImageUrl(record, ["fotos"]),
+    imageUrl: getEntityCoverImageUrl(record),
+    galleryUrls: getEntityGalleryImageUrls(record),
     stationName: station.name || undefined,
     stationRecordId: station.recordId || undefined,
     stationSlug: station.slug || undefined,

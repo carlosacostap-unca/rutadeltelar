@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 import { getStationContextBySlug, getStations } from "@/app/lib/data";
 import { hasValidCoordinates } from "@/app/lib/geo";
 import { createPageMetadata } from "@/app/lib/metadata";
+import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
-import { MediaFallback } from "@/components/media-fallback";
 import { ShareButton } from "@/components/share-button";
 import { StationDetailMap } from "@/components/station-detail-map";
 import { SurfaceCard } from "@/components/surface-card";
@@ -54,10 +54,6 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
   }
 
   const { station, artisans, products, experiences, highlightSpots } = context;
-  const allGallery = [
-    ...(station.imageUrl ? [station.imageUrl] : []),
-    ...(station.galleryUrls ?? []).filter((u) => u !== station.imageUrl),
-  ];
 
   return (
     <main className="flex flex-1 flex-col">
@@ -86,36 +82,19 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
 
       {/* Hero gallery */}
       <section className="mb-10">
-        {allGallery.length > 0 ? (
-          <div className="relative">
-            <div className="flex gap-3 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {allGallery.map((url, i) => (
-                <div
-                  key={url}
-                  className={`relative shrink-0 overflow-hidden rounded-3xl [scroll-snap-align:start] ${i === 0 ? "aspect-[16/9] w-full" : "aspect-[4/3] w-[280px]"}`}
-                >
-                  <Image
-                    src={url}
-                    alt={`${station.name} ${i + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 70vw"
-                    priority={i === 0}
-                  />
-                </div>
-              ))}
-            </div>
-            {station.hasInauguratedStation && (
-              <span className="absolute left-4 top-4 rounded-full bg-[color:var(--accent)] px-3 py-1 text-xs font-semibold text-white shadow">
-                Inaugurada
-              </span>
-            )}
-          </div>
-        ) : (
-          <div className="aspect-[16/9] overflow-hidden rounded-3xl border border-[color:var(--border)]">
-            <MediaFallback label="Estacion" />
-          </div>
-        )}
+        <div className="relative">
+          <DetailMediaGallery
+            title={station.name}
+            fallbackLabel="Estacion"
+            coverUrl={station.imageUrl}
+            galleryUrls={station.galleryUrls}
+          />
+          {station.hasInauguratedStation && (
+            <span className="absolute left-4 top-4 rounded-full bg-[color:var(--accent)] px-3 py-1 text-xs font-semibold text-white shadow">
+              Inaugurada
+            </span>
+          )}
+        </div>
       </section>
 
       {/* Título y descripción */}

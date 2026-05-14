@@ -7,9 +7,9 @@ import {
   getExperiences,
 } from "@/app/lib/data";
 import { createPageMetadata } from "@/app/lib/metadata";
+import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
-import { MediaFallback } from "@/components/media-fallback";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -82,22 +82,14 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
 
       {/* Hero: foto + título */}
       <section className="mb-10 grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-start">
-        {experience.imageUrl ? (
-          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow">
-            <Image
-              src={experience.imageUrl}
-              alt={experience.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              priority
-            />
-          </div>
-        ) : (
-          <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow">
-            <MediaFallback label="Experiencia" />
-          </div>
-        )}
+        <DetailMediaGallery
+          title={experience.title}
+          fallbackLabel="Experiencia"
+          coverUrl={experience.imageUrl}
+          galleryUrls={experience.galleryUrls}
+          coverClassName="aspect-[4/3]"
+          coverSizes="(max-width: 1024px) 100vw, 50vw"
+        />
 
         <div>
           {/* Categoría + duración */}

@@ -4,8 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductContextBySlug, getProducts } from "@/app/lib/data";
 import { createPageMetadata } from "@/app/lib/metadata";
+import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
-import { MediaFallback } from "@/components/media-fallback";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -78,23 +78,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
       {/* Galería + info */}
       <section className="mb-10 grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-start">
-        {/* Imagen principal */}
-        {product.imageUrl ? (
-          <div className="relative aspect-square overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow">
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              priority
-            />
-          </div>
-        ) : (
-          <div className="aspect-square overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow">
-            <MediaFallback label="Producto" />
-          </div>
-        )}
+        <DetailMediaGallery
+          title={product.name}
+          fallbackLabel="Producto"
+          coverUrl={product.imageUrl}
+          galleryUrls={product.galleryUrls}
+          coverClassName="aspect-square"
+          coverSizes="(max-width: 1024px) 100vw, 50vw"
+        />
 
         {/* Info */}
         <div>

@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ruta del Telar
 
-## Getting Started
+Aplicacion publica de la Ruta del Telar de Catamarca, construida con Next.js.
 
-First, run the development server:
+## Desarrollo
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+El servidor de desarrollo usa el puerto `3000` por defecto:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Si ese puerto esta ocupado, se puede indicar otro:
 
-## Learn More
+```bash
+npm run dev -- --port 3001
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Verificacion
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Antes de publicar o abrir un PR, correr la verificacion completa:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run verify
+```
 
-## Deploy on Vercel
+Ese comando ejecuta, en orden:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run openspec:validate`
+- `npm run lint`
+- `npm run build`
+- `npm run test:playwright`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Para una pasada mas corta durante desarrollo:
+
+```bash
+npm run verify:quick
+```
+
+La version rapida ejecuta OpenSpec, lint y build, pero salta Playwright.
+
+## OpenSpec
+
+El proyecto usa OpenSpec para mantener requisitos y cambios propuestos en `openspec/`.
+
+```bash
+npm run openspec:list
+npm run openspec:validate
+```
+
+Las specs actuales viven en `openspec/specs/`. Para proponer una nueva funcionalidad con Codex, usar el flujo de OpenSpec antes de implementar el cambio.
+
+## Pruebas E2E
+
+```bash
+npm run test:playwright
+```
+
+Las pruebas levantan un servidor Next en `http://localhost:3211` y desactivan PocketBase para usar los datos locales de fallback.
+
+## Datos
+
+El sitio puede leer desde PocketBase cuando las variables correspondientes estan configuradas. Si no hay conexion o no hay variables, usa datos locales para mantener la experiencia publica disponible.

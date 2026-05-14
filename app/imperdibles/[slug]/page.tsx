@@ -7,10 +7,10 @@ import {
   getHighlightSpots,
 } from "@/app/lib/data";
 import { createPageMetadata } from "@/app/lib/metadata";
+import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HomeCarousel } from "@/components/home-carousel";
 import { IcsDownloadButton } from "@/components/ics-download-button";
-import { MediaFallback } from "@/components/media-fallback";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -69,10 +69,6 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
 
   const { spot, relatedArtisans, relatedExperiences, relatedStation, relatedProducts } = context;
   const isEvent = spot.type.toLowerCase() === "evento";
-  const allGallery = [
-    ...(spot.imageUrl ? [spot.imageUrl] : []),
-    ...(spot.galleryUrls ?? []).filter((u) => u !== spot.imageUrl),
-  ];
 
   return (
     <main className="flex flex-1 flex-col">
@@ -101,29 +97,12 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
 
       {/* Galería */}
       <section className="mb-10">
-        {allGallery.length > 0 ? (
-          <div className="flex gap-3 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {allGallery.map((url, i) => (
-              <div
-                key={url}
-                className={`relative shrink-0 overflow-hidden rounded-3xl [scroll-snap-align:start] ${i === 0 ? "aspect-[16/9] w-full" : "aspect-[4/3] w-[260px]"}`}
-              >
-                <Image
-                  src={url}
-                  alt={`${spot.title} ${i + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 70vw"
-                  priority={i === 0}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="aspect-[16/9] overflow-hidden rounded-3xl border border-[color:var(--border)]">
-            <MediaFallback label="Imperdible" />
-          </div>
-        )}
+        <DetailMediaGallery
+          title={spot.title}
+          fallbackLabel="Imperdible"
+          coverUrl={spot.imageUrl}
+          galleryUrls={spot.galleryUrls}
+        />
       </section>
 
       {/* Título + subtítulo + tipo */}
