@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type HighlightSpot } from "@/app/lib/content";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
@@ -176,6 +177,7 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
                                   fill
                                   className="object-cover"
                                   sizes="64px"
+                                  style={getImageFocusStyle(event.imageFocus)}
                                 />
                               </div>
                             )}
@@ -235,6 +237,7 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
                         fill
                         className="object-cover transition group-hover:scale-[1.03]"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        style={getImageFocusStyle(spot.imageFocus)}
                         fallback={
                           <div className="mb-4 aspect-[3/2] overflow-hidden rounded-xl">
                             <MediaFallback label="Imperdible" />

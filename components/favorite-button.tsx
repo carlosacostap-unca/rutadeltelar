@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ImageFocus } from "@/app/lib/image-focus";
 
 export type FavoriteItem = {
   type: "estacion" | "producto" | "actor" | "experiencia" | "imperdible" | "recorrido";
@@ -9,6 +10,7 @@ export type FavoriteItem = {
   subtitle?: string;
   href: string;
   imageUrl?: string;
+  imageFocus?: ImageFocus;
 };
 
 const FAVORITES_KEY = "ruta-del-telar:favorites:v1";

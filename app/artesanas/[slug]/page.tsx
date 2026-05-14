@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { type Artisan } from "@/app/lib/content";
 import { getArtisanContextBySlug, getArtisans } from "@/app/lib/data";
+import { getImageFocusStyle, type FocusedImage } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { ContactButtons } from "@/components/contact-buttons";
 import { FavoriteButton } from "@/components/favorite-button";
@@ -175,6 +176,8 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
   }
 
   const { artisan, relatedExperiences, relatedHighlightSpots, relatedStation, relatedProducts } = context;
+  const galleryImages: FocusedImage[] =
+    artisan.galleryImages ?? artisan.galleryUrls?.map((url) => ({ url })) ?? [];
 
   return (
     <main className="flex flex-1 flex-col">
@@ -195,6 +198,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
               subtitle: artisan.craft,
               href: `/artesanas/${artisan.slug}`,
               imageUrl: artisan.imageUrl,
+              imageFocus: artisan.imageFocus,
             }}
           />
           <ShareButton title={artisan.name} text={artisan.craft} />
@@ -206,7 +210,15 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
         {/* Foto */}
         {artisan.imageUrl ? (
           <div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow sm:h-44 sm:w-44">
-            <Image src={artisan.imageUrl} alt={artisan.name} fill className="object-cover" sizes="176px" priority />
+            <Image
+              src={artisan.imageUrl}
+              alt={artisan.name}
+              fill
+              className="object-cover"
+              sizes="176px"
+              style={getImageFocusStyle(artisan.imageFocus)}
+              priority
+            />
           </div>
         ) : (
           <div className="display-font flex h-36 w-36 shrink-0 items-center justify-center rounded-3xl bg-[color:var(--surface)] text-5xl text-[color:var(--accent-strong)] soft-shadow sm:h-44 sm:w-44">
@@ -240,24 +252,32 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
           <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--text-muted)]">{artisan.bio}</p>
 
           {/* Contacto */}
-          <ContactButtons phone={artisan.contactPhone} email={artisan.contactEmail} address={artisan.address} />
+          <ContactButtons
+            phone={artisan.contactPhone}
+            email={artisan.contactEmail}
+            address={artisan.address}
+            facebook_url={artisan.facebook_url}
+            instagram_url={artisan.instagram_url}
+            pagina_web_url={artisan.pagina_web_url}
+          />
         </div>
       </section>
 
-      {artisan.galleryUrls && artisan.galleryUrls.length > 0 && (
+      {galleryImages.length > 0 && (
         <section className="mb-10">
           <div className="flex gap-3 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {artisan.galleryUrls.map((url, index) => (
+            {galleryImages.map((image, index) => (
               <div
-                key={url}
+                key={image.url}
                 className="relative aspect-[4/3] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-[color:var(--border)] [scroll-snap-align:start]"
               >
                 <Image
-                  src={url}
+                  src={image.url}
                   alt={`${artisan.name} galeria ${index + 1}`}
                   fill
                   className="object-cover"
                   sizes="220px"
+                  style={getImageFocusStyle(image.focus)}
                 />
               </div>
             ))}
@@ -282,7 +302,14 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
               <SurfaceCard className="!p-0 h-full overflow-hidden transition group-hover:border-[color:var(--accent)]">
                 {product.imageUrl ? (
                   <div className="relative aspect-square w-full overflow-hidden">
-                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover transition group-hover:scale-[1.03]" sizes="200px" />
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition group-hover:scale-[1.03]"
+                      sizes="200px"
+                      style={getImageFocusStyle(product.imageFocus)}
+                    />
                   </div>
                 ) : (
                   <div className="flex aspect-square items-center justify-center bg-[color:var(--surface)] text-3xl">🧵</div>
@@ -309,7 +336,14 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
               <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
                 {spot.imageUrl ? (
                   <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
-                    <Image src={spot.imageUrl} alt={spot.title} fill className="object-cover transition group-hover:scale-[1.03]" sizes="240px" />
+                    <Image
+                      src={spot.imageUrl}
+                      alt={spot.title}
+                      fill
+                      className="object-cover transition group-hover:scale-[1.03]"
+                      sizes="240px"
+                      style={getImageFocusStyle(spot.imageFocus)}
+                    />
                   </div>
                 ) : (
                   <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">⭐</div>
@@ -335,7 +369,14 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
               <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
                 {exp.imageUrl ? (
                   <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
-                    <Image src={exp.imageUrl} alt={exp.title} fill className="object-cover transition group-hover:scale-[1.03]" sizes="260px" />
+                    <Image
+                      src={exp.imageUrl}
+                      alt={exp.title}
+                      fill
+                      className="object-cover transition group-hover:scale-[1.03]"
+                      sizes="260px"
+                      style={getImageFocusStyle(exp.imageFocus)}
+                    />
                   </div>
                 ) : (
                   <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">🧭</div>

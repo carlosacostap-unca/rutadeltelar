@@ -22,6 +22,13 @@ import {
   type EntityMediaFields,
 } from "@/app/lib/multimedia";
 import {
+  getGalleryImageFocus,
+  parseGalleryFocusMap,
+  type FocusedImage,
+  type GalleryFocusMap,
+  type ImageFocus,
+} from "@/app/lib/image-focus";
+import {
   getPocketBaseList,
   getPocketBaseFileUrl,
   type PocketBaseRecord,
@@ -246,10 +253,57 @@ function getEntityCoverImageUrl(record: PocketBaseRecord & EntityMediaFields) {
   return fileName ? getFileUrl(record, fileName) : undefined;
 }
 
-function getEntityGalleryImageUrls(record: PocketBaseRecord & EntityMediaFields) {
-  return getEntityGalleryImages(record)
-    .map((fileName) => getFileUrl(record, fileName))
-    .filter((value): value is string => Boolean(value));
+function getEntityCoverFocus(record: PocketBaseRecord): ImageFocus | undefined {
+  const focus = {
+    x: readNumber(record, ["foto_portada_focus_x"]),
+    y: readNumber(record, ["foto_portada_focus_y"]),
+  };
+
+  return focus.x !== undefined || focus.y !== undefined ? focus : undefined;
+}
+
+function getEntityGalleryFocusMap(record: PocketBaseRecord): GalleryFocusMap | undefined {
+  return parseGalleryFocusMap(getPathValue(record, "galeria_fotos_focus"));
+}
+
+function getEntityGalleryImageItems(
+  record: PocketBaseRecord & EntityMediaFields,
+  focusMap = getEntityGalleryFocusMap(record),
+): FocusedImage[] {
+  const images: FocusedImage[] = [];
+
+  for (const fileName of getEntityGalleryImages(record)) {
+    const url = getFileUrl(record, fileName);
+
+    if (!url) {
+      continue;
+    }
+
+    const focus = getGalleryImageFocus(fileName, focusMap);
+    images.push({
+      url,
+      fileName,
+      ...(focus ? { focus } : {}),
+    });
+  }
+
+  return images;
+}
+
+function getEntityImageFields(record: PocketBaseRecord & EntityMediaFields) {
+  const galleryFocusMap = getEntityGalleryFocusMap(record);
+  const galleryImages = getEntityGalleryImageItems(record, galleryFocusMap);
+  const imageFocus = getEntityCoverFocus(record);
+
+  return {
+    imageUrl: getEntityCoverImageUrl(record),
+    galleryUrls: galleryImages.map((item) => item.url),
+    imageFocus,
+    galleryImages,
+    foto_portada_focus_x: imageFocus?.x,
+    foto_portada_focus_y: imageFocus?.y,
+    galeria_fotos_focus: galleryFocusMap,
+  };
 }
 
 function resolveExperienceIncludes(record: PocketBaseRecord) {
@@ -331,8 +385,7 @@ function normalizeExperience(record: PocketBaseRecord): Experience | null {
     ),
     includes: resolveExperienceIncludes(record),
     stops: resolveExperienceStops(record),
-    imageUrl: getEntityCoverImageUrl(record),
-    galleryUrls: getEntityGalleryImageUrls(record),
+    ...getEntityImageFields(record),
     stationName: readDisplayString(record, ["expand.estacion_id.nombre"], ""),
     stationRecordId: readString(record, ["estacion_id", "expand.estacion_id.id"], ""),
     stationSlug: readString(
@@ -442,8 +495,7 @@ function normalizeArtisan(record: PocketBaseRecord): Artisan | null {
         ["featuredPiece", "featured_piece", "piece"],
         "Pieza destacada",
       ),
-    imageUrl: getEntityCoverImageUrl(record),
-    galleryUrls: getEntityGalleryImageUrls(record),
+    ...getEntityImageFields(record),
     stationName: readDisplayString(record, ["expand.estacion_id.nombre"], ""),
     stationRecordId: readString(
       record,
@@ -460,6 +512,9 @@ function normalizeArtisan(record: PocketBaseRecord): Artisan | null {
     contactPhone: readDisplayString(record, ["contacto_telefono"], ""),
     contactEmail: readDisplayString(record, ["contacto_email"], "") || undefined,
     address: readDisplayString(record, ["ubicacion"], ""),
+    facebook_url: readString(record, ["facebook_url"], "") || undefined,
+    instagram_url: readString(record, ["instagram_url"], "") || undefined,
+    pagina_web_url: readString(record, ["pagina_web_url"], "") || undefined,
     latitude: readNumber(record, ["latitud"]),
     longitude: readNumber(record, ["longitud"]),
     // Artesano / Productor
@@ -522,8 +577,7 @@ function normalizeStation(record: PocketBaseRecord): Station | null {
     ),
     status: readString(record, ["estado"], "aprobado"),
     hasInauguratedStation: Boolean(getPathValue(record, "posee_estacion_inaugurada")),
-    imageUrl: getEntityCoverImageUrl(record),
-    galleryUrls: getEntityGalleryImageUrls(record),
+    ...getEntityImageFields(record),
     latitude: readNumber(record, ["latitud"]),
     longitude: readNumber(record, ["longitud"]),
   };
@@ -565,7 +619,7 @@ function normalizeHighlightSpot(record: PocketBaseRecord): HighlightSpot | null 
       ["expand.prioridad.nombre", "prioridad"],
       "media",
     ),
-    imageUrl: getEntityCoverImageUrl(record),
+    ...getEntityImageFields(record),
     stationName: readDisplayString(record, ["expand.estacion_id.nombre"], ""),
     stationRecordId: readString(
       record,
@@ -580,7 +634,6 @@ function normalizeHighlightSpot(record: PocketBaseRecord): HighlightSpot | null 
     relatedExperienceRecordIds: readIdArray(record, ["experiencias_relacionadas"]),
     relatedArtisanRecordIds: readIdArray(record, ["actores_relacionados"]),
     relatedProductRecordIds: readIdArray(record, ["productos_relacionados"]),
-    galleryUrls: getEntityGalleryImageUrls(record),
     horarios: readDisplayString(record, ["horarios"], "") || undefined,
     accesibilidad: readDisplayString(record, ["accesibilidad"], "") || undefined,
     estacionalidad: readDisplayString(record, ["estacionalidad"], "") || undefined,
@@ -1217,8 +1270,7 @@ function normalizeProduct(record: PocketBaseRecord): Product | null {
     category: readDisplayString(record, ["expand.categoria.nombre", "categoria"], "Artesanía"),
     subcategory: readDisplayString(record, ["expand.subcategoria.nombre", "subcategoria"], "") || undefined,
     techniques,
-    imageUrl: getEntityCoverImageUrl(record),
-    galleryUrls: getEntityGalleryImageUrls(record),
+    ...getEntityImageFields(record),
     stationName: station.name || undefined,
     stationRecordId: station.recordId || undefined,
     stationSlug: station.slug || undefined,

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Artisan, type Station } from "@/app/lib/content";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -199,6 +200,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
                       fill
                       className="object-cover"
                       sizes="48px"
+                      style={getImageFocusStyle(item.imageFocus)}
                       fallback={
                         <div className="display-font flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--surface)] text-lg text-[color:var(--accent-strong)]">
                           {item.name[0]}

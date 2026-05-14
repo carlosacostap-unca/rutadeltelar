@@ -6,6 +6,7 @@ import {
   getHighlightSpotContextBySlug,
   getHighlightSpots,
 } from "@/app/lib/data";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
@@ -89,6 +90,7 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
               subtitle: spot.location,
               href: `/imperdibles/${spot.slug}`,
               imageUrl: spot.imageUrl,
+              imageFocus: spot.imageFocus,
             }}
           />
           <ShareButton title={spot.title} text={spot.subtitle} />
@@ -102,6 +104,8 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
           fallbackLabel="Imperdible"
           coverUrl={spot.imageUrl}
           galleryUrls={spot.galleryUrls}
+          coverFocus={spot.imageFocus}
+          galleryImages={spot.galleryImages}
         />
       </section>
 
@@ -248,7 +252,14 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
               <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
                 {actor.imageUrl ? (
                   <div className="relative mb-3 h-14 w-14 overflow-hidden rounded-full border border-[color:var(--border)]">
-                    <Image src={actor.imageUrl} alt={actor.name} fill className="object-cover" sizes="56px" />
+                    <Image
+                      src={actor.imageUrl}
+                      alt={actor.name}
+                      fill
+                      className="object-cover"
+                      sizes="56px"
+                      style={getImageFocusStyle(actor.imageFocus)}
+                    />
                   </div>
                 ) : (
                   <div className="display-font mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--surface)] text-xl text-[color:var(--accent-strong)]">
@@ -278,7 +289,14 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
               <SurfaceCard className="!p-0 h-full overflow-hidden transition group-hover:border-[color:var(--accent)]">
                 {product.imageUrl ? (
                   <div className="relative aspect-square w-full overflow-hidden">
-                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover transition group-hover:scale-[1.03]" sizes="200px" />
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition group-hover:scale-[1.03]"
+                      sizes="200px"
+                      style={getImageFocusStyle(product.imageFocus)}
+                    />
                   </div>
                 ) : (
                   <div className="flex aspect-square items-center justify-center bg-[color:var(--surface)] text-3xl">🧵</div>
@@ -305,7 +323,14 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
               <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
                 {exp.imageUrl ? (
                   <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
-                    <Image src={exp.imageUrl} alt={exp.title} fill className="object-cover transition group-hover:scale-[1.03]" sizes="260px" />
+                    <Image
+                      src={exp.imageUrl}
+                      alt={exp.title}
+                      fill
+                      className="object-cover transition group-hover:scale-[1.03]"
+                      sizes="260px"
+                      style={getImageFocusStyle(exp.imageFocus)}
+                    />
                   </div>
                 ) : (
                   <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">🧭</div>

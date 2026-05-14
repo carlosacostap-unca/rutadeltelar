@@ -6,6 +6,7 @@ import {
   getExperienceContextBySlug,
   getExperiences,
 } from "@/app/lib/data";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
@@ -74,6 +75,7 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
               subtitle: experience.location,
               href: `/explorar/${experience.slug}`,
               imageUrl: experience.imageUrl,
+              imageFocus: experience.imageFocus,
             }}
           />
           <ShareButton title={experience.title} text={experience.summary} />
@@ -87,6 +89,8 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
           fallbackLabel="Experiencia"
           coverUrl={experience.imageUrl}
           galleryUrls={experience.galleryUrls}
+          coverFocus={experience.imageFocus}
+          galleryImages={experience.galleryImages}
           coverClassName="aspect-[4/3]"
           coverSizes="(max-width: 1024px) 100vw, 50vw"
         />
@@ -157,7 +161,14 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
             <div className="flex items-center gap-3">
               {responsibleArtisan?.imageUrl ? (
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-[color:var(--border)]">
-                  <Image src={responsibleArtisan.imageUrl} alt={responsibleArtisan.name} fill className="object-cover" sizes="48px" />
+                  <Image
+                    src={responsibleArtisan.imageUrl}
+                    alt={responsibleArtisan.name}
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                    style={getImageFocusStyle(responsibleArtisan.imageFocus)}
+                  />
                 </div>
               ) : (
                 <div className="display-font flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[color:var(--surface)] text-xl text-[color:var(--accent-strong)]">
@@ -220,7 +231,14 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
               <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
                 {spot.imageUrl ? (
                   <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
-                    <Image src={spot.imageUrl} alt={spot.title} fill className="object-cover transition group-hover:scale-[1.03]" sizes="240px" />
+                    <Image
+                      src={spot.imageUrl}
+                      alt={spot.title}
+                      fill
+                      className="object-cover transition group-hover:scale-[1.03]"
+                      sizes="240px"
+                      style={getImageFocusStyle(spot.imageFocus)}
+                    />
                   </div>
                 ) : (
                   <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">⭐</div>

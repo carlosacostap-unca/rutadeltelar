@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { type Artisan, type HighlightSpot, type Station } from "@/app/lib/content";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
@@ -158,6 +159,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
                       fill
                       className="object-cover transition group-hover:scale-[1.03]"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      style={getImageFocusStyle(station.imageFocus)}
                       fallback={<MediaFallback label="Estacion" />}
                     />
                   ) : (

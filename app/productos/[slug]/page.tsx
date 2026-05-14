@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductContextBySlug, getProducts } from "@/app/lib/data";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
@@ -70,6 +71,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               subtitle: product.stationName,
               href: `/productos/${product.slug}`,
               imageUrl: product.imageUrl,
+              imageFocus: product.imageFocus,
             }}
           />
           <ShareButton title={product.name} text={product.description} />
@@ -83,6 +85,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           fallbackLabel="Producto"
           coverUrl={product.imageUrl}
           galleryUrls={product.galleryUrls}
+          coverFocus={product.imageFocus}
+          galleryImages={product.galleryImages}
           coverClassName="aspect-square"
           coverSizes="(max-width: 1024px) 100vw, 50vw"
         />
@@ -162,7 +166,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   <div className="flex items-center gap-4">
                     {actor.imageUrl ? (
                       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-[color:var(--border)]">
-                        <Image src={actor.imageUrl} alt={actor.name} fill className="object-cover" sizes="64px" />
+                        <Image
+                          src={actor.imageUrl}
+                          alt={actor.name}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                          style={getImageFocusStyle(actor.imageFocus)}
+                        />
                       </div>
                     ) : (
                       <div className="display-font flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[color:var(--surface)] text-2xl text-[color:var(--accent-strong)]">

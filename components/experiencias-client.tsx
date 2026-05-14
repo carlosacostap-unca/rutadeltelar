@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Experience, type Station } from "@/app/lib/content";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
@@ -139,6 +140,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    style={getImageFocusStyle(exp.imageFocus)}
                     fallback={<MediaFallback label="Experiencia" />}
                   />
                 </div>

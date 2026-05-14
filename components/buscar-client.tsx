@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { type Artisan, type Experience, type HighlightSpot, type Product, type Station } from "@/app/lib/content";
+import { getImageFocusStyle, type ImageFocus } from "@/app/lib/image-focus";
 import { SurfaceCard } from "@/components/surface-card";
 
 type SearchData = {
@@ -29,6 +30,7 @@ type ResultItem = {
   subtitle?: string;
   tag?: string;
   imageUrl?: string;
+  imageFocus?: ImageFocus;
 };
 
 function normalize(s: string) {
@@ -56,6 +58,8 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       title: s.name,
       subtitle: s.slogan,
       tag: s.locality,
+      imageUrl: s.imageUrl,
+      imageFocus: s.imageFocus,
     }));
   if (estaciones.length)
     groups.push({ type: "estacion", label: "Estaciones", count: estaciones.length, items: estaciones });
@@ -69,6 +73,7 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       subtitle: a.craft,
       tag: a.actorType,
       imageUrl: a.imageUrl,
+      imageFocus: a.imageFocus,
     }));
   if (actores.length)
     groups.push({ type: "actor", label: "Actores", count: actores.length, items: actores });
@@ -82,6 +87,7 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       subtitle: p.stationName,
       tag: p.category,
       imageUrl: p.imageUrl,
+      imageFocus: p.imageFocus,
     }));
   if (prods.length)
     groups.push({ type: "producto", label: "Productos", count: prods.length, items: prods });
@@ -95,6 +101,7 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       subtitle: e.location,
       tag: e.tag,
       imageUrl: e.imageUrl,
+      imageFocus: e.imageFocus,
     }));
   if (exps.length)
     groups.push({ type: "experiencia", label: "Experiencias", count: exps.length, items: exps });
@@ -108,6 +115,7 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       subtitle: s.subtitle,
       tag: s.type,
       imageUrl: s.imageUrl,
+      imageFocus: s.imageFocus,
     }));
   if (spots.length)
     groups.push({ type: "imperdible", label: "Imperdibles", count: spots.length, items: spots });
@@ -130,7 +138,14 @@ function GroupSection({ group }: { group: ResultGroup }) {
             <SurfaceCard className="flex h-full items-center gap-3 !py-3 transition group-hover:border-[color:var(--accent)]">
               {item.imageUrl ? (
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[color:var(--border)]">
-                  <Image src={item.imageUrl} alt={item.title} fill className="object-cover" sizes="48px" />
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                    style={getImageFocusStyle(item.imageFocus)}
+                  />
                 </div>
               ) : (
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[color:var(--surface)] text-xl">

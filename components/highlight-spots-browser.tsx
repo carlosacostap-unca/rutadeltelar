@@ -8,6 +8,7 @@ import {
   type HighlightSpot,
   type Station,
 } from "@/app/lib/content";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { SectionHeading } from "@/components/section-heading";
 import { StationsTerritoryMap } from "@/components/stations-territory-map";
 import { SurfaceCard } from "@/components/surface-card";
@@ -84,6 +85,7 @@ export function HighlightSpotsBrowser({
                       fill
                       className="object-cover"
                       sizes="(max-width: 1280px) 50vw, 33vw"
+                      style={getImageFocusStyle(spot.imageFocus)}
                     />
                   </div>
                 ) : null}

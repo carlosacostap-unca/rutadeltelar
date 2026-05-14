@@ -1,3 +1,5 @@
+import type { FocusedImage, GalleryFocusMap, ImageFocus } from "@/app/lib/image-focus";
+
 export const highlights = [
   { value: "12", label: "paradas textiles" },
   { value: "5", label: "circuitos sugeridos" },
@@ -17,6 +19,11 @@ export type Station = {
   hasInauguratedStation?: boolean;
   imageUrl?: string;
   galleryUrls?: string[];
+  imageFocus?: ImageFocus;
+  galleryImages?: FocusedImage[];
+  foto_portada_focus_x?: number;
+  foto_portada_focus_y?: number;
+  galeria_fotos_focus?: GalleryFocusMap;
   latitude?: number;
   longitude?: number;
 };
@@ -71,6 +78,11 @@ export type Experience = {
   stops: string[];
   imageUrl?: string;
   galleryUrls?: string[];
+  imageFocus?: ImageFocus;
+  galleryImages?: FocusedImage[];
+  foto_portada_focus_x?: number;
+  foto_portada_focus_y?: number;
+  galeria_fotos_focus?: GalleryFocusMap;
   stationName?: string;
   stationSlug?: string;
   stationRecordId?: string;
@@ -165,10 +177,15 @@ export type HighlightSpot = {
   location: string;
   priority: string;
   imageUrl?: string;
+  imageFocus?: ImageFocus;
   stationName?: string;
   stationSlug?: string;
   stationRecordId?: string;
   galleryUrls?: string[];
+  galleryImages?: FocusedImage[];
+  foto_portada_focus_x?: number;
+  foto_portada_focus_y?: number;
+  galeria_fotos_focus?: GalleryFocusMap;
   horarios?: string;
   accesibilidad?: string;
   estacionalidad?: string;
@@ -228,12 +245,20 @@ export type Artisan = {
   featuredPiece: string;
   imageUrl?: string;
   galleryUrls?: string[];
+  imageFocus?: ImageFocus;
+  galleryImages?: FocusedImage[];
+  foto_portada_focus_x?: number;
+  foto_portada_focus_y?: number;
+  galeria_fotos_focus?: GalleryFocusMap;
   stationName?: string;
   stationSlug?: string;
   stationRecordId?: string;
   contactPhone?: string;
   contactEmail?: string;
   address?: string;
+  facebook_url?: string;
+  instagram_url?: string;
+  pagina_web_url?: string;
   latitude?: number;
   longitude?: number;
   // Artesano
@@ -346,6 +371,11 @@ export type Product = {
   techniques: string[];
   imageUrl?: string;
   galleryUrls?: string[];
+  imageFocus?: ImageFocus;
+  galleryImages?: FocusedImage[];
+  foto_portada_focus_x?: number;
+  foto_portada_focus_y?: number;
+  galeria_fotos_focus?: GalleryFocusMap;
   stationName?: string;
   stationSlug?: string;
   stationRecordId?: string;

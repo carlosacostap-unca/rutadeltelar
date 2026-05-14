@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getImageFocusStyle, type FocusedImage, type ImageFocus } from "@/app/lib/image-focus";
 import { MediaFallback } from "@/components/media-fallback";
 
 type DetailMediaGalleryProps = {
@@ -6,6 +7,8 @@ type DetailMediaGalleryProps = {
   fallbackLabel: string;
   coverUrl?: string;
   galleryUrls?: string[];
+  coverFocus?: ImageFocus;
+  galleryImages?: FocusedImage[];
   coverClassName?: string;
   coverSizes?: string;
 };
@@ -15,9 +18,13 @@ export function DetailMediaGallery({
   fallbackLabel,
   coverUrl,
   galleryUrls = [],
+  coverFocus,
+  galleryImages,
   coverClassName = "aspect-[16/9]",
   coverSizes = "(max-width: 1024px) 100vw, 70vw",
 }: DetailMediaGalleryProps) {
+  const images: FocusedImage[] = galleryImages ?? galleryUrls.map((url) => ({ url }));
+
   return (
     <div className="space-y-3">
       {coverUrl ? (
@@ -28,6 +35,7 @@ export function DetailMediaGallery({
             fill
             className="object-cover"
             sizes={coverSizes}
+            style={getImageFocusStyle(coverFocus)}
             priority
           />
         </div>
@@ -37,19 +45,20 @@ export function DetailMediaGallery({
         </div>
       )}
 
-      {galleryUrls.length > 0 && (
+      {images.length > 0 && (
         <div className="flex gap-3 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {galleryUrls.map((url, index) => (
+          {images.map((image, index) => (
             <div
-              key={url}
+              key={image.url}
               className="relative aspect-[4/3] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-[color:var(--border)] [scroll-snap-align:start]"
             >
               <Image
-                src={url}
+                src={image.url}
                 alt={`${title} galeria ${index + 1}`}
                 fill
                 className="object-cover"
                 sizes="220px"
+                style={getImageFocusStyle(image.focus)}
               />
             </div>
           ))}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Product, type Station } from "@/app/lib/content";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
@@ -261,6 +262,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                    style={getImageFocusStyle(product.imageFocus)}
                     fallback={
                       <div className="aspect-[4/3] overflow-hidden">
                         <MediaFallback label="Producto" />

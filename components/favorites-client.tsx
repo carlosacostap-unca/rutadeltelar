@@ -10,6 +10,7 @@ import {
   readFavorites,
   writeFavorites,
 } from "@/components/favorite-button";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { SurfaceCard } from "@/components/surface-card";
 
 const TYPE_LABELS: Record<FavoriteItem["type"], string> = {
@@ -94,6 +95,7 @@ export function FavoritesClient() {
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    style={getImageFocusStyle(item.imageFocus)}
                   />
                 </div>
               ) : null}

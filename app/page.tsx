@@ -6,6 +6,7 @@ import {
   getProductsResult,
   getStationsResult,
 } from "@/app/lib/data";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { HomeCarousel } from "@/components/home-carousel";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
@@ -137,7 +138,14 @@ export default async function Home() {
                   </div>
                   {event.imageUrl && (
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
-                      <Image src={event.imageUrl} alt={event.title} fill className="object-cover" sizes="64px" />
+                      <Image
+                        src={event.imageUrl}
+                        alt={event.title}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                        style={getImageFocusStyle(event.imageFocus)}
+                      />
                     </div>
                   )}
                 </SurfaceCard>
@@ -181,6 +189,7 @@ export default async function Home() {
                       fill
                       className="object-cover transition group-hover:scale-[1.04]"
                       sizes="(max-width: 640px) 50vw, 33vw"
+                      style={getImageFocusStyle(station.imageFocus)}
                       fallback={<MediaFallback label="Estacion" />}
                     />
                   ) : (
@@ -228,6 +237,7 @@ export default async function Home() {
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="220px"
+                    style={getImageFocusStyle(product.imageFocus)}
                     fallback={<MediaFallback label="Producto" />}
                   />
                 </div>
@@ -272,6 +282,7 @@ export default async function Home() {
                     fill
                     className="object-cover"
                     sizes="80px"
+                    style={getImageFocusStyle(actor.imageFocus)}
                   />
                 </div>
               ) : (

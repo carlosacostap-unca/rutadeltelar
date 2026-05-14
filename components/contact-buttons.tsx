@@ -1,7 +1,12 @@
+import { getActorSocialLinks } from "@/app/lib/contact-links";
+
 type ContactButtonsProps = {
   phone?: string;
   email?: string;
   address?: string;
+  facebook_url?: string;
+  instagram_url?: string;
+  pagina_web_url?: string;
 };
 
 function cleanPhone(phone: string) {
@@ -9,8 +14,21 @@ function cleanPhone(phone: string) {
   return phone.replace(/\D/g, "");
 }
 
-export function ContactButtons({ phone, email, address }: ContactButtonsProps) {
-  if (!phone && !email && !address) return null;
+export function ContactButtons({
+  phone,
+  email,
+  address,
+  facebook_url,
+  instagram_url,
+  pagina_web_url,
+}: ContactButtonsProps) {
+  const socialLinks = getActorSocialLinks({
+    facebook_url,
+    instagram_url,
+    pagina_web_url,
+  });
+
+  if (!phone && !email && !address && socialLinks.length === 0) return null;
 
   return (
     <div className="mt-4 flex flex-wrap gap-3">
@@ -63,6 +81,18 @@ export function ContactButtons({ phone, email, address }: ContactButtonsProps) {
           {address}
         </span>
       )}
+
+      {socialLinks.map((link) => (
+        <a
+          key={link.label}
+          href={link.href}
+          target={link.target}
+          rel={link.rel}
+          className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--accent)]"
+        >
+          {link.label}
+        </a>
+      ))}
     </div>
   );
 }

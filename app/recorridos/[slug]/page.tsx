@@ -7,6 +7,7 @@ import {
   getSuggestedJourneyBySlug,
   getSuggestedJourneys,
 } from "@/app/lib/data";
+import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { FavoriteButton } from "@/components/favorite-button";
 import { SectionHeading } from "@/components/section-heading";
@@ -75,6 +76,7 @@ export default async function SuggestedJourneyPage({
               subtitle: journey.duration,
               href: `/recorridos/${journey.slug}`,
               imageUrl: journey.station.imageUrl,
+              imageFocus: journey.station.imageFocus,
             }}
           />
           <ShareButton title={journey.title} text={journey.description} />
@@ -106,6 +108,7 @@ export default async function SuggestedJourneyPage({
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 40vw"
+                style={getImageFocusStyle(journey.station.imageFocus)}
               />
             </div>
           ) : (

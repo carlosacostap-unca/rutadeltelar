@@ -18,6 +18,7 @@ import {
   type Station,
 } from "@/app/lib/content";
 import { hasValidCoordinates } from "@/app/lib/geo";
+import { getImageFocusStyle, type ImageFocus } from "@/app/lib/image-focus";
 
 type StationsTerritoryMapLeafletProps = {
   stations: Station[];
@@ -83,9 +84,11 @@ function PopupAction({
 function PopupImage({
   src,
   alt,
+  focus,
 }: {
   src?: string;
   alt: string;
+  focus?: ImageFocus;
 }) {
   if (!src) {
     return null;
@@ -100,6 +103,7 @@ function PopupImage({
         height={176}
         unoptimized
         className="h-28 w-full object-cover"
+        style={getImageFocusStyle(focus)}
       />
     </div>
   );
@@ -225,7 +229,7 @@ export function StationsTerritoryMapLeaflet({
               </Tooltip>
               <Popup>
                 <div className="space-y-3 min-w-[180px]">
-                  <PopupImage src={station.imageUrl} alt={station.name} />
+                  <PopupImage src={station.imageUrl} alt={station.name} focus={station.imageFocus} />
                   <div className="space-y-1">
                     <p className="text-sm font-semibold">{station.name}</p>
                     <p className="text-xs text-[#725a49]">{station.locality}</p>
@@ -263,7 +267,7 @@ export function StationsTerritoryMapLeaflet({
             </Tooltip>
             <Popup>
               <div className="space-y-3 min-w-[180px]">
-                <PopupImage src={artisan.imageUrl} alt={artisan.name} />
+                <PopupImage src={artisan.imageUrl} alt={artisan.name} focus={artisan.imageFocus} />
                 <div className="space-y-1">
                   <p className="text-sm font-semibold">{artisan.name}</p>
                   <p className="text-xs text-[#725a49]">{artisan.place}</p>
@@ -305,7 +309,7 @@ export function StationsTerritoryMapLeaflet({
             </Tooltip>
             <Popup>
               <div className="space-y-3 min-w-[180px]">
-                <PopupImage src={spot.imageUrl} alt={spot.title} />
+                <PopupImage src={spot.imageUrl} alt={spot.title} focus={spot.imageFocus} />
                 <div className="space-y-1">
                   <p className="text-sm font-semibold">{spot.title}</p>
                   <p className="text-xs text-[#725a49]">{spot.location}</p>
