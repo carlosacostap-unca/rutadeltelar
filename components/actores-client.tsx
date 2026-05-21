@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Artisan, type Station } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { HighlightedData } from "@/components/highlighted-data";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -49,7 +50,8 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
       const matchSearch =
         !q ||
         a.name.toLowerCase().includes(q) ||
-        a.craft.toLowerCase().includes(q);
+        a.craft.toLowerCase().includes(q) ||
+        (a.datoDestacado ?? "").toLowerCase().includes(q);
       const matchTipo =
         tipo === "todos" ||
         (a.actorType ?? "").toLowerCase() === tipo.toLowerCase();
@@ -228,6 +230,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
               <p className="mt-1 text-sm leading-relaxed text-[color:var(--foreground)] line-clamp-2">
                 {item.craft}
               </p>
+              <HighlightedData value={item.datoDestacado} compact className="mt-3" />
             </SurfaceCard>
           </Link>
         ))}

@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { type Artisan, type HighlightSpot, type Station } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { HighlightedData } from "@/components/highlighted-data";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
@@ -43,7 +44,8 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
       const matchSearch =
         !q ||
         s.name.toLowerCase().includes(q) ||
-        s.locality.toLowerCase().includes(q);
+        s.locality.toLowerCase().includes(q) ||
+        (s.datoDestacado ?? "").toLowerCase().includes(q);
       return matchDept && matchSearch;
     });
   }, [stations, dept, search]);
@@ -191,6 +193,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
                   <p className="mt-2 text-xs italic leading-relaxed text-[color:var(--text-muted)]">
                     &quot;{station.slogan}&quot;
                   </p>
+                  <HighlightedData value={station.datoDestacado} compact className="mt-3" />
                 </div>
               </SurfaceCard>
             </Link>

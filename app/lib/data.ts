@@ -16,6 +16,7 @@ import {
   type Station,
 } from "@/app/lib/content";
 import { toValidIsoDate } from "@/app/lib/dates";
+import { normalizeHighlightedData } from "@/app/lib/highlighted-data";
 import {
   getEntityCoverImage,
   getEntityGalleryImages,
@@ -306,6 +307,15 @@ function getEntityImageFields(record: PocketBaseRecord & EntityMediaFields) {
   };
 }
 
+function getHighlightedDataFields(record: PocketBaseRecord) {
+  const value = normalizeHighlightedData(readDisplayString(record, ["dato_destacado"], ""));
+
+  return {
+    dato_destacado: value,
+    datoDestacado: value,
+  };
+}
+
 function resolveExperienceIncludes(record: PocketBaseRecord) {
   const values = uniqueStrings([
     ...readDisplayStringArray(record, ["recomendaciones", "includes", "highlights"]),
@@ -385,6 +395,7 @@ function normalizeExperience(record: PocketBaseRecord): Experience | null {
     ),
     includes: resolveExperienceIncludes(record),
     stops: resolveExperienceStops(record),
+    ...getHighlightedDataFields(record),
     ...getEntityImageFields(record),
     stationName: readDisplayString(record, ["expand.estacion_id.nombre"], ""),
     stationRecordId: readString(record, ["estacion_id", "expand.estacion_id.id"], ""),
@@ -495,6 +506,7 @@ function normalizeArtisan(record: PocketBaseRecord): Artisan | null {
         ["featuredPiece", "featured_piece", "piece"],
         "Pieza destacada",
       ),
+    ...getHighlightedDataFields(record),
     ...getEntityImageFields(record),
     stationName: readDisplayString(record, ["expand.estacion_id.nombre"], ""),
     stationRecordId: readString(
@@ -577,6 +589,7 @@ function normalizeStation(record: PocketBaseRecord): Station | null {
     ),
     status: readString(record, ["estado"], "aprobado"),
     hasInauguratedStation: Boolean(getPathValue(record, "posee_estacion_inaugurada")),
+    ...getHighlightedDataFields(record),
     ...getEntityImageFields(record),
     latitude: readNumber(record, ["latitud"]),
     longitude: readNumber(record, ["longitud"]),
@@ -619,6 +632,7 @@ function normalizeHighlightSpot(record: PocketBaseRecord): HighlightSpot | null 
       ["expand.prioridad.nombre", "prioridad"],
       "media",
     ),
+    ...getHighlightedDataFields(record),
     ...getEntityImageFields(record),
     stationName: readDisplayString(record, ["expand.estacion_id.nombre"], ""),
     stationRecordId: readString(
@@ -1270,6 +1284,7 @@ function normalizeProduct(record: PocketBaseRecord): Product | null {
     category: readDisplayString(record, ["expand.categoria.nombre", "categoria"], "Artesanía"),
     subcategory: readDisplayString(record, ["expand.subcategoria.nombre", "subcategoria"], "") || undefined,
     techniques,
+    ...getHighlightedDataFields(record),
     ...getEntityImageFields(record),
     stationName: station.name || undefined,
     stationRecordId: station.recordId || undefined,

@@ -236,6 +236,11 @@ export function StationsTerritoryMapLeaflet({
                     <p className="text-xs text-[#725a49]">
                       {station.slogan || "Nodo territorial de la ruta"}
                     </p>
+                    {station.datoDestacado ? (
+                      <p className="rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419]">
+                        {station.datoDestacado}
+                      </p>
+                    ) : null}
                   </div>
                   <PopupAction
                     label="Ver estacion"
@@ -274,6 +279,11 @@ export function StationsTerritoryMapLeaflet({
                   <p className="text-xs text-[#725a49]">
                     {artisan.craft || "Actor artesanal"}
                   </p>
+                  {artisan.datoDestacado ? (
+                    <p className="rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419]">
+                      {artisan.datoDestacado}
+                    </p>
+                  ) : null}
                 </div>
                 {artisan.stationName ? (
                   <p className="text-xs text-[#725a49]">
@@ -316,6 +326,11 @@ export function StationsTerritoryMapLeaflet({
                   <p className="text-xs text-[#725a49]">
                     {spot.subtitle || spot.type}
                   </p>
+                  {spot.datoDestacado ? (
+                    <p className="rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419]">
+                      {spot.datoDestacado}
+                    </p>
+                  ) : null}
                 </div>
                 {spot.stationName ? (
                   <p className="text-xs text-[#725a49]">

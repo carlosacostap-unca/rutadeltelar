@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type HighlightSpot } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { HighlightedData } from "@/components/highlighted-data";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
@@ -268,6 +269,7 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
                   <p className="mt-2 text-xs text-[color:var(--text-muted)] line-clamp-2">
                     {spot.description}
                   </p>
+                  <HighlightedData value={spot.datoDestacado} compact className="mt-3" />
                   {spot.location && (
                     <p className="mt-3 text-xs font-medium text-[color:var(--text-muted)]">
                       📍 {spot.location}

@@ -11,6 +11,7 @@ export type FavoriteItem = {
   href: string;
   imageUrl?: string;
   imageFocus?: ImageFocus;
+  datoDestacado?: string;
 };
 
 const FAVORITES_KEY = "ruta-del-telar:favorites:v1";

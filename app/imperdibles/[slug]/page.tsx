@@ -10,6 +10,7 @@ import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
+import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
 import { IcsDownloadButton } from "@/components/ics-download-button";
 import { ShareButton } from "@/components/share-button";
@@ -91,6 +92,7 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
               href: `/imperdibles/${spot.slug}`,
               imageUrl: spot.imageUrl,
               imageFocus: spot.imageFocus,
+              datoDestacado: spot.datoDestacado,
             }}
           />
           <ShareButton title={spot.title} text={spot.subtitle} />
@@ -169,6 +171,7 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
       {/* Descripción */}
       <section className="mb-10">
         <p className="text-sm leading-7 text-[color:var(--text-muted)]">{spot.description}</p>
+        <HighlightedData value={spot.datoDestacado} className="mt-5 max-w-2xl" />
       </section>
 
       {/* Datos prácticos */}
@@ -271,6 +274,7 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
                 )}
                 <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">{actor.name}</h3>
                 <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{actor.craft}</p>
+                <HighlightedData value={actor.datoDestacado} compact className="mt-3" />
               </SurfaceCard>
             </Link>
           ))}
@@ -304,6 +308,7 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
                 <div className="p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{product.subcategory ?? product.category}</p>
                   <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)] line-clamp-2">{product.name}</h3>
+                  <HighlightedData value={product.datoDestacado} compact className="mt-3" />
                 </div>
               </SurfaceCard>
             </Link>
@@ -341,6 +346,7 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
                 </div>
                 <h3 className="text-sm font-semibold leading-snug text-[color:var(--foreground)]">{exp.title}</h3>
                 <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{exp.description}</p>
+                <HighlightedData value={exp.datoDestacado} compact className="mt-3" />
               </SurfaceCard>
             </Link>
           ))}

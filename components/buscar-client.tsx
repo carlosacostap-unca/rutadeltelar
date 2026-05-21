@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { type Artisan, type Experience, type HighlightSpot, type Product, type Station } from "@/app/lib/content";
 import { getImageFocusStyle, type ImageFocus } from "@/app/lib/image-focus";
+import { HighlightedData } from "@/components/highlighted-data";
 import { SurfaceCard } from "@/components/surface-card";
 
 type SearchData = {
@@ -31,6 +32,7 @@ type ResultItem = {
   tag?: string;
   imageUrl?: string;
   imageFocus?: ImageFocus;
+  datoDestacado?: string;
 };
 
 function normalize(s: string) {
@@ -51,7 +53,7 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
   const groups: ResultGroup[] = [];
 
   const estaciones = data.stations
-    .filter((s) => matches(query, s.name, s.locality, s.slogan, s.department))
+    .filter((s) => matches(query, s.name, s.locality, s.slogan, s.department, s.datoDestacado))
     .map((s): ResultItem => ({
       slug: s.slug,
       href: `/estaciones/${s.slug}`,
@@ -60,12 +62,13 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       tag: s.locality,
       imageUrl: s.imageUrl,
       imageFocus: s.imageFocus,
+      datoDestacado: s.datoDestacado,
     }));
   if (estaciones.length)
     groups.push({ type: "estacion", label: "Estaciones", count: estaciones.length, items: estaciones });
 
   const actores = data.artisans
-    .filter((a) => matches(query, a.name, a.craft, a.actorType, a.place))
+    .filter((a) => matches(query, a.name, a.craft, a.actorType, a.place, a.datoDestacado))
     .map((a): ResultItem => ({
       slug: a.slug,
       href: `/artesanas/${a.slug}`,
@@ -74,12 +77,13 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       tag: a.actorType,
       imageUrl: a.imageUrl,
       imageFocus: a.imageFocus,
+      datoDestacado: a.datoDestacado,
     }));
   if (actores.length)
     groups.push({ type: "actor", label: "Actores", count: actores.length, items: actores });
 
   const prods = data.products
-    .filter((p) => matches(query, p.name, p.category, p.subcategory, p.description, ...p.techniques))
+    .filter((p) => matches(query, p.name, p.category, p.subcategory, p.description, p.datoDestacado, ...p.techniques))
     .map((p): ResultItem => ({
       slug: p.slug,
       href: `/productos/${p.slug}`,
@@ -88,12 +92,13 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       tag: p.category,
       imageUrl: p.imageUrl,
       imageFocus: p.imageFocus,
+      datoDestacado: p.datoDestacado,
     }));
   if (prods.length)
     groups.push({ type: "producto", label: "Productos", count: prods.length, items: prods });
 
   const exps = data.experiences
-    .filter((e) => matches(query, e.title, e.tag, e.location, e.description))
+    .filter((e) => matches(query, e.title, e.tag, e.location, e.description, e.datoDestacado))
     .map((e): ResultItem => ({
       slug: e.slug,
       href: `/explorar/${e.slug}`,
@@ -102,12 +107,13 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       tag: e.tag,
       imageUrl: e.imageUrl,
       imageFocus: e.imageFocus,
+      datoDestacado: e.datoDestacado,
     }));
   if (exps.length)
     groups.push({ type: "experiencia", label: "Experiencias", count: exps.length, items: exps });
 
   const spots = data.spots
-    .filter((s) => matches(query, s.title, s.subtitle, s.type, s.location, s.description))
+    .filter((s) => matches(query, s.title, s.subtitle, s.type, s.location, s.description, s.datoDestacado))
     .map((s): ResultItem => ({
       slug: s.slug,
       href: `/imperdibles/${s.slug}`,
@@ -116,6 +122,7 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       tag: s.type,
       imageUrl: s.imageUrl,
       imageFocus: s.imageFocus,
+      datoDestacado: s.datoDestacado,
     }));
   if (spots.length)
     groups.push({ type: "imperdible", label: "Imperdibles", count: spots.length, items: spots });
@@ -168,6 +175,7 @@ function GroupSection({ group }: { group: ResultGroup }) {
                 {item.subtitle && (
                   <p className="truncate text-xs text-[color:var(--text-muted)]">{item.subtitle}</p>
                 )}
+                <HighlightedData value={item.datoDestacado} compact className="mt-2" />
               </div>
             </SurfaceCard>
           </Link>

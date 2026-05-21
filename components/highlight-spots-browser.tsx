@@ -9,6 +9,7 @@ import {
   type Station,
 } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { HighlightedData } from "@/components/highlighted-data";
 import { SectionHeading } from "@/components/section-heading";
 import { StationsTerritoryMap } from "@/components/stations-territory-map";
 import { SurfaceCard } from "@/components/surface-card";
@@ -106,6 +107,7 @@ export function HighlightSpotsBrowser({
                 <p className="mt-2 text-sm text-[color:var(--text-muted)]">
                   {spot.location}
                 </p>
+                <HighlightedData value={spot.datoDestacado} compact className="mt-4" />
                 <Link
                   href={`/imperdibles/${spot.slug}`}
                   className="mt-4 inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] hover:-translate-y-0.5 hover:border-[color:var(--accent)]"

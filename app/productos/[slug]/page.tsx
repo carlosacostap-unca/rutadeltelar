@@ -7,6 +7,7 @@ import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
+import { HighlightedData } from "@/components/highlighted-data";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -72,6 +73,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               href: `/productos/${product.slug}`,
               imageUrl: product.imageUrl,
               imageFocus: product.imageFocus,
+              datoDestacado: product.datoDestacado,
             }}
           />
           <ShareButton title={product.name} text={product.description} />
@@ -120,6 +122,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           <p className="mt-5 text-sm leading-7 text-[color:var(--text-muted)]">
             {product.description}
           </p>
+          <HighlightedData value={product.datoDestacado} className="mt-5" />
 
           {/* Estación de origen */}
           {relatedStation && (
@@ -195,6 +198,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   <p className="mt-3 text-sm leading-relaxed text-[color:var(--text-muted)] line-clamp-2">
                     {actor.craft}
                   </p>
+                  <HighlightedData value={actor.datoDestacado} compact className="mt-3" />
                   <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--accent)] group-hover:underline">
                     Ver perfil →
                   </span>

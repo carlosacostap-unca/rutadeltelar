@@ -8,6 +8,7 @@ import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
+import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
 import { ShareButton } from "@/components/share-button";
 import { StationDetailMap } from "@/components/station-detail-map";
@@ -76,6 +77,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
               href: `/estaciones/${station.slug}`,
               imageUrl: station.imageUrl,
               imageFocus: station.imageFocus,
+              datoDestacado: station.datoDestacado,
             }}
           />
           <ShareButton title={station.name} text={station.summary} />
@@ -117,6 +119,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
         <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--text-muted)]">
           {station.summary}
         </p>
+        <HighlightedData value={station.datoDestacado} className="mt-5 max-w-2xl" />
       </section>
 
       {/* Mapa embebido */}
@@ -168,6 +171,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
                 <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">
                   {actor.craft}
                 </p>
+                <HighlightedData value={actor.datoDestacado} compact className="mt-3" />
               </SurfaceCard>
             </Link>
           ))}
@@ -207,6 +211,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
                   <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)] line-clamp-2">
                     {product.name}
                   </h3>
+                  <HighlightedData value={product.datoDestacado} compact className="mt-3" />
                 </div>
               </SurfaceCard>
             </Link>
@@ -244,6 +249,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
                 </div>
                 <h3 className="text-sm font-semibold leading-snug text-[color:var(--foreground)]">{exp.title}</h3>
                 <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{exp.description}</p>
+                <HighlightedData value={exp.datoDestacado} compact className="mt-3" />
               </SurfaceCard>
             </Link>
           ))}
@@ -277,6 +283,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{spot.type}</p>
                 <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">{spot.title}</h3>
                 <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{spot.subtitle}</p>
+                <HighlightedData value={spot.datoDestacado} compact className="mt-3" />
               </SurfaceCard>
             </Link>
           ))}

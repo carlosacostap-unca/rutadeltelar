@@ -8,6 +8,7 @@ import { getImageFocusStyle, type FocusedImage } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { ContactButtons } from "@/components/contact-buttons";
 import { FavoriteButton } from "@/components/favorite-button";
+import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
@@ -199,6 +200,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
               href: `/artesanas/${artisan.slug}`,
               imageUrl: artisan.imageUrl,
               imageFocus: artisan.imageFocus,
+              datoDestacado: artisan.datoDestacado,
             }}
           />
           <ShareButton title={artisan.name} text={artisan.craft} />
@@ -250,6 +252,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
             <p className="mt-2 text-sm text-[color:var(--text-muted)]">{artisan.stationName}</p>
           ) : null}
           <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--text-muted)]">{artisan.bio}</p>
+          <HighlightedData value={artisan.datoDestacado} className="mt-5 max-w-2xl" />
 
           {/* Contacto */}
           <ContactButtons
@@ -317,6 +320,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
                 <div className="p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{product.subcategory ?? product.category}</p>
                   <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)] line-clamp-2">{product.name}</h3>
+                  <HighlightedData value={product.datoDestacado} compact className="mt-3" />
                 </div>
               </SurfaceCard>
             </Link>
@@ -351,6 +355,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{spot.type}</p>
                 <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">{spot.title}</h3>
                 <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{spot.subtitle}</p>
+                <HighlightedData value={spot.datoDestacado} compact className="mt-3" />
               </SurfaceCard>
             </Link>
           ))}
@@ -387,6 +392,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
                 </div>
                 <h3 className="text-sm font-semibold leading-snug text-[color:var(--foreground)]">{exp.title}</h3>
                 <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{exp.description}</p>
+                <HighlightedData value={exp.datoDestacado} compact className="mt-3" />
               </SurfaceCard>
             </Link>
           ))}

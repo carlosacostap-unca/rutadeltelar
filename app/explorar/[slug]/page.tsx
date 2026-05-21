@@ -10,6 +10,7 @@ import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
+import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
@@ -76,6 +77,7 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
               href: `/explorar/${experience.slug}`,
               imageUrl: experience.imageUrl,
               imageFocus: experience.imageFocus,
+              datoDestacado: experience.datoDestacado,
             }}
           />
           <ShareButton title={experience.title} text={experience.summary} />
@@ -119,6 +121,7 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
           <p className="mt-5 text-sm leading-7 text-[color:var(--text-muted)]">
             {experience.description}
           </p>
+          <HighlightedData value={experience.datoDestacado} className="mt-5" />
 
           {/* Ubicación */}
           <p className="mt-4 flex items-center gap-1.5 text-sm text-[color:var(--text-muted)]">
@@ -182,6 +185,7 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
                 {responsibleArtisan?.craft && (
                   <p className="text-xs text-[color:var(--text-muted)]">{responsibleArtisan.craft}</p>
                 )}
+                <HighlightedData value={responsibleArtisan?.datoDestacado} compact className="mt-3" />
               </div>
             </div>
             {responsibleArtisan && (
@@ -246,6 +250,7 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{spot.type}</p>
                 <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">{spot.title}</h3>
                 <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{spot.subtitle}</p>
+                <HighlightedData value={spot.datoDestacado} compact className="mt-3" />
               </SurfaceCard>
             </Link>
           ))}

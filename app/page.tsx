@@ -7,6 +7,7 @@ import {
   getStationsResult,
 } from "@/app/lib/data";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
@@ -135,6 +136,7 @@ export default async function Home() {
                     <p className="mt-1 text-xs text-[color:var(--text-muted)] line-clamp-1">
                       {event.subtitle}
                     </p>
+                    <HighlightedData value={event.datoDestacado} compact className="mt-2" />
                   </div>
                   {event.imageUrl && (
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
@@ -213,6 +215,7 @@ export default async function Home() {
                   <h3 className="mt-0.5 text-sm font-semibold leading-snug text-[color:var(--foreground)]">
                     {station.locality}
                   </h3>
+                  <HighlightedData value={station.datoDestacado} compact className="mt-3" />
                 </div>
               </SurfaceCard>
             </Link>
@@ -260,6 +263,7 @@ export default async function Home() {
                   {product.techniques.slice(0, 2).join(" · ")}
                 </p>
               )}
+              <HighlightedData value={product.datoDestacado} compact className="mt-3" />
             </SurfaceCard>
           </Link>
         ))}
@@ -299,6 +303,7 @@ export default async function Home() {
               <p className="mt-0.5 text-[10px] text-[color:var(--text-muted)]">
                 {actor.place}
               </p>
+              <HighlightedData value={actor.datoDestacado} compact className="mt-3" />
             </SurfaceCard>
           </Link>
         ))}

@@ -11,6 +11,7 @@ import {
   writeFavorites,
 } from "@/components/favorite-button";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { HighlightedData } from "@/components/highlighted-data";
 import { SurfaceCard } from "@/components/surface-card";
 
 const TYPE_LABELS: Record<FavoriteItem["type"], string> = {
@@ -110,6 +111,7 @@ export function FavoritesClient() {
                   {item.subtitle}
                 </p>
               ) : null}
+              <HighlightedData value={item.datoDestacado} compact className="mt-3" />
             </Link>
             <button
               type="button"

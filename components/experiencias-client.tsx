@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Experience, type Station } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { HighlightedData } from "@/components/highlighted-data";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
@@ -166,6 +167,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
               <p className="mt-1 text-sm leading-relaxed text-[color:var(--text-muted)] line-clamp-2">
                 {exp.description}
               </p>
+              <HighlightedData value={exp.datoDestacado} compact className="mt-3" />
               {exp.stationName && (
                 <p className="mt-3 text-xs font-medium text-[color:var(--text-muted)]">
                   📍 {exp.stationName}

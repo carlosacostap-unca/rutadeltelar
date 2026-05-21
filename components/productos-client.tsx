@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type Product, type Station } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { HighlightedData } from "@/components/highlighted-data";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 import { SurfaceCard } from "@/components/surface-card";
@@ -63,6 +64,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
         !q ||
         p.name.toLowerCase().includes(q) ||
         p.description.toLowerCase().includes(q) ||
+        (p.datoDestacado ?? "").toLowerCase().includes(q) ||
         p.techniques.some((t) => t.toLowerCase().includes(q));
       const matchCat = category === "todas" || p.category === category;
       const matchSub =
@@ -300,6 +302,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
                     {product.stationName}
                   </p>
                 )}
+                <HighlightedData value={product.datoDestacado} compact className="mt-3" />
               </div>
             </SurfaceCard>
           </Link>

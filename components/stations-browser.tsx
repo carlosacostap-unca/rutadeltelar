@@ -7,6 +7,7 @@ import {
   type HighlightSpot,
   type Station,
 } from "@/app/lib/content";
+import { HighlightedData } from "@/components/highlighted-data";
 import { SectionHeading } from "@/components/section-heading";
 import { StationsTerritoryMap } from "@/components/stations-territory-map";
 import { SurfaceCard } from "@/components/surface-card";
@@ -81,6 +82,7 @@ export function StationsBrowser({
               <p className="mt-3 text-sm leading-6 text-[color:var(--text-muted)]">
                 {selectedStation.summary}
               </p>
+              <HighlightedData value={selectedStation.datoDestacado} className="mt-4" />
               <Link
                 href={`/estaciones/${selectedStation.slug}`}
                 className="mt-4 inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
@@ -134,6 +136,7 @@ export function StationsBrowser({
               <p className="mt-3 text-sm leading-6 text-[color:var(--text-muted)]">
                 {station.summary}
               </p>
+              <HighlightedData value={station.datoDestacado} compact className="mt-4" />
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   type="button"

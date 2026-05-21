@@ -8,6 +8,7 @@ import {
   type HighlightSpot,
   type Station,
 } from "@/app/lib/content";
+import { HighlightedData } from "@/components/highlighted-data";
 import { SectionHeading } from "@/components/section-heading";
 import { StationsTerritoryMap } from "@/components/stations-territory-map";
 import { SurfaceCard } from "@/components/surface-card";
@@ -114,6 +115,7 @@ export function ExperiencesBrowser({
                 <p className="mt-3 text-sm leading-6 text-[color:var(--text-muted)]">
                   {item.description}
                 </p>
+                <HighlightedData value={item.datoDestacado} compact className="mt-4" />
                 <div className="mt-5 flex items-center justify-between text-sm text-[color:var(--text-muted)]">
                   <span>{item.location}</span>
                   <span>{item.duration}</span>

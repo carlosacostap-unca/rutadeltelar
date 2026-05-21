@@ -15,6 +15,8 @@ export type Station = {
   department?: string;
   slogan: string;
   summary: string;
+  dato_destacado?: string;
+  datoDestacado?: string;
   status: string;
   hasInauguratedStation?: boolean;
   imageUrl?: string;
@@ -74,6 +76,8 @@ export type Experience = {
   location: string;
   intensity: string;
   summary: string;
+  dato_destacado?: string;
+  datoDestacado?: string;
   includes: string[];
   stops: string[];
   imageUrl?: string;
@@ -172,6 +176,8 @@ export type HighlightSpot = {
   title: string;
   subtitle: string;
   description: string;
+  dato_destacado?: string;
+  datoDestacado?: string;
   type: string;
   eventDate?: string;
   location: string;
@@ -243,6 +249,8 @@ export type Artisan = {
   techniques: string[];
   years: string;
   featuredPiece: string;
+  dato_destacado?: string;
+  datoDestacado?: string;
   imageUrl?: string;
   galleryUrls?: string[];
   imageFocus?: ImageFocus;
@@ -369,6 +377,8 @@ export type Product = {
   category: string;
   subcategory?: string;
   techniques: string[];
+  dato_destacado?: string;
+  datoDestacado?: string;
   imageUrl?: string;
   galleryUrls?: string[];
   imageFocus?: ImageFocus;

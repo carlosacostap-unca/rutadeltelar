@@ -77,6 +77,7 @@ export default async function SuggestedJourneyPage({
               href: `/recorridos/${journey.slug}`,
               imageUrl: journey.station.imageUrl,
               imageFocus: journey.station.imageFocus,
+              datoDestacado: journey.station.datoDestacado,
             }}
           />
           <ShareButton title={journey.title} text={journey.description} />
@@ -98,6 +99,16 @@ export default async function SuggestedJourneyPage({
             <p className="mt-5 max-w-2xl text-sm leading-7 text-white/80">
               {journey.description}
             </p>
+            {journey.station.datoDestacado ? (
+              <div className="mt-5 max-w-2xl rounded-2xl border border-white/15 bg-white/10 px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/65">
+                  Dato destacado
+                </p>
+                <p className="mt-0.5 text-sm font-medium leading-6 text-white">
+                  {journey.station.datoDestacado}
+                </p>
+              </div>
+            ) : null}
           </div>
 
           {journey.station.imageUrl ? (
