@@ -9,6 +9,11 @@ The application SHALL render detail pages for stations, actors, products, experi
 - **AND** the link SHALL open in a new browser tab with safe external-link attributes
 - **AND** any embedded detail map SHALL use satellite imagery with reference overlays for orientation
 
+#### Scenario: Actor address has valid coordinates
+- **WHEN** an actor detail page shows an address and the actor has valid latitude and longitude
+- **THEN** clicking the address SHALL open a satellite map with a pin at those coordinates
+- **AND** the link SHALL open in a new browser tab with safe external-link attributes
+
 #### Scenario: Detail entity does not have valid coordinates
 - **WHEN** a detail entity lacks valid latitude or longitude
 - **THEN** the detail page SHALL NOT show a broken satellite map button

@@ -30,8 +30,8 @@ export function getSatelliteMapUrl(point: MapPoint, zoom = 18) {
     return null;
   }
 
-  const center = `${point.latitude},${point.longitude}`;
+  const query = `${point.latitude},${point.longitude}`;
   const safeZoom = Number.isFinite(zoom) ? Math.min(Math.max(Math.round(zoom), 1), 21) : 18;
 
-  return `https://www.google.com/maps/@?api=1&map_action=map&center=${encodeURIComponent(center)}&zoom=${safeZoom}&basemap=satellite`;
+  return `https://www.google.com/maps?q=${encodeURIComponent(query)}&t=k&z=${safeZoom}`;
 }

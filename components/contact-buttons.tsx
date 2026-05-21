@@ -1,9 +1,11 @@
 import { getActorSocialLinks } from "@/app/lib/contact-links";
+import { getSatelliteMapUrl, type MapPoint } from "@/app/lib/map-links";
 
 type ContactButtonsProps = {
   phone?: string;
   email?: string;
   address?: string;
+  mapPoint?: MapPoint;
   facebook_url?: string;
   instagram_url?: string;
   pagina_web_url?: string;
@@ -18,6 +20,7 @@ export function ContactButtons({
   phone,
   email,
   address,
+  mapPoint,
   facebook_url,
   instagram_url,
   pagina_web_url,
@@ -27,6 +30,7 @@ export function ContactButtons({
     instagram_url,
     pagina_web_url,
   });
+  const addressMapUrl = mapPoint ? getSatelliteMapUrl(mapPoint) : null;
 
   if (!phone && !email && !address && socialLinks.length === 0) return null;
 
@@ -73,7 +77,21 @@ export function ContactButtons({
         </a>
       )}
 
-      {address && (
+      {address && addressMapUrl && (
+        <a
+          href={addressMapUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-medium text-[color:var(--foreground)] transition hover:border-[color:var(--accent)]"
+        >
+          <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" />
+          </svg>
+          {address}
+        </a>
+      )}
+
+      {address && !addressMapUrl && (
         <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm text-[color:var(--text-muted)]">
           <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" />

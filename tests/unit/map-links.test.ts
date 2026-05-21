@@ -7,11 +7,10 @@ describe("map link helpers", () => {
     const url = getSatelliteMapUrl({ latitude: -27.64977, longitude: -67.02602 });
 
     assert.ok(url);
-    assert.match(url, /^https:\/\/www\.google\.com\/maps\/@\?/);
-    assert.match(url, /map_action=map/);
-    assert.match(url, /center=-27\.64977%2C-67\.02602/);
-    assert.match(url, /zoom=18/);
-    assert.match(url, /basemap=satellite/);
+    assert.match(url, /^https:\/\/www\.google\.com\/maps\?/);
+    assert.match(url, /q=-27\.64977%2C-67\.02602/);
+    assert.match(url, /t=k/);
+    assert.match(url, /z=18/);
   });
 
   it("does not build satellite URLs for invalid coordinates", () => {
@@ -21,7 +20,7 @@ describe("map link helpers", () => {
   });
 
   it("clamps zoom to the Google Maps range", () => {
-    assert.match(getSatelliteMapUrl({ latitude: -27, longitude: -67 }, 99) ?? "", /zoom=21/);
-    assert.match(getSatelliteMapUrl({ latitude: -27, longitude: -67 }, -1) ?? "", /zoom=1/);
+    assert.match(getSatelliteMapUrl({ latitude: -27, longitude: -67 }, 99) ?? "", /z=21/);
+    assert.match(getSatelliteMapUrl({ latitude: -27, longitude: -67 }, -1) ?? "", /z=1/);
   });
 });

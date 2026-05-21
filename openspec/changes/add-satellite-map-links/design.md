@@ -11,6 +11,7 @@ The public app already normalizes `latitud` and `longitud` into `latitude` and `
 - Add administrative/place labels and main transportation references over the satellite base.
 - Reuse coordinate validation so invalid or missing points do not render broken links.
 - Open the satellite map in a new tab with `target="_blank"` and `rel="noopener noreferrer"`.
+- Make visible address chips actionable when the record has valid coordinates.
 - Keep the current layout and existing embedded/internal maps intact.
 - Increase map zoom so coordinate-based views open closer to the selected location.
 
@@ -30,6 +31,9 @@ The public app already normalizes `latitud` and `longitud` into `latitude` and `
 
 - Use Google Maps satellite URL format.
   - Rationale: visitors commonly understand Google Maps, and the app already links to Google Maps in station fallback copy.
+
+- Use a pinned Google Maps query URL for coordinate links.
+  - Rationale: visitors should see an explicit pin at the entity coordinates, not only a centered map view.
 
 - Use closer default zoom levels for internal Leaflet maps and external satellite links.
   - Rationale: coordinate actions are most useful when they show the immediate surroundings of the place.

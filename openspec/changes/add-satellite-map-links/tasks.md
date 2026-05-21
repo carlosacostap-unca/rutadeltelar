@@ -11,6 +11,7 @@
 - [x] 2.4 Increase default zoom for embedded maps and satellite map links.
 - [x] 2.5 Use satellite imagery with transportation, boundaries, and place reference overlays in embedded maps.
 - [x] 2.6 Add metric scale controls to embedded maps.
+- [x] 2.7 Make actor address chips open a pinned satellite map when coordinates exist.
 
 ## 3. Tests And Verification
 

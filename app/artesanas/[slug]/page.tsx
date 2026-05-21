@@ -261,6 +261,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
             phone={artisan.contactPhone}
             email={artisan.contactEmail}
             address={artisan.address}
+            mapPoint={artisan}
             facebook_url={artisan.facebook_url}
             instagram_url={artisan.instagram_url}
             pagina_web_url={artisan.pagina_web_url}
