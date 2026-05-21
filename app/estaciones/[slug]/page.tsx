@@ -10,6 +10,7 @@ import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
+import { SatelliteMapButton } from "@/components/satellite-map-button";
 import { ShareButton } from "@/components/share-button";
 import { StationDetailMap } from "@/components/station-detail-map";
 import { SurfaceCard } from "@/components/surface-card";
@@ -307,14 +308,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
                   {station.locality}{station.department ? `, ${station.department}` : ""}
                 </p>
               </div>
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${station.latitude},${station.longitude}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-[color:var(--accent)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[color:var(--accent-strong)]"
-              >
-                Abrir en Maps
-              </a>
+              <SatelliteMapButton point={station} />
             </div>
           ) : (
             <p className="text-sm text-[color:var(--text-muted)]">

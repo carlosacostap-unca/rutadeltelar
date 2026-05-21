@@ -6,6 +6,7 @@ import {
   getHighlightSpotContextBySlug,
   getHighlightSpots,
 } from "@/app/lib/data";
+import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
@@ -13,6 +14,7 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
 import { IcsDownloadButton } from "@/components/ics-download-button";
+import { SatelliteMapButton } from "@/components/satellite-map-button";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -173,6 +175,28 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
         <p className="text-sm leading-7 text-[color:var(--text-muted)]">{spot.description}</p>
         <HighlightedData value={spot.datoDestacado} className="mt-5 max-w-2xl" />
       </section>
+
+      {hasValidCoordinates(spot) ? (
+        <section className="mb-10">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+            Ubicacion
+          </h2>
+          <SurfaceCard>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs text-[color:var(--text-muted)]">Coordenadas</p>
+                <p className="mt-1 font-mono text-sm font-semibold text-[color:var(--foreground)]">
+                  {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
+                </p>
+                <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+                  {spot.location}
+                </p>
+              </div>
+              <SatelliteMapButton point={spot} />
+            </div>
+          </SurfaceCard>
+        </section>
+      ) : null}
 
       {/* Datos prácticos */}
       {(spot.horarios || spot.accesibilidad || spot.estacionalidad || spot.duracionSugerida || (spot.recomendaciones && spot.recomendaciones.length > 0)) && (

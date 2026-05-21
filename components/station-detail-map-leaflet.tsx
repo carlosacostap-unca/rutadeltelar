@@ -1,8 +1,9 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, Marker, Popup, ScaleControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { SatelliteReferenceTileLayers } from "@/components/satellite-reference-tile-layers";
 
 // Fix leaflet default icon
 const icon = L.icon({
@@ -25,14 +26,12 @@ export default function StationDetailMapLeaflet({ lat, lng, label }: Props) {
   return (
     <MapContainer
       center={[lat, lng]}
-      zoom={13}
+      zoom={16}
       style={{ height: "280px", width: "100%" }}
       scrollWheelZoom={false}
     >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+      <SatelliteReferenceTileLayers />
+      <ScaleControl position="bottomleft" imperial={false} />
       <Marker position={[lat, lng]} icon={icon}>
         <Popup>{label}</Popup>
       </Marker>

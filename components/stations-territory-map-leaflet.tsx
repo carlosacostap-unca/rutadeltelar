@@ -8,7 +8,7 @@ import {
   CircleMarker,
   MapContainer,
   Popup,
-  TileLayer,
+  ScaleControl,
   Tooltip,
   useMap,
 } from "react-leaflet";
@@ -19,6 +19,12 @@ import {
 } from "@/app/lib/content";
 import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle, type ImageFocus } from "@/app/lib/image-focus";
+import { SatelliteReferenceTileLayers } from "@/components/satellite-reference-tile-layers";
+import { SatelliteMapButton } from "@/components/satellite-map-button";
+
+const TERRITORY_MAP_SINGLE_POINT_ZOOM = 13;
+const TERRITORY_MAP_MULTI_POINT_ZOOM = 10;
+const TERRITORY_MAP_MAX_BOUNDS_ZOOM = 13;
 
 type StationsTerritoryMapLeafletProps = {
   stations: Station[];
@@ -133,6 +139,10 @@ export function StationsTerritoryMapLeaflet({
     if (!showHighlightSpots) return [];
     return getGeolocatedHighlightSpots(highlightSpots);
   }, [highlightSpots, showHighlightSpots]);
+  const geolocatedPointCount =
+    geolocatedStations.length +
+    geolocatedArtisans.length +
+    geolocatedHighlightSpots.length;
 
   const center = useMemo<LatLngExpression>(() => {
     const allPoints = [
@@ -190,18 +200,20 @@ export function StationsTerritoryMapLeaflet({
     <div className="overflow-hidden rounded-2xl border border-[color:var(--border)]">
       <MapContainer
         center={center}
-        zoom={geolocatedStations.length <= 1 ? 10 : 8}
+        zoom={
+          geolocatedPointCount <= 1
+            ? TERRITORY_MAP_SINGLE_POINT_ZOOM
+            : TERRITORY_MAP_MULTI_POINT_ZOOM
+        }
         bounds={bounds}
-        boundsOptions={{ padding: [28, 28] }}
+        boundsOptions={{ padding: [18, 18], maxZoom: TERRITORY_MAP_MAX_BOUNDS_ZOOM }}
         scrollWheelZoom={false}
         zoomControl
         className="h-[360px] w-full sm:h-[460px]"
       >
         <MapResizer />
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <SatelliteReferenceTileLayers />
+        <ScaleControl position="bottomleft" imperial={false} />
 
         {geolocatedStations.map((station) => {
           const isActive = station.slug === activeSlug || station.slug === selectedSlug;
@@ -246,6 +258,7 @@ export function StationsTerritoryMapLeaflet({
                     label="Ver estacion"
                     onClick={() => router.push(`/estaciones/${station.slug}`)}
                   />
+                  <SatelliteMapButton point={station} compact className="w-full" />
                 </div>
               </Popup>
             </CircleMarker>
@@ -294,6 +307,7 @@ export function StationsTerritoryMapLeaflet({
                   label="Ver actor"
                   onClick={() => router.push(`/artesanas/${artisan.slug}`)}
                 />
+                <SatelliteMapButton point={artisan} compact className="w-full" />
               </div>
             </Popup>
           </CircleMarker>
@@ -341,6 +355,7 @@ export function StationsTerritoryMapLeaflet({
                   label="Ver imperdible"
                   onClick={() => router.push(`/imperdibles/${spot.slug}`)}
                 />
+                <SatelliteMapButton point={spot} compact className="w-full" />
               </div>
             </Popup>
           </CircleMarker>

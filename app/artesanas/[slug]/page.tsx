@@ -4,12 +4,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { type Artisan } from "@/app/lib/content";
 import { getArtisanContextBySlug, getArtisans } from "@/app/lib/data";
+import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle, type FocusedImage } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { ContactButtons } from "@/components/contact-buttons";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
+import { SatelliteMapButton } from "@/components/satellite-map-button";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -265,6 +267,28 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
           />
         </div>
       </section>
+
+      {hasValidCoordinates(artisan) ? (
+        <section className="mb-10">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+            Ubicacion
+          </h2>
+          <SurfaceCard>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs text-[color:var(--text-muted)]">Coordenadas</p>
+                <p className="mt-1 font-mono text-sm font-semibold text-[color:var(--foreground)]">
+                  {artisan.latitude.toFixed(5)}, {artisan.longitude.toFixed(5)}
+                </p>
+                <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+                  {artisan.place}
+                </p>
+              </div>
+              <SatelliteMapButton point={artisan} />
+            </div>
+          </SurfaceCard>
+        </section>
+      ) : null}
 
       {galleryImages.length > 0 && (
         <section className="mb-10">
