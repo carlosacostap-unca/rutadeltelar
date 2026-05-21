@@ -23,7 +23,9 @@ function CarouselArrow({
       type="button"
       aria-label={direction === "left" ? "Mover carrusel a la izquierda" : "Mover carrusel a la derecha"}
       onClick={onClick}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:border-[color:var(--accent)]"
+      className={`absolute top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--card)] text-[color:var(--foreground)] shadow transition hover:border-[color:var(--accent)] ${
+        direction === "left" ? "left-1" : "right-1"
+      }`}
     >
       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         {direction === "left" ? (
@@ -79,22 +81,22 @@ export function HomeCarousel({
             {title}
           </h2>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <CarouselArrow direction="left" onClick={() => scroll("left")} />
-          <CarouselArrow direction="right" onClick={() => scroll("right")} />
-          <Link
-            href={href}
-            className="text-sm font-semibold text-[color:var(--accent)] transition hover:underline"
-          >
-            {verTodosLabel} -&gt;
-          </Link>
-        </div>
+        <Link
+          href={href}
+          className="shrink-0 text-sm font-semibold text-[color:var(--accent)] transition hover:underline"
+        >
+          {verTodosLabel} -&gt;
+        </Link>
       </div>
-      <div
-        ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-3 [scroll-snap-type:x_mandatory] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {children}
+      <div className="relative">
+        <CarouselArrow direction="left" onClick={() => scroll("left")} />
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto pb-3 [scroll-snap-type:x_mandatory] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {children}
+        </div>
+        <CarouselArrow direction="right" onClick={() => scroll("right")} />
       </div>
     </section>
   );
