@@ -7,6 +7,7 @@ import { getArtisanContextBySlug, getArtisans } from "@/app/lib/data";
 import { getImageFocusStyle, type FocusedImage } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { ContactButtons } from "@/components/contact-buttons";
+import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
@@ -210,23 +211,19 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
       {/* Cabecera */}
       <section className="mb-10 grid gap-6 lg:grid-cols-[auto_1fr] lg:items-start">
         {/* Foto */}
-        {artisan.imageUrl ? (
-          <div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow sm:h-44 sm:w-44">
-            <Image
-              src={artisan.imageUrl}
-              alt={artisan.name}
-              fill
-              className="object-cover"
-              sizes="176px"
-              style={getImageFocusStyle(artisan.imageFocus)}
-              priority
-            />
-          </div>
-        ) : (
-          <div className="display-font flex h-36 w-36 shrink-0 items-center justify-center rounded-3xl bg-[color:var(--surface)] text-5xl text-[color:var(--accent-strong)] soft-shadow sm:h-44 sm:w-44">
-            {artisan.name[0]}
-          </div>
-        )}
+        <div className="w-36 shrink-0 sm:w-44">
+          <DetailMediaGallery
+            title={artisan.name}
+            fallbackLabel="Actor"
+            coverUrl={artisan.imageUrl}
+            galleryUrls={artisan.galleryUrls}
+            coverFocus={artisan.imageFocus}
+            galleryImages={galleryImages}
+            coverClassName="aspect-square w-36 sm:w-44"
+            coverSizes="176px"
+            thumbnailClassName="aspect-[4/3] w-36 sm:w-44"
+          />
+        </div>
 
         {/* Info */}
         <div>
@@ -266,28 +263,6 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
           />
         </div>
       </section>
-
-      {galleryImages.length > 0 && (
-        <section className="mb-10">
-          <div className="flex gap-3 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {galleryImages.map((image, index) => (
-              <div
-                key={image.url}
-                className="relative aspect-[4/3] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-[color:var(--border)] [scroll-snap-align:start]"
-              >
-                <Image
-                  src={image.url}
-                  alt={`${artisan.name} galeria ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="220px"
-                  style={getImageFocusStyle(image.focus)}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* Ficha por subtipo */}
       <section className="mb-10">
