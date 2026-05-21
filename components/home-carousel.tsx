@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode, useRef } from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 
 type HomeCarouselProps = {
   eyebrow: string;
@@ -58,6 +58,17 @@ export function HomeCarousel({
   children,
 }: HomeCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const node = scrollRef.current;
+    if (!node) return;
+
+    const scrollEnd = node.scrollLeft + node.clientWidth;
+    setCanScrollLeft(node.scrollLeft > 1);
+    setCanScrollRight(scrollEnd < node.scrollWidth - 1);
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
     const node = scrollRef.current;
@@ -68,7 +79,26 @@ export function HomeCarousel({
       left: direction === "left" ? -distance : distance,
       behavior: "smooth",
     });
+    window.setTimeout(updateScrollState, 280);
   };
+
+  useEffect(() => {
+    const node = scrollRef.current;
+    if (!node) return;
+
+    updateScrollState();
+    const timeoutId = window.setTimeout(updateScrollState, 250);
+    const handleResize = () => updateScrollState();
+
+    node.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      node.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [children, updateScrollState]);
 
   return (
     <section className="mb-12">
@@ -89,14 +119,18 @@ export function HomeCarousel({
         </Link>
       </div>
       <div className="relative">
-        <CarouselArrow direction="left" onClick={() => scroll("left")} />
+        {canScrollLeft ? (
+          <CarouselArrow direction="left" onClick={() => scroll("left")} />
+        ) : null}
         <div
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto pb-3 [scroll-snap-type:x_mandatory] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {children}
         </div>
-        <CarouselArrow direction="right" onClick={() => scroll("right")} />
+        {canScrollRight ? (
+          <CarouselArrow direction="right" onClick={() => scroll("right")} />
+        ) : null}
       </div>
     </section>
   );

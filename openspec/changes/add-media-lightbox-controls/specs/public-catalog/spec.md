@@ -16,3 +16,4 @@ Public catalog cards, listing rows, highlighted catalog sections, related-conten
 - **WHEN** a public horizontal carousel is rendered
 - **THEN** it SHALL include controls to move left and right through the carousel content
 - **AND** the controls SHALL be positioned over the carousel card area rather than in the section heading
+- **AND** each control SHALL only be shown when there is hidden carousel content in that direction
