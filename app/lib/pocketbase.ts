@@ -103,6 +103,40 @@ export async function getPocketBaseList(
   return (await response.json()) as PocketBaseListResponse<PocketBaseRecord>;
 }
 
+export async function getPocketBaseFullList(
+  key: PocketBaseCollectionKey,
+  options: ListOptions = {},
+) {
+  const perPage = options.perPage ?? 100;
+  const firstPage = await getPocketBaseList(key, {
+    ...options,
+    page: 1,
+    perPage,
+  });
+
+  if (!firstPage || firstPage.totalPages <= 1) {
+    return firstPage;
+  }
+
+  const remainingPages = await Promise.all(
+    Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+      getPocketBaseList(key, {
+        ...options,
+        page: index + 2,
+        perPage,
+      }),
+    ),
+  );
+
+  return {
+    ...firstPage,
+    items: [
+      ...firstPage.items,
+      ...remainingPages.flatMap((page) => page?.items ?? []),
+    ],
+  };
+}
+
 export function getPocketBaseFileUrl(
   record: PocketBaseFileRecord,
   fileName?: string,

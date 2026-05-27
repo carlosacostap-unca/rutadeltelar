@@ -30,6 +30,7 @@ import {
   type ImageFocus,
 } from "@/app/lib/image-focus";
 import {
+  getPocketBaseFullList,
   getPocketBaseList,
   getPocketBaseFileUrl,
   type PocketBaseRecord,
@@ -567,7 +568,7 @@ function normalizeStation(record: PocketBaseRecord): Station | null {
     ["nombre", "title", "name"],
     locality ? `Estacion ${locality}` : "",
   );
-  const slug = readString(record, ["slug", "handle"], slugify(locality || name));
+  const slug = readString(record, ["slug", "handle"], slugify(name || locality));
 
   if (!slug || !name) {
     return null;
@@ -775,7 +776,7 @@ export async function getArtisansResult(): Promise<DataResult<Artisan>> {
 
 export async function getStationsResult(): Promise<DataResult<Station>> {
   try {
-    const response = await getPocketBaseList("stations", {
+    const response = await getPocketBaseFullList("stations", {
       filter: 'estado = "aprobado"',
       expand: "departamento",
       perPage: 100,
