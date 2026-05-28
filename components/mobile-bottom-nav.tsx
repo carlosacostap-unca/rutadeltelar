@@ -112,9 +112,9 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="Navegacion principal"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-[color:var(--border)] bg-[rgba(252,249,245,0.85)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 bg-[rgba(239,212,176,0.92)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl md:hidden"
     >
-      <div className="mx-auto grid max-w-lg grid-cols-5 gap-1 rounded-2xl border border-[color:var(--border)] bg-[rgba(255,255,255,0.88)] p-2 soft-shadow">
+      <div className="mx-auto grid max-w-lg grid-cols-5 gap-1 rounded-2xl bg-[#f5dec0] p-2 shadow-[0_-8px_32px_rgba(5,28,43,0.18)]">
         {navItems.map((item) => {
           const active = isActive(pathname, item.href);
 
@@ -126,8 +126,8 @@ export function MobileBottomNav() {
               aria-current={active ? "page" : undefined}
               className={`flex flex-col items-center justify-center rounded-xl px-2 py-2 text-center transition-colors ${
                 active
-                  ? "bg-[color:var(--accent)] text-white shadow-sm"
-                  : "text-[color:var(--text-muted)] hover:text-[color:var(--foreground)]"
+                  ? "bg-[#0b3350] text-white shadow-sm"
+                  : "text-[#0b3350]/75 hover:text-[#0b3350]"
               }`}
             >
               <svg

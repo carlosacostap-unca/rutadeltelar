@@ -1,19 +1,79 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro, Noto_Serif } from "next/font/google";
+import localFont from "next/font/local";
 import { getSiteUrl } from "@/app/lib/metadata";
 import { AppShell } from "@/components/app-shell";
 import "./globals.css";
 
-const beVietnamPro = Be_Vietnam_Pro({
-  weight: ["400", "500", "600"],
-  variable: "--font-be-vietnam",
-  subsets: ["latin"],
-});
-
-const notoSerif = Noto_Serif({
-  weight: ["400", "600", "700"],
-  variable: "--font-noto-serif",
-  subsets: ["latin"],
+const neueHaasDisplay = localFont({
+  variable: "--font-neue-haas-display",
+  display: "swap",
+  src: [
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-XThin.ttf",
+      weight: "100",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-XThinItalic.ttf",
+      weight: "100",
+      style: "italic",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-Thin.ttf",
+      weight: "200",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-ThinItalic.ttf",
+      weight: "200",
+      style: "italic",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-Light.ttf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-LightItalic.ttf",
+      weight: "300",
+      style: "italic",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-Roman.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-RomanItalic.ttf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-Mediu.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-MediumItalic.ttf",
+      weight: "500",
+      style: "italic",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-Black.ttf",
+      weight: "900",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/neue-haas-display/NeueHaasDisplay-BlackItalic.ttf",
+      weight: "900",
+      style: "italic",
+    },
+  ],
 });
 
 export const metadata: Metadata = {
@@ -43,7 +103,7 @@ export default function RootLayout({
     <html
       lang="es"
       data-scroll-behavior="smooth"
-      className={`${beVietnamPro.variable} ${notoSerif.variable} h-full antialiased`}
+      className={`${neueHaasDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <AppShell>{children}</AppShell>

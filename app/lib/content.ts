@@ -13,6 +13,7 @@ export type Station = {
   name: string;
   locality: string;
   department?: string;
+  departmentImageUrl?: string;
   slogan: string;
   summary: string;
   dato_destacado?: string;

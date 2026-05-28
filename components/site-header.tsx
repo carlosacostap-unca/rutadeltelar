@@ -25,12 +25,12 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="top-0 z-40 hidden border-b border-[color:var(--border)] bg-[rgba(252,249,245,0.88)] backdrop-blur-xl md:sticky md:block">
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+    <header className="top-0 z-40 hidden bg-[#efd4b0] md:sticky md:block">
+      <div className="mx-auto flex max-w-6xl items-center gap-6 px-5 py-8 sm:px-8 lg:px-10">
         <Link
           href="/"
           aria-label="Ir al inicio"
-          className="display-font shrink-0 text-lg font-semibold leading-none text-[color:var(--foreground)] hover:text-[color:var(--accent)]"
+          className="brand-font shrink-0 text-[2.35rem] font-normal uppercase leading-none tracking-normal text-[#0b3350] hover:text-[#0b3350]/80"
         >
           Ruta del Telar
         </Link>
@@ -47,10 +47,10 @@ export function SiteHeader() {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition sm:text-sm ${
+                className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium uppercase tracking-[0.08em] transition ${
                   active
-                    ? "bg-[color:var(--accent)] text-white shadow-sm"
-                    : "text-[color:var(--text-muted)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
+                    ? "bg-[#0b3350] text-[#efd4b0] shadow-sm"
+                    : "text-[#0b3350] hover:bg-[#0b3350]/10"
                 }`}
               >
                 {link.label}
@@ -62,7 +62,7 @@ export function SiteHeader() {
         <Link
           href="/buscar"
           aria-label="Buscar en la ruta"
-          className="hidden shrink-0 rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-1.5 text-sm font-semibold text-[color:var(--foreground)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] sm:inline-flex"
+          className="hidden shrink-0 rounded-full bg-[#0b3350] px-3.5 py-1.5 text-sm font-medium uppercase tracking-[0.08em] text-[#efd4b0] hover:bg-[#092b43] sm:inline-flex"
         >
           Buscar
         </Link>

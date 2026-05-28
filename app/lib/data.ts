@@ -249,6 +249,21 @@ function getFileUrl(record: PocketBaseRecord, fileName: string) {
   return getPocketBaseFileUrl(record, fileName);
 }
 
+function getExpandedFileUrl(record: PocketBaseRecord, expandKey: string, fileKey: string) {
+  const expanded = record.expand?.[expandKey];
+
+  if (!expanded || Array.isArray(expanded) || typeof expanded !== "object") {
+    return undefined;
+  }
+
+  const expandedRecord = expanded as PocketBaseRecord;
+  const fileName = getPathValue(expandedRecord, fileKey);
+
+  return typeof fileName === "string" && fileName.trim()
+    ? getFileUrl(expandedRecord, fileName.trim())
+    : undefined;
+}
+
 function getEntityCoverImageUrl(record: PocketBaseRecord & EntityMediaFields) {
   const fileName = getEntityCoverImage(record);
 
@@ -580,6 +595,7 @@ function normalizeStation(record: PocketBaseRecord): Station | null {
     name,
     locality: readDisplayString(record, ["localidad", "nombre"], "Ruta del Telar"),
     department: readDisplayString(record, ["expand.departamento.nombre", "departamento"], "") || undefined,
+    departmentImageUrl: getExpandedFileUrl(record, "departamento", "foto_portada"),
     slogan: readDisplayString(record, ["eslogan"], "Nodo territorial de la ruta"),
     summary: stripHtml(
       readString(

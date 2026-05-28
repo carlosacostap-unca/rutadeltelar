@@ -1,313 +1,279 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   getArtisansResult,
-  getHighlightSpotsResult,
   getProductsResult,
   getStationsResult,
 } from "@/app/lib/data";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
-import { HighlightedData } from "@/components/highlighted-data";
-import { HomeCarousel } from "@/components/home-carousel";
+import { HomeHeroCarousel } from "@/components/home-hero-carousel";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
-import { SurfaceCard } from "@/components/surface-card";
 
-function formatEventDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleDateString("es-AR", { day: "numeric", month: "long" });
+type ImageLike = {
+  imageUrl?: string;
+  imageFocus?: { x?: number; y?: number };
+};
+
+type FeaturedCardProps = {
+  href: string;
+  image: ImageLike;
+  title: string;
+  eyebrow?: string;
+  subtitle?: string;
+  imageAlt: string;
+  size?: "large" | "compact";
+  titleCase?: "natural" | "uppercase";
+};
+
+type FeaturedDepartment = {
+  name: string;
+  imageUrl?: string;
+  stationCount: number;
+};
+
+function normalize(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function takePreferred<T extends { name?: string; locality?: string }>(
+  items: T[],
+  preferredNames: string[],
+  limit: number,
+) {
+  const selected: T[] = [];
+
+  preferredNames.forEach((preferredName) => {
+    const match = items.find((item) => {
+      const candidates = [item.name, item.locality].filter(Boolean).map(String);
+      return candidates.some((candidate) =>
+        normalize(candidate).includes(normalize(preferredName)),
+      );
+    });
+
+    if (match && !selected.includes(match)) {
+      selected.push(match);
+    }
+  });
+
+  items.forEach((item) => {
+    if (selected.length < limit && !selected.includes(item)) {
+      selected.push(item);
+    }
+  });
+
+  return selected.slice(0, limit);
+}
+
+function getFeaturedDepartments(
+  stations: Array<{
+    department?: string;
+    departmentImageUrl?: string;
+  }>,
+) {
+  const departments = new Map<string, FeaturedDepartment>();
+
+  stations.forEach((station) => {
+    if (!station.department) {
+      return;
+    }
+
+    const existing = departments.get(station.department);
+
+    if (existing) {
+      existing.stationCount += 1;
+
+      if (!existing.imageUrl && station.departmentImageUrl) {
+        existing.imageUrl = station.departmentImageUrl;
+      }
+
+      return;
+    }
+
+    departments.set(station.department, {
+      name: station.department,
+      imageUrl: station.departmentImageUrl,
+      stationCount: 1,
+    });
+  });
+
+  return [...departments.values()].sort((a, b) =>
+    a.name.localeCompare(b.name, "es"),
+  );
+}
+
+function getDepartmentHref(departmentName: string) {
+  return `/estaciones?departamento=${encodeURIComponent(departmentName)}`;
+}
+
+function SectionTitle({
+  eyebrow,
+  title,
+}: {
+  eyebrow: string;
+  title: string;
+}) {
+  return (
+    <div className="mb-8">
+      <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
+        {eyebrow}
+      </p>
+      <h2 className="brand-font mt-1 text-[2rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] sm:text-[2.45rem]">
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+function FeaturedCard({
+  href,
+  image,
+  title,
+  eyebrow,
+  subtitle,
+  imageAlt,
+  size = "large",
+  titleCase = "uppercase",
+}: FeaturedCardProps) {
+  const imageHeight = size === "compact" ? "aspect-[1.05]" : "aspect-[0.95]";
+  const footerPadding = size === "compact" ? "p-4" : "p-6";
+  const titleSize = size === "compact" ? "text-xl" : "text-[1.75rem]";
+  const titleTransform = titleCase === "uppercase" ? "uppercase" : "";
+
+  return (
+    <Link href={href} className="group block">
+      <article className="h-full overflow-hidden rounded-[1.85rem] bg-[#efd4b0] text-[#0d314a] transition duration-200 group-hover:-translate-y-1">
+        <div className={`relative w-full overflow-hidden ${imageHeight}`}>
+          {image.imageUrl ? (
+            <PbImage
+              src={image.imageUrl}
+              alt={imageAlt}
+              fill
+              className="object-cover transition duration-500 group-hover:scale-[1.04]"
+              sizes={
+                size === "compact"
+                  ? "(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 260px"
+                  : "(max-width: 768px) 100vw, 33vw"
+              }
+              loading={size === "compact" ? "eager" : undefined}
+              quality={90}
+              style={getImageFocusStyle(image.imageFocus)}
+              fallback={<MediaFallback label={imageAlt} />}
+            />
+          ) : (
+            <MediaFallback label={imageAlt} />
+          )}
+        </div>
+        <div className={footerPadding}>
+          {eyebrow ? (
+            <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#18364d]/80">
+              {eyebrow}
+            </p>
+          ) : null}
+          <h3
+            className={`${titleSize} ${titleTransform} mt-1 font-black leading-[0.92] tracking-normal text-[#082d49]`}
+          >
+            {title}
+          </h3>
+          {subtitle ? (
+            <p className="mt-3 text-[0.72rem] font-medium uppercase tracking-normal text-[#18364d]/75">
+              {subtitle}
+            </p>
+          ) : null}
+        </div>
+      </article>
+    </Link>
+  );
 }
 
 export default async function Home() {
-  const now = new Date();
-  const in30days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-
-  const [stationsResult, artisansResult, productsResult, highlightSpotsResult] =
-    await Promise.all([
-      getStationsResult(),
-      getArtisansResult(),
-      getProductsResult(),
-      getHighlightSpotsResult(),
-    ]);
+  const [stationsResult, artisansResult, productsResult] = await Promise.all([
+    getStationsResult(),
+    getArtisansResult(),
+    getProductsResult(),
+  ]);
 
   const stations = stationsResult.items;
   const products = productsResult.items;
-
-  // Artesanos: solo tipo artesano
   const artisans = artisansResult.items.filter((a) =>
     (a.actorType ?? "artesano").toLowerCase().includes("artesan"),
   );
 
-  // Próximos imperdibles: tipo evento con fecha en próximos 30 días
-  const upcomingEvents = highlightSpotsResult.items
-    .filter((s) => {
-      if (s.type.toLowerCase() !== "evento" || !s.eventDate) return false;
-      const d = new Date(s.eventDate);
-      return d >= now && d <= in30days;
-    })
-    .sort((a, b) => new Date(a.eventDate!).getTime() - new Date(b.eventDate!).getTime());
-
+  const featuredDepartments = getFeaturedDepartments(stations);
+  const stationDepartmentLinks = featuredDepartments.map((department) => ({
+    name: department.name,
+    href: getDepartmentHref(department.name),
+  }));
+  const featuredProducts = takePreferred(
+    products,
+    ["Chal de Vicuna", "Ruana de Vicuna"],
+    2,
+  );
+  const featuredArtisans = takePreferred(
+    artisans,
+    ["Tapices Ocampo", "Huellas del Exito", "Tinku Kamayu", "Liliana Saracho"],
+    4,
+  );
   return (
-    <main className="flex flex-1 flex-col">
-      {/* ── Hero ───────────────────────────────────────────────── */}
-      <section className="mb-12">
-        <div className="relative overflow-hidden rounded-3xl bg-[linear-gradient(160deg,#a85d41_0%,#8a452b_100%)]">
-          <div className="relative z-10 px-6 py-10 sm:px-10 sm:py-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/50">
-              Ruta del Telar · Catamarca
-            </p>
-            <h1 className="display-font mt-4 text-5xl leading-[1.1] text-white sm:text-6xl">
-              El tejido
-              <br />
-              como camino
-            </h1>
-            <p className="mt-5 max-w-sm text-sm leading-7 text-white/75">
-              Un recorrido cultural por comunidades artesanas de Catamarca donde
-              el telar es identidad, oficio y territorio vivo.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/explorar"
-                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[color:var(--accent-strong)] transition hover:-translate-y-0.5"
-              >
-                Explorar
-              </Link>
-              <Link
-                href="/favoritos"
-                className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
-              >
-                Favoritos
-              </Link>
-            </div>
-          </div>
-          {/* decoración textil abstracta */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute right-0 top-0 h-full w-1/3 bg-[repeating-linear-gradient(45deg,rgba(255,255,255,0.03)_0px,rgba(255,255,255,0.03)_2px,transparent_2px,transparent_12px)]"
-          />
-        </div>
-      </section>
+    <main className="relative left-1/2 flex w-screen -translate-x-1/2 -mt-6 flex-col bg-[#123a55] text-white">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-20 lg:px-10">
+        <HomeHeroCarousel stationDepartmentLinks={stationDepartmentLinks} />
 
-      {/* ── Próximos imperdibles ───────────────────────────────── */}
-      {upcomingEvents.length > 0 && (
-        <section className="mb-12">
-          <div className="mb-5 flex items-end justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-                Agenda
-              </p>
-              <h2 className="display-font mt-1 text-2xl leading-tight text-[color:var(--foreground)]">
-                Próximos imperdibles
-              </h2>
-            </div>
-            <Link
-              href="/imperdibles"
-              className="text-sm font-semibold text-[color:var(--accent)] transition hover:underline"
-            >
-              Ver agenda →
-            </Link>
-          </div>
-          <div className="flex flex-col gap-3">
-            {upcomingEvents.map((event) => (
-              <Link
-                key={event.slug}
-                href={`/imperdibles/${event.slug}`}
-                className="group"
-              >
-                <SurfaceCard className="soft-shadow flex items-center gap-4 transition group-hover:border-[color:var(--accent)]">
-                  {event.eventDate && (
-                    <div className="flex w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-[color:var(--accent)] py-3 text-white">
-                      <span className="text-xs font-semibold uppercase leading-none">
-                        {new Date(event.eventDate).toLocaleDateString("es-AR", { month: "short" })}
-                      </span>
-                      <span className="display-font mt-0.5 text-2xl font-bold leading-none">
-                        {new Date(event.eventDate).getDate()}
-                      </span>
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-                      {event.location}
-                      {event.eventDate && ` · ${formatEventDate(event.eventDate)}`}
-                    </p>
-                    <h3 className="mt-0.5 text-base font-semibold text-[color:var(--foreground)] group-hover:text-[color:var(--accent)]">
-                      {event.title}
-                    </h3>
-                    <p className="mt-1 text-xs text-[color:var(--text-muted)] line-clamp-1">
-                      {event.subtitle}
-                    </p>
-                    <HighlightedData value={event.datoDestacado} compact className="mt-2" />
-                  </div>
-                  {event.imageUrl && (
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
-                      <Image
-                        src={event.imageUrl}
-                        alt={event.title}
-                        fill
-                        className="object-cover"
-                        sizes="64px"
-                        style={getImageFocusStyle(event.imageFocus)}
-                      />
-                    </div>
-                  )}
-                </SurfaceCard>
-              </Link>
+        <section className="mb-20">
+          <SectionTitle eyebrow="Territorio" title="Explora las estaciones" />
+          <div className="grid gap-10 md:grid-cols-3 md:gap-14">
+            {featuredDepartments.map((department) => (
+              <FeaturedCard
+                key={department.name}
+                href={getDepartmentHref(department.name)}
+                image={department}
+                title={department.name}
+                eyebrow="Departamento"
+                imageAlt={`Departamento ${department.name}`}
+                titleCase="natural"
+              />
             ))}
           </div>
         </section>
-      )}
 
-      {/* ── Explorá las estaciones ────────────────────────────── */}
-      <section className="mb-12">
-        <div className="mb-5 flex items-end justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-              Territorio
-            </p>
-            <h2 className="display-font mt-1 text-2xl leading-tight text-[color:var(--foreground)]">
-              Explorá las estaciones
-            </h2>
+        <section className="mb-20">
+          <SectionTitle eyebrow="Artesanias" title="Productos destacados" />
+          <div className="grid max-w-3xl gap-10 sm:grid-cols-2 md:gap-14">
+            {featuredProducts.map((product) => (
+              <FeaturedCard
+                key={product.slug}
+                href={`/productos/${product.slug}`}
+                image={product}
+                title={product.name}
+                eyebrow={product.subcategory ?? product.category}
+                subtitle={product.techniques.slice(0, 2).join(" - ")}
+                imageAlt={product.name}
+                titleCase="natural"
+              />
+            ))}
           </div>
-          <Link
-            href="/estaciones"
-            className="text-sm font-semibold text-[color:var(--accent)] transition hover:underline"
-          >
-            Ver todas →
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {stations.map((station) => (
-            <Link
-              key={station.slug}
-              href={`/estaciones/${station.slug}`}
-              className="group"
-            >
-              <SurfaceCard className="soft-shadow overflow-hidden !p-0 transition group-hover:border-[color:var(--accent)]">
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl">
-                  {station.imageUrl ? (
-                    <PbImage
-                      src={station.imageUrl}
-                      alt={station.name}
-                      fill
-                      className="object-cover transition group-hover:scale-[1.04]"
-                      sizes="(max-width: 640px) 50vw, 33vw"
-                      style={getImageFocusStyle(station.imageFocus)}
-                      fallback={<MediaFallback label="Estacion" />}
-                    />
-                  ) : (
-                    <>
-                      <MediaFallback label="Estacion" />
-                    {/*
-                      🗺️
-                    */}
-                    </>
-                  )}
-                  {station.hasInauguratedStation && (
-                    <span className="absolute left-2 top-2 rounded-full bg-[color:var(--accent)] px-2 py-0.5 text-[10px] font-semibold text-white">
-                      Inaugurada
-                    </span>
-                  )}
-                </div>
-                <div className="p-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-                    {station.department ?? station.locality}
-                  </p>
-                  <h3 className="mt-0.5 text-sm font-semibold leading-snug text-[color:var(--foreground)]">
-                    {station.locality}
-                  </h3>
-                  <HighlightedData value={station.datoDestacado} compact className="mt-3" />
-                </div>
-              </SurfaceCard>
-            </Link>
-          ))}
-        </div>
-      </section>
+        </section>
 
-      {/* ── Productos destacados ──────────────────────────────── */}
-      <HomeCarousel eyebrow="Artesanía" title="Productos destacados" href="/productos">
-        {products.map((product) => (
-          <Link
-            key={product.slug}
-            href={`/productos/${product.slug}`}
-            className="group w-[220px] shrink-0 [scroll-snap-align:start]"
-          >
-            <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
-              {product.imageUrl ? (
-                <div className="relative mb-3 aspect-square overflow-hidden rounded-xl">
-                  <PbImage
-                    src={product.imageUrl}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition group-hover:scale-[1.03]"
-                    sizes="220px"
-                    style={getImageFocusStyle(product.imageFocus)}
-                    fallback={<MediaFallback label="Producto" />}
-                  />
-                </div>
-              ) : (
-                <div className="mb-3 aspect-square overflow-hidden rounded-xl">
-                  <MediaFallback label="Producto" />
-                  {/*
-                  🧵
-                  */}
-                </div>
-              )}
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-                {product.subcategory ?? product.category}
-              </p>
-              <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">
-                {product.name}
-              </h3>
-              {product.techniques.length > 0 && (
-                <p className="mt-1 text-[10px] text-[color:var(--text-muted)]">
-                  {product.techniques.slice(0, 2).join(" · ")}
-                </p>
-              )}
-              <HighlightedData value={product.datoDestacado} compact className="mt-3" />
-            </SurfaceCard>
-          </Link>
-        ))}
-      </HomeCarousel>
-
-      {/* ── Conocé a los artesanos ────────────────────────────── */}
-      <HomeCarousel eyebrow="Comunidad" title="Conocé a los artesanos" href="/artesanas">
-        {artisans.map((actor) => (
-          <Link
-            key={actor.slug}
-            href={`/artesanas/${actor.slug}`}
-            className="group w-[200px] shrink-0 [scroll-snap-align:start]"
-          >
-            <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
-              {actor.imageUrl ? (
-                <div className="relative mb-3 h-20 w-20 overflow-hidden rounded-full border-2 border-[color:var(--border)]">
-                  <Image
-                    src={actor.imageUrl}
-                    alt={actor.name}
-                    fill
-                    className="object-cover"
-                    sizes="80px"
-                    style={getImageFocusStyle(actor.imageFocus)}
-                  />
-                </div>
-              ) : (
-                <div className="display-font mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-[color:var(--surface)] text-3xl text-[color:var(--accent-strong)]">
-                  {actor.name.slice(0, 1)}
-                </div>
-              )}
-              <h3 className="text-sm font-semibold text-[color:var(--foreground)]">
-                {actor.name}
-              </h3>
-              <p className="mt-0.5 text-[10px] font-medium text-[color:var(--accent-mid)]">
-                {actor.craft}
-              </p>
-              <p className="mt-0.5 text-[10px] text-[color:var(--text-muted)]">
-                {actor.place}
-              </p>
-              <HighlightedData value={actor.datoDestacado} compact className="mt-3" />
-            </SurfaceCard>
-          </Link>
-        ))}
-      </HomeCarousel>
+        <section>
+          <SectionTitle eyebrow="Comunidad" title="Conoce a los artesanos" />
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {featuredArtisans.map((artisan) => (
+              <FeaturedCard
+                key={artisan.slug}
+                href={`/artesanas/${artisan.slug}`}
+                image={artisan}
+                title={artisan.name}
+                subtitle={artisan.place}
+                imageAlt={artisan.name}
+                size="compact"
+                titleCase="natural"
+              />
+            ))}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

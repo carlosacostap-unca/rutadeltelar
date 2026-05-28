@@ -3,6 +3,7 @@ import {
   getHighlightSpotsResult,
   getStationsResult,
 } from "@/app/lib/data";
+import { Suspense } from "react";
 import { EstacionesClient } from "@/components/estaciones-client";
 import { DataSourceBadge } from "@/components/data-source-badge";
 import { SectionHeading } from "@/components/section-heading";
@@ -38,12 +39,20 @@ export default async function EstacionesPage() {
         </div>
       </header>
 
-      <EstacionesClient
-        stations={stations}
-        artisans={artisans}
-        highlightSpots={highlightSpots}
-        departments={departments}
-      />
+      <Suspense
+        fallback={
+          <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-6 text-sm text-[color:var(--text-muted)]">
+            Cargando estaciones...
+          </div>
+        }
+      >
+        <EstacionesClient
+          stations={stations}
+          artisans={artisans}
+          highlightSpots={highlightSpots}
+          departments={departments}
+        />
+      </Suspense>
     </main>
   );
 }

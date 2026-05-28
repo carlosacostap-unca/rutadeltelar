@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
+import { useRouter, useSearchParams } from "next/navigation";
 import { type Artisan, type HighlightSpot, type Station } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { HighlightedData } from "@/components/highlighted-data";
@@ -33,9 +34,28 @@ type Props = {
 };
 
 export function EstacionesClient({ stations, artisans, highlightSpots, departments }: Props) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
+  const urlDepartment = searchParams.get("departamento");
+  const dept = urlDepartment && departments.includes(urlDepartment) ? urlDepartment : "todas";
   const [view, setView] = useState<"lista" | "mapa">("lista");
-  const [dept, setDept] = useState<string>("todas");
   const [search, setSearch] = useState("");
+
+  function handleDepartmentChange(value: string) {
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      if (value === "todas") {
+        params.delete("departamento");
+      } else {
+        params.set("departamento", value);
+      }
+
+      const query = params.toString();
+      router.replace(query ? `/estaciones?${query}` : "/estaciones", { scroll: false });
+    });
+  }
 
   const filtered = useMemo(() => {
     return stations.filter((s) => {
@@ -107,7 +127,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
           <button
             type="button"
             aria-pressed={dept === "todas"}
-            onClick={() => setDept("todas")}
+            onClick={() => handleDepartmentChange("todas")}
             className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${
               dept === "todas"
                 ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
@@ -121,7 +141,7 @@ export function EstacionesClient({ stations, artisans, highlightSpots, departmen
               key={d}
               type="button"
               aria-pressed={dept === d}
-              onClick={() => setDept(d)}
+              onClick={() => handleDepartmentChange(d)}
               className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${
                 dept === d
                   ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
