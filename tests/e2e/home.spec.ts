@@ -15,7 +15,7 @@ test("shows the stations hero slide", async ({ page }) => {
 
   await expect(
     page.getByRole("button", { name: "Ver hero anterior" }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Ver hero siguiente" }),
   ).toBeVisible();
@@ -100,7 +100,10 @@ test("keeps hero swipe navigation within the first and last slides", async ({
 
   await expect(
     page.getByRole("button", { name: "Ver hero anterior" }),
-  ).toBeDisabled();
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Ver hero siguiente" }),
+  ).toBeVisible();
 
   await page.mouse.move(heroBox.x + heroBox.width * 0.25, y);
   await page.mouse.down();
@@ -113,8 +116,11 @@ test("keeps hero swipe navigation within the first and last slides", async ({
 
   await page.getByRole("button", { name: "Ver hero 4" }).click();
   await expect(
+    page.getByRole("button", { name: "Ver hero anterior" }),
+  ).toBeVisible();
+  await expect(
     page.getByRole("button", { name: "Ver hero siguiente" }),
-  ).toBeDisabled();
+  ).toHaveCount(0);
 
   await page.mouse.move(heroBox.x + heroBox.width * 0.8, y);
   await page.mouse.down();

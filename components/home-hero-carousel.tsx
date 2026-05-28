@@ -153,11 +153,9 @@ function isInteractiveSwipeTarget(target: EventTarget | null) {
 
 function HeroArrow({
   direction,
-  disabled,
   onClick,
 }: {
   direction: "previous" | "next";
-  disabled: boolean;
   onClick: () => void;
 }) {
   return (
@@ -166,9 +164,8 @@ function HeroArrow({
       aria-label={
         direction === "previous" ? "Ver hero anterior" : "Ver hero siguiente"
       }
-      disabled={disabled}
       onClick={onClick}
-      className={`absolute bottom-5 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/35 bg-black/32 text-white backdrop-blur transition hover:bg-black/46 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-black/32 md:top-1/2 md:bottom-auto md:h-11 md:w-11 md:-translate-y-1/2 ${
+      className={`absolute bottom-5 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/35 bg-black/32 text-white backdrop-blur transition hover:bg-black/46 md:top-1/2 md:bottom-auto md:h-11 md:w-11 md:-translate-y-1/2 ${
         direction === "previous"
           ? "right-20 md:left-5 md:right-auto"
           : "right-6 md:right-5"
@@ -436,12 +433,12 @@ export function HomeHeroCarousel({
           })}
         </div>
 
-        <HeroArrow
-          direction="previous"
-          disabled={isFirstSlide}
-          onClick={goToPrevious}
-        />
-        <HeroArrow direction="next" disabled={isLastSlide} onClick={goToNext} />
+        {!isFirstSlide ? (
+          <HeroArrow direction="previous" onClick={goToPrevious} />
+        ) : null}
+        {!isLastSlide ? (
+          <HeroArrow direction="next" onClick={goToNext} />
+        ) : null}
 
         <div
           className="absolute bottom-6 left-7 z-20 flex items-center gap-2 md:left-16"
