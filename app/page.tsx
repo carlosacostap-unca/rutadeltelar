@@ -152,6 +152,7 @@ function FeaturedCard({
               alt={imageAlt}
               fill
               className="object-cover transition duration-500 group-hover:scale-[1.04]"
+              usage={size === "compact" ? "thumbnail" : "small"}
               sizes={
                 size === "compact"
                   ? "(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 260px"

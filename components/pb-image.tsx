@@ -2,12 +2,17 @@
 
 import Image, { type ImageProps } from "next/image";
 import { useState } from "react";
+import {
+  withPocketBaseImageThumb,
+  type PocketBaseImageUsage,
+} from "@/app/lib/pocketbase-images";
 
 const pocketBaseFilePath = "/api/files/";
 
 type PbImageProps = Omit<ImageProps, "onError"> & {
   /** Contenido a mostrar cuando la imagen no carga (404, error de red, etc.) */
   fallback?: React.ReactNode;
+  usage?: PocketBaseImageUsage;
 };
 
 function isPocketBaseFileUrl(src: ImageProps["src"]) {
@@ -44,9 +49,13 @@ function pocketBaseImageLoader({
  * Envuelve next/image con manejo de error para imágenes de PocketBase.
  * Si la imagen devuelve 404 u otro error, oculta el img y muestra el fallback.
  */
-export function PbImage({ fallback, className, alt, ...props }: PbImageProps) {
+export function PbImage({ fallback, className, alt, usage, ...props }: PbImageProps) {
   const [failed, setFailed] = useState(false);
-  const usePocketBaseLoader = isPocketBaseFileUrl(props.src);
+  const src =
+    usage && typeof props.src === "string"
+      ? withPocketBaseImageThumb(props.src, usage)
+      : props.src;
+  const usePocketBaseLoader = isPocketBaseFileUrl(src);
 
   if (failed) {
     return <>{fallback ?? null}</>;
@@ -61,6 +70,7 @@ export function PbImage({ fallback, className, alt, ...props }: PbImageProps) {
       ) : null}
       <Image
         {...props}
+        src={src}
         alt={alt}
         className={className}
         decoding={props.decoding ?? "async"}

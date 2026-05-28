@@ -47,6 +47,41 @@ test("shows the actors hero slide", async ({ page }) => {
   await expect(activeHero.getByText(/experiencia inolvidable/i)).toBeVisible();
 });
 
+test("supports swiping the hero carousel", async ({ page }) => {
+  await page.goto("/");
+
+  const hero = page.locator('section[aria-label="Presentacion principal"]');
+  const track = page.getByTestId("home-hero-track");
+  const heroBox = await hero.boundingBox();
+
+  expect(heroBox).not.toBeNull();
+  await expect(track).toHaveAttribute("style", /translateX/);
+
+  if (!heroBox) {
+    return;
+  }
+
+  const startX = heroBox.x + heroBox.width * 0.75;
+  const endX = heroBox.x + heroBox.width * 0.2;
+  const y = heroBox.y + heroBox.height * 0.48;
+
+  await page.mouse.move(startX, y);
+  await page.mouse.down();
+  await page.mouse.move(endX, y, { steps: 8 });
+  await page.mouse.up();
+
+  const activeHero = page.locator(
+    'section[aria-label="Presentacion principal"] [aria-hidden="false"]',
+  );
+
+  await expect(
+    activeHero.getByRole("heading", { name: "Estaciones" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Ver hero 2" }),
+  ).toHaveAttribute("aria-current", "true");
+});
+
 test("shows the highlights hero slide", async ({ page }) => {
   await page.goto("/");
 

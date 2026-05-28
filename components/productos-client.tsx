@@ -264,6 +264,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                    usage="small"
                     style={getImageFocusStyle(product.imageFocus)}
                     fallback={
                       <div className="aspect-[4/3] overflow-hidden">

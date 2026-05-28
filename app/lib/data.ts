@@ -31,10 +31,14 @@ import {
 } from "@/app/lib/image-focus";
 import {
   getPocketBaseFullList,
+  getPocketBaseImageUrl,
   getPocketBaseList,
-  getPocketBaseFileUrl,
   type PocketBaseRecord,
 } from "@/app/lib/pocketbase";
+import {
+  withPocketBaseImageThumb,
+  type PocketBaseImageUsage,
+} from "@/app/lib/pocketbase-images";
 
 export type DataSource = "pocketbase" | "mock";
 
@@ -241,15 +245,24 @@ function readIdArray(record: PocketBaseRecord, keys: string[]) {
   return uniqueStrings(readStringArray(record, keys));
 }
 
-function getFileUrl(record: PocketBaseRecord, fileName: string) {
+function getFileUrl(
+  record: PocketBaseRecord,
+  fileName: string,
+  usage: PocketBaseImageUsage = "medium",
+) {
   if (/^https?:\/\//i.test(fileName)) {
-    return fileName;
+    return withPocketBaseImageThumb(fileName, usage);
   }
 
-  return getPocketBaseFileUrl(record, fileName);
+  return getPocketBaseImageUrl(record, fileName, usage);
 }
 
-function getExpandedFileUrl(record: PocketBaseRecord, expandKey: string, fileKey: string) {
+function getExpandedFileUrl(
+  record: PocketBaseRecord,
+  expandKey: string,
+  fileKey: string,
+  usage: PocketBaseImageUsage = "medium",
+) {
   const expanded = record.expand?.[expandKey];
 
   if (!expanded || Array.isArray(expanded) || typeof expanded !== "object") {
@@ -260,14 +273,17 @@ function getExpandedFileUrl(record: PocketBaseRecord, expandKey: string, fileKey
   const fileName = getPathValue(expandedRecord, fileKey);
 
   return typeof fileName === "string" && fileName.trim()
-    ? getFileUrl(expandedRecord, fileName.trim())
+    ? getFileUrl(expandedRecord, fileName.trim(), usage)
     : undefined;
 }
 
-function getEntityCoverImageUrl(record: PocketBaseRecord & EntityMediaFields) {
+function getEntityCoverImageUrl(
+  record: PocketBaseRecord & EntityMediaFields,
+  usage: PocketBaseImageUsage = "medium",
+) {
   const fileName = getEntityCoverImage(record);
 
-  return fileName ? getFileUrl(record, fileName) : undefined;
+  return fileName ? getFileUrl(record, fileName, usage) : undefined;
 }
 
 function getEntityCoverFocus(record: PocketBaseRecord): ImageFocus | undefined {
@@ -290,7 +306,7 @@ function getEntityGalleryImageItems(
   const images: FocusedImage[] = [];
 
   for (const fileName of getEntityGalleryImages(record)) {
-    const url = getFileUrl(record, fileName);
+    const url = getFileUrl(record, fileName, "medium");
 
     if (!url) {
       continue;
@@ -595,7 +611,7 @@ function normalizeStation(record: PocketBaseRecord): Station | null {
     name,
     locality: readDisplayString(record, ["localidad", "nombre"], "Ruta del Telar"),
     department: readDisplayString(record, ["expand.departamento.nombre", "departamento"], "") || undefined,
-    departmentImageUrl: getExpandedFileUrl(record, "departamento", "foto_portada"),
+    departmentImageUrl: getExpandedFileUrl(record, "departamento", "foto_portada", "large"),
     slogan: readDisplayString(record, ["eslogan"], "Nodo territorial de la ruta"),
     summary: stripHtml(
       readString(

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getProductContextBySlug, getProducts } from "@/app/lib/data";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
@@ -170,7 +171,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                     {actor.imageUrl ? (
                       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-[color:var(--border)]">
                         <Image
-                          src={actor.imageUrl}
+                          src={withPocketBaseImageThumb(actor.imageUrl, "thumbnail")}
                           alt={actor.name}
                           fill
                           className="object-cover"

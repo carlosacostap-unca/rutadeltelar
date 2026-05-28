@@ -9,6 +9,7 @@ import {
   type Station,
 } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { HighlightedData } from "@/components/highlighted-data";
 import { SectionHeading } from "@/components/section-heading";
 import { StationsTerritoryMap } from "@/components/stations-territory-map";
@@ -81,7 +82,7 @@ export function HighlightSpotsBrowser({
                 {spot.imageUrl ? (
                   <div className="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl border border-[color:var(--border)]">
                     <Image
-                      src={spot.imageUrl}
+                      src={withPocketBaseImageThumb(spot.imageUrl, "small")}
                       alt={spot.title}
                       fill
                       className="object-cover"

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import { getImageFocusStyle, type FocusedImage, type ImageFocus } from "@/app/lib/image-focus";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { ImageLightbox, type LightboxImage } from "@/components/image-lightbox";
 import { MediaFallback } from "@/components/media-fallback";
 
@@ -74,11 +75,20 @@ export function DetailMediaGallery({
     () => galleryImages ?? galleryUrls.map((url) => ({ url })),
     [galleryImages, galleryUrls],
   );
+  const coverDisplayUrl = coverUrl ? withPocketBaseImageThumb(coverUrl, "medium") : undefined;
+  const thumbnailImages = useMemo<FocusedImage[]>(
+    () =>
+      images.map((image) => ({
+        ...image,
+        url: withPocketBaseImageThumb(image.url, "thumbnail"),
+      })),
+    [images],
+  );
   const lightboxImages = useMemo<LightboxImage[]>(
     () => [
-      ...(coverUrl ? [{ url: coverUrl, alt: title }] : []),
+      ...(coverUrl ? [{ url: withPocketBaseImageThumb(coverUrl, "large"), alt: title }] : []),
       ...images.map((image, index) => ({
-        url: image.url,
+        url: withPocketBaseImageThumb(image.url, "large"),
         alt: `${title} galeria ${index + 1}`,
       })),
     ],
@@ -94,7 +104,7 @@ export function DetailMediaGallery({
 
   return (
     <div className="space-y-3">
-      {coverUrl ? (
+      {coverDisplayUrl ? (
         <button
           type="button"
           onClick={() => setActiveIndex(0)}
@@ -102,7 +112,7 @@ export function DetailMediaGallery({
           aria-label={`Ampliar imagen de ${title}`}
         >
           <Image
-            src={coverUrl}
+            src={coverDisplayUrl}
             alt={title}
             fill
             className="object-cover"
@@ -117,16 +127,16 @@ export function DetailMediaGallery({
         </div>
       )}
 
-      {images.length > 0 && (
+      {thumbnailImages.length > 0 && (
         <div className="relative">
-          {images.length > 1 ? (
+          {thumbnailImages.length > 1 ? (
             <ScrollArrow direction="left" onClick={() => scrollThumbnails("left")} />
           ) : null}
           <div
             ref={thumbnailScrollRef}
             className="flex gap-3 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {images.map((image, index) => (
+            {thumbnailImages.map((image, index) => (
               <button
                 type="button"
                 key={image.url}
@@ -145,7 +155,7 @@ export function DetailMediaGallery({
               </button>
             ))}
           </div>
-          {images.length > 1 ? (
+          {thumbnailImages.length > 1 ? (
             <ScrollArrow direction="right" onClick={() => scrollThumbnails("right")} />
           ) : null}
         </div>

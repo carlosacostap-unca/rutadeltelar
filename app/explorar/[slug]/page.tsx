@@ -8,6 +8,7 @@ import {
 } from "@/app/lib/data";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
@@ -165,7 +166,7 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
               {responsibleArtisan?.imageUrl ? (
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-[color:var(--border)]">
                   <Image
-                    src={responsibleArtisan.imageUrl}
+                    src={withPocketBaseImageThumb(responsibleArtisan.imageUrl, "thumbnail")}
                     alt={responsibleArtisan.name}
                     fill
                     className="object-cover"
@@ -236,7 +237,7 @@ export default async function ExperienceDetailPage({ params }: ExperienceDetailP
                 {spot.imageUrl ? (
                   <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
                     <Image
-                      src={spot.imageUrl}
+                      src={withPocketBaseImageThumb(spot.imageUrl, "thumbnail")}
                       alt={spot.title}
                       fill
                       className="object-cover transition group-hover:scale-[1.03]"

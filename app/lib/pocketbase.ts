@@ -1,3 +1,8 @@
+import {
+  getPocketBaseImageThumb,
+  type PocketBaseImageUsage,
+} from "@/app/lib/pocketbase-images";
+
 type PocketBaseCollectionKey =
   | "experiences"
   | "artisans"
@@ -140,6 +145,7 @@ export async function getPocketBaseFullList(
 export function getPocketBaseFileUrl(
   record: PocketBaseFileRecord,
   fileName?: string,
+  options: { thumb?: string } = {},
 ) {
   const config = getPocketBaseConfig();
 
@@ -147,5 +153,22 @@ export function getPocketBaseFileUrl(
     return undefined;
   }
 
-  return `${config.baseUrl}/api/files/${record.collectionId}/${record.id}/${fileName}`;
+  const url = `${config.baseUrl}/api/files/${record.collectionId}/${record.id}/${fileName}`;
+
+  if (!options.thumb) {
+    return url;
+  }
+
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}thumb=${encodeURIComponent(options.thumb)}`;
+}
+
+export function getPocketBaseImageUrl(
+  record: PocketBaseFileRecord,
+  fileName?: string,
+  usage: PocketBaseImageUsage = "medium",
+) {
+  return getPocketBaseFileUrl(record, fileName, {
+    thumb: getPocketBaseImageThumb(usage),
+  });
 }

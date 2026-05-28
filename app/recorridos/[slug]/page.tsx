@@ -9,6 +9,7 @@ import {
 } from "@/app/lib/data";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { FavoriteButton } from "@/components/favorite-button";
 import { SectionHeading } from "@/components/section-heading";
 import { ShareButton } from "@/components/share-button";
@@ -114,7 +115,7 @@ export default async function SuggestedJourneyPage({
           {journey.station.imageUrl ? (
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10">
               <Image
-                src={journey.station.imageUrl}
+                src={withPocketBaseImageThumb(journey.station.imageUrl, "medium")}
                 alt={journey.station.name}
                 fill
                 className="object-cover"

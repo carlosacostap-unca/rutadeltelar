@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { type Artisan, type Experience, type HighlightSpot, type Product, type Station } from "@/app/lib/content";
 import { getImageFocusStyle, type ImageFocus } from "@/app/lib/image-focus";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { HighlightedData } from "@/components/highlighted-data";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -146,7 +147,7 @@ function GroupSection({ group }: { group: ResultGroup }) {
               {item.imageUrl ? (
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[color:var(--border)]">
                   <Image
-                    src={item.imageUrl}
+                    src={withPocketBaseImageThumb(item.imageUrl, "thumbnail")}
                     alt={item.title}
                     fill
                     className="object-cover"

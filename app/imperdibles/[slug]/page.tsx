@@ -9,6 +9,7 @@ import {
 import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
@@ -280,7 +281,7 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
                 {actor.imageUrl ? (
                   <div className="relative mb-3 h-14 w-14 overflow-hidden rounded-full border border-[color:var(--border)]">
                     <Image
-                      src={actor.imageUrl}
+                      src={withPocketBaseImageThumb(actor.imageUrl, "thumbnail")}
                       alt={actor.name}
                       fill
                       className="object-cover"
@@ -318,7 +319,7 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
                 {product.imageUrl ? (
                   <div className="relative aspect-square w-full overflow-hidden">
                     <Image
-                      src={product.imageUrl}
+                      src={withPocketBaseImageThumb(product.imageUrl, "thumbnail")}
                       alt={product.name}
                       fill
                       className="object-cover transition group-hover:scale-[1.03]"
@@ -353,7 +354,7 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
                 {exp.imageUrl ? (
                   <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
                     <Image
-                      src={exp.imageUrl}
+                      src={withPocketBaseImageThumb(exp.imageUrl, "thumbnail")}
                       alt={exp.title}
                       fill
                       className="object-cover transition group-hover:scale-[1.03]"

@@ -202,6 +202,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
                       fill
                       className="object-cover"
                       sizes="48px"
+                      usage="thumbnail"
                       style={getImageFocusStyle(item.imageFocus)}
                       fallback={
                         <div className="display-font flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--surface)] text-lg text-[color:var(--accent-strong)]">

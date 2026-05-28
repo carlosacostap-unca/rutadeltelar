@@ -6,6 +6,7 @@ import { type Artisan } from "@/app/lib/content";
 import { getArtisanContextBySlug, getArtisans } from "@/app/lib/data";
 import { getImageFocusStyle, type FocusedImage } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { ContactButtons } from "@/components/contact-buttons";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
@@ -282,7 +283,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
                 {product.imageUrl ? (
                   <div className="relative aspect-square w-full overflow-hidden">
                     <Image
-                      src={product.imageUrl}
+                      src={withPocketBaseImageThumb(product.imageUrl, "thumbnail")}
                       alt={product.name}
                       fill
                       className="object-cover transition group-hover:scale-[1.03]"
@@ -317,7 +318,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
                 {spot.imageUrl ? (
                   <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
                     <Image
-                      src={spot.imageUrl}
+                      src={withPocketBaseImageThumb(spot.imageUrl, "thumbnail")}
                       alt={spot.title}
                       fill
                       className="object-cover transition group-hover:scale-[1.03]"
@@ -351,7 +352,7 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
                 {exp.imageUrl ? (
                   <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
                     <Image
-                      src={exp.imageUrl}
+                      src={withPocketBaseImageThumb(exp.imageUrl, "thumbnail")}
                       alt={exp.title}
                       fill
                       className="object-cover transition group-hover:scale-[1.03]"

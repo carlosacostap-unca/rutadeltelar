@@ -178,6 +178,7 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
                                   fill
                                   className="object-cover"
                                   sizes="64px"
+                                  usage="thumbnail"
                                   style={getImageFocusStyle(event.imageFocus)}
                                 />
                               </div>
@@ -238,6 +239,7 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
                         fill
                         className="object-cover transition group-hover:scale-[1.03]"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        usage="small"
                         style={getImageFocusStyle(spot.imageFocus)}
                         fallback={
                           <div className="mb-4 aspect-[3/2] overflow-hidden rounded-xl">

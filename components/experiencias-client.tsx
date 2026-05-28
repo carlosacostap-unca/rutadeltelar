@@ -141,6 +141,7 @@ export function ExperienciasClient({ experiences, stations, categories, duration
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    usage="small"
                     style={getImageFocusStyle(exp.imageFocus)}
                     fallback={<MediaFallback label="Experiencia" />}
                   />

@@ -11,6 +11,7 @@ import {
   writeFavorites,
 } from "@/components/favorite-button";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { HighlightedData } from "@/components/highlighted-data";
 import { SurfaceCard } from "@/components/surface-card";
 
@@ -91,7 +92,7 @@ export function FavoritesClient() {
               {item.imageUrl ? (
                 <div className="relative mb-4 aspect-[4/3] overflow-hidden rounded-xl">
                   <Image
-                    src={item.imageUrl}
+                    src={withPocketBaseImageThumb(item.imageUrl, "small")}
                     alt={item.title}
                     fill
                     className="object-cover transition group-hover:scale-[1.03]"

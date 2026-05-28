@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import type { MouseEvent, PointerEvent, TransitionEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type StationDepartmentLink = {
   name: string;
@@ -137,6 +138,25 @@ const heroSlides = [
   },
 ];
 
+const heroTrackSlides = [
+  heroSlides[heroSlides.length - 1],
+  ...heroSlides,
+  heroSlides[0],
+];
+
+const heroTrackSlideCount = heroTrackSlides.length;
+const swipeThreshold = 48;
+
+type SwipeGesture = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+};
+
+function isInteractiveSwipeTarget(target: EventTarget | null) {
+  return target instanceof Element && Boolean(target.closest("a,button"));
+}
+
 function HeroArrow({
   direction,
   onClick,
@@ -209,53 +229,236 @@ export function HomeHeroCarousel({
   stationDepartmentLinks = fallbackStationDepartmentLinks,
 }: HomeHeroCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [trackIndex, setTrackIndex] = useState(1);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isJumping, setIsJumping] = useState(false);
+  const swipeGesture = useRef<SwipeGesture | null>(null);
+  const ignoreClickAfterSwipe = useRef(false);
+  const ignoreClickTimeout = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!isJumping) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      setIsJumping(false);
+    });
+
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [isJumping]);
+
+  useEffect(() => {
+    return () => {
+      if (ignoreClickTimeout.current) {
+        clearTimeout(ignoreClickTimeout.current);
+      }
+    };
+  }, []);
 
   const goToPrevious = () => {
+    setDragOffset(0);
+    setIsJumping(false);
+    setTrackIndex((current) => current - 1);
     setActiveIndex((current) =>
       current === 0 ? heroSlides.length - 1 : current - 1,
     );
   };
 
   const goToNext = () => {
+    setDragOffset(0);
+    setIsJumping(false);
+    setTrackIndex((current) => current + 1);
     setActiveIndex((current) =>
       current === heroSlides.length - 1 ? 0 : current + 1,
     );
   };
 
+  const goToSlide = (index: number) => {
+    setDragOffset(0);
+    setIsJumping(false);
+    setActiveIndex(index);
+    setTrackIndex(index + 1);
+  };
+
+  const resetSwipeGesture = () => {
+    swipeGesture.current = null;
+    setDragOffset(0);
+    setIsDragging(false);
+  };
+
+  const markSwipeClickIgnored = () => {
+    ignoreClickAfterSwipe.current = true;
+
+    if (ignoreClickTimeout.current) {
+      clearTimeout(ignoreClickTimeout.current);
+    }
+
+    ignoreClickTimeout.current = setTimeout(() => {
+      ignoreClickAfterSwipe.current = false;
+    }, 0);
+  };
+
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (
+      !event.isPrimary ||
+      isInteractiveSwipeTarget(event.target) ||
+      (event.pointerType === "mouse" && event.button !== 0)
+    ) {
+      return;
+    }
+
+    swipeGesture.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+    };
+    setIsDragging(true);
+    setDragOffset(0);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const gesture = swipeGesture.current;
+
+    if (!gesture || gesture.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+
+    if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      setDragOffset(deltaX);
+    }
+  };
+
+  const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    const gesture = swipeGesture.current;
+
+    if (!gesture || gesture.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    const isHorizontalSwipe =
+      Math.abs(deltaX) >= swipeThreshold &&
+      Math.abs(deltaX) > Math.abs(deltaY) * 1.1;
+
+    swipeGesture.current = null;
+    setIsDragging(false);
+
+    if (isHorizontalSwipe) {
+      markSwipeClickIgnored();
+
+      if (deltaX < 0) {
+        goToNext();
+      } else {
+        goToPrevious();
+      }
+
+      return;
+    }
+
+    setDragOffset(0);
+  };
+
+  const handleTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (
+      event.target !== event.currentTarget ||
+      event.propertyName !== "transform"
+    ) {
+      return;
+    }
+
+    if (trackIndex === 0) {
+      setIsJumping(true);
+      setTrackIndex(heroSlides.length);
+      return;
+    }
+
+    if (trackIndex === heroSlides.length + 1) {
+      setIsJumping(true);
+      setTrackIndex(1);
+    }
+  };
+
+  const handleClickCapture = (event: MouseEvent<HTMLDivElement>) => {
+    if (!ignoreClickAfterSwipe.current) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    ignoreClickAfterSwipe.current = false;
+  };
+
   return (
     <section className="mb-16 md:mb-20" aria-label="Presentacion principal">
-      <div className="relative min-h-[660px] overflow-hidden rounded-[2rem] sm:min-h-[610px] md:min-h-[560px]">
-        {heroSlides.map((slide, index) => {
-          const active = index === activeIndex;
+      <div
+        className="relative min-h-[660px] overflow-hidden rounded-[2rem] [touch-action:pan-y] sm:min-h-[610px] md:min-h-[560px]"
+        onClickCapture={handleClickCapture}
+        onPointerCancel={resetSwipeGesture}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+      >
+        <div
+          data-testid="home-hero-track"
+          className={`flex min-h-[660px] sm:min-h-[610px] md:min-h-[560px] ${
+            isDragging || isJumping
+              ? "transition-none"
+              : "transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          }`}
+          style={{
+            transform: `translateX(calc(${
+              trackIndex * (-100 / heroTrackSlideCount)
+            }% + ${dragOffset}px))`,
+            width: `${heroTrackSlideCount * 100}%`,
+          }}
+          onTransitionEnd={handleTransitionEnd}
+        >
+          {heroTrackSlides.map((slide, trackSlideIndex) => {
+            const slideIndex =
+              (trackSlideIndex + heroSlides.length - 1) % heroSlides.length;
+            const active = trackSlideIndex === trackIndex;
 
-          return (
-            <div
-              key={slide.image}
-              aria-hidden={!active}
-              className={`absolute inset-0 transition-opacity duration-500 ${
-                active ? "opacity-100" : "pointer-events-none opacity-0"
-              }`}
-            >
-              <Image
-                src={slide.image}
-                alt={slide.imageAlt}
-                fill
-                priority={index === 0}
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 1100px"
-              />
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.76)_0%,rgba(0,0,0,0.52)_48%,rgba(0,0,0,0.26)_100%)]" />
-              <div className="relative z-10 flex min-h-[660px] max-w-4xl flex-col justify-center px-7 py-16 sm:min-h-[610px] md:min-h-[560px] md:px-16">
-                {slide.content}
-                {index === 1 ? (
-                  <StationHeroDepartmentLinks
-                    departments={stationDepartmentLinks}
-                  />
-                ) : null}
+            return (
+              <div
+                key={`${slide.image}-${trackSlideIndex}`}
+                aria-hidden={!active}
+                className={`relative min-h-[660px] w-full shrink-0 sm:min-h-[610px] md:min-h-[560px] ${
+                  active ? "" : "pointer-events-none"
+                }`}
+                style={{ width: `${100 / heroTrackSlideCount}%` }}
+              >
+                <Image
+                  src={slide.image}
+                  alt={slide.imageAlt}
+                  fill
+                  priority={slideIndex === 0}
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 1100px"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.76)_0%,rgba(0,0,0,0.52)_48%,rgba(0,0,0,0.26)_100%)]" />
+                <div className="relative z-10 flex min-h-[660px] max-w-4xl flex-col justify-center px-7 py-16 sm:min-h-[610px] md:min-h-[560px] md:px-16">
+                  {slide.content}
+                  {slideIndex === 1 ? (
+                    <StationHeroDepartmentLinks
+                      departments={stationDepartmentLinks}
+                    />
+                  ) : null}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
 
         <HeroArrow direction="previous" onClick={goToPrevious} />
         <HeroArrow direction="next" onClick={goToNext} />
@@ -274,7 +477,7 @@ export function HomeHeroCarousel({
                 type="button"
                 aria-label={`Ver hero ${index + 1}`}
                 aria-current={active ? "true" : undefined}
-                onClick={() => setActiveIndex(index)}
+                onClick={() => goToSlide(index)}
                 className={`h-2.5 rounded-full transition-all ${
                   active ? "w-9 bg-[#efd4b0]" : "w-2.5 bg-white/55"
                 }`}

@@ -19,6 +19,7 @@ import {
 } from "@/app/lib/content";
 import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle, type ImageFocus } from "@/app/lib/image-focus";
+import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { SatelliteReferenceTileLayers } from "@/components/satellite-reference-tile-layers";
 import { SatelliteMapButton } from "@/components/satellite-map-button";
 
@@ -103,7 +104,7 @@ function PopupImage({
   return (
     <div className="overflow-hidden rounded-xl border border-[rgba(74,51,35,0.14)]">
       <Image
-        src={src}
+        src={withPocketBaseImageThumb(src, "thumbnail")}
         alt={alt}
         width={320}
         height={176}
