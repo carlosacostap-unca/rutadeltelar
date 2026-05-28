@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { MouseEvent, PointerEvent, TransitionEvent } from "react";
+import type { MouseEvent, PointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 
 type StationDepartmentLink = {
@@ -138,13 +138,7 @@ const heroSlides = [
   },
 ];
 
-const heroTrackSlides = [
-  heroSlides[heroSlides.length - 1],
-  ...heroSlides,
-  heroSlides[0],
-];
-
-const heroTrackSlideCount = heroTrackSlides.length;
+const heroTrackSlideCount = heroSlides.length;
 const swipeThreshold = 48;
 
 type SwipeGesture = {
@@ -159,9 +153,11 @@ function isInteractiveSwipeTarget(target: EventTarget | null) {
 
 function HeroArrow({
   direction,
+  disabled,
   onClick,
 }: {
   direction: "previous" | "next";
+  disabled: boolean;
   onClick: () => void;
 }) {
   return (
@@ -170,8 +166,9 @@ function HeroArrow({
       aria-label={
         direction === "previous" ? "Ver hero anterior" : "Ver hero siguiente"
       }
+      disabled={disabled}
       onClick={onClick}
-      className={`absolute bottom-5 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/35 bg-black/32 text-white backdrop-blur transition hover:bg-black/46 md:top-1/2 md:bottom-auto md:h-11 md:w-11 md:-translate-y-1/2 ${
+      className={`absolute bottom-5 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/35 bg-black/32 text-white backdrop-blur transition hover:bg-black/46 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-black/32 md:top-1/2 md:bottom-auto md:h-11 md:w-11 md:-translate-y-1/2 ${
         direction === "previous"
           ? "right-20 md:left-5 md:right-auto"
           : "right-6 md:right-5"
@@ -229,29 +226,15 @@ export function HomeHeroCarousel({
   stationDepartmentLinks = fallbackStationDepartmentLinks,
 }: HomeHeroCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [trackIndex, setTrackIndex] = useState(1);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [isJumping, setIsJumping] = useState(false);
   const swipeGesture = useRef<SwipeGesture | null>(null);
   const ignoreClickAfterSwipe = useRef(false);
   const ignoreClickTimeout = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
-
-  useEffect(() => {
-    if (!isJumping) {
-      return;
-    }
-
-    const frame = requestAnimationFrame(() => {
-      setIsJumping(false);
-    });
-
-    return () => {
-      cancelAnimationFrame(frame);
-    };
-  }, [isJumping]);
+  const isFirstSlide = activeIndex === 0;
+  const isLastSlide = activeIndex === heroSlides.length - 1;
 
   useEffect(() => {
     return () => {
@@ -262,31 +245,36 @@ export function HomeHeroCarousel({
   }, []);
 
   const goToPrevious = () => {
+    if (isFirstSlide) {
+      return;
+    }
+
     setDragOffset(0);
-    setIsJumping(false);
-    setTrackIndex((current) => current - 1);
-    setActiveIndex((current) =>
-      current === 0 ? heroSlides.length - 1 : current - 1,
-    );
+    setActiveIndex((current) => current - 1);
   };
 
   const goToNext = () => {
+    if (isLastSlide) {
+      return;
+    }
+
     setDragOffset(0);
-    setIsJumping(false);
-    setTrackIndex((current) => current + 1);
-    setActiveIndex((current) =>
-      current === heroSlides.length - 1 ? 0 : current + 1,
-    );
+    setActiveIndex((current) => current + 1);
   };
 
   const goToSlide = (index: number) => {
     setDragOffset(0);
-    setIsJumping(false);
     setActiveIndex(index);
-    setTrackIndex(index + 1);
   };
 
-  const resetSwipeGesture = () => {
+  const releaseSwipePointer = (element: HTMLDivElement, pointerId: number) => {
+    if (element.hasPointerCapture(pointerId)) {
+      element.releasePointerCapture(pointerId);
+    }
+  };
+
+  const resetSwipeGesture = (event: PointerEvent<HTMLDivElement>) => {
+    releaseSwipePointer(event.currentTarget, event.pointerId);
     swipeGesture.current = null;
     setDragOffset(0);
     setIsDragging(false);
@@ -334,6 +322,11 @@ export function HomeHeroCarousel({
     const deltaY = event.clientY - gesture.startY;
 
     if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if ((isFirstSlide && deltaX > 0) || (isLastSlide && deltaX < 0)) {
+        setDragOffset(0);
+        return;
+      }
+
       setDragOffset(deltaX);
     }
   };
@@ -352,9 +345,13 @@ export function HomeHeroCarousel({
       Math.abs(deltaX) > Math.abs(deltaY) * 1.1;
 
     swipeGesture.current = null;
+    releaseSwipePointer(event.currentTarget, event.pointerId);
     setIsDragging(false);
 
-    if (isHorizontalSwipe) {
+    if (
+      isHorizontalSwipe &&
+      !((isFirstSlide && deltaX > 0) || (isLastSlide && deltaX < 0))
+    ) {
       markSwipeClickIgnored();
 
       if (deltaX < 0) {
@@ -367,26 +364,6 @@ export function HomeHeroCarousel({
     }
 
     setDragOffset(0);
-  };
-
-  const handleTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
-    if (
-      event.target !== event.currentTarget ||
-      event.propertyName !== "transform"
-    ) {
-      return;
-    }
-
-    if (trackIndex === 0) {
-      setIsJumping(true);
-      setTrackIndex(heroSlides.length);
-      return;
-    }
-
-    if (trackIndex === heroSlides.length + 1) {
-      setIsJumping(true);
-      setTrackIndex(1);
-    }
   };
 
   const handleClickCapture = (event: MouseEvent<HTMLDivElement>) => {
@@ -402,8 +379,9 @@ export function HomeHeroCarousel({
   return (
     <section className="mb-16 md:mb-20" aria-label="Presentacion principal">
       <div
-        className="relative min-h-[660px] overflow-hidden rounded-[2rem] [touch-action:pan-y] sm:min-h-[610px] md:min-h-[560px]"
+        className="relative min-h-[660px] select-none overflow-hidden rounded-[2rem] [touch-action:pan-y] sm:min-h-[610px] md:min-h-[560px]"
         onClickCapture={handleClickCapture}
+        onDragStart={(event) => event.preventDefault()}
         onPointerCancel={resetSwipeGesture}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -412,26 +390,23 @@ export function HomeHeroCarousel({
         <div
           data-testid="home-hero-track"
           className={`flex min-h-[660px] sm:min-h-[610px] md:min-h-[560px] ${
-            isDragging || isJumping
+            isDragging
               ? "transition-none"
               : "transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
           }`}
           style={{
             transform: `translateX(calc(${
-              trackIndex * (-100 / heroTrackSlideCount)
+              activeIndex * (-100 / heroTrackSlideCount)
             }% + ${dragOffset}px))`,
             width: `${heroTrackSlideCount * 100}%`,
           }}
-          onTransitionEnd={handleTransitionEnd}
         >
-          {heroTrackSlides.map((slide, trackSlideIndex) => {
-            const slideIndex =
-              (trackSlideIndex + heroSlides.length - 1) % heroSlides.length;
-            const active = trackSlideIndex === trackIndex;
+          {heroSlides.map((slide, index) => {
+            const active = index === activeIndex;
 
             return (
               <div
-                key={`${slide.image}-${trackSlideIndex}`}
+                key={slide.image}
                 aria-hidden={!active}
                 className={`relative min-h-[660px] w-full shrink-0 sm:min-h-[610px] md:min-h-[560px] ${
                   active ? "" : "pointer-events-none"
@@ -442,14 +417,15 @@ export function HomeHeroCarousel({
                   src={slide.image}
                   alt={slide.imageAlt}
                   fill
-                  priority={slideIndex === 0}
+                  priority={index === 0}
+                  draggable={false}
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 1100px"
                 />
                 <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.76)_0%,rgba(0,0,0,0.52)_48%,rgba(0,0,0,0.26)_100%)]" />
                 <div className="relative z-10 flex min-h-[660px] max-w-4xl flex-col justify-center px-7 py-16 sm:min-h-[610px] md:min-h-[560px] md:px-16">
                   {slide.content}
-                  {slideIndex === 1 ? (
+                  {index === 1 ? (
                     <StationHeroDepartmentLinks
                       departments={stationDepartmentLinks}
                     />
@@ -460,8 +436,12 @@ export function HomeHeroCarousel({
           })}
         </div>
 
-        <HeroArrow direction="previous" onClick={goToPrevious} />
-        <HeroArrow direction="next" onClick={goToNext} />
+        <HeroArrow
+          direction="previous"
+          disabled={isFirstSlide}
+          onClick={goToPrevious}
+        />
+        <HeroArrow direction="next" disabled={isLastSlide} onClick={goToNext} />
 
         <div
           className="absolute bottom-6 left-7 z-20 flex items-center gap-2 md:left-16"

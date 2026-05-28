@@ -82,6 +82,50 @@ test("supports swiping the hero carousel", async ({ page }) => {
   ).toHaveAttribute("aria-current", "true");
 });
 
+test("keeps hero swipe navigation within the first and last slides", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const hero = page.locator('section[aria-label="Presentacion principal"]');
+  const heroBox = await hero.boundingBox();
+
+  expect(heroBox).not.toBeNull();
+
+  if (!heroBox) {
+    return;
+  }
+
+  const y = heroBox.y + heroBox.height * 0.48;
+
+  await expect(
+    page.getByRole("button", { name: "Ver hero anterior" }),
+  ).toBeDisabled();
+
+  await page.mouse.move(heroBox.x + heroBox.width * 0.25, y);
+  await page.mouse.down();
+  await page.mouse.move(heroBox.x + heroBox.width * 0.8, y, { steps: 8 });
+  await page.mouse.up();
+
+  await expect(
+    page.getByRole("button", { name: "Ver hero 1" }),
+  ).toHaveAttribute("aria-current", "true");
+
+  await page.getByRole("button", { name: "Ver hero 4" }).click();
+  await expect(
+    page.getByRole("button", { name: "Ver hero siguiente" }),
+  ).toBeDisabled();
+
+  await page.mouse.move(heroBox.x + heroBox.width * 0.8, y);
+  await page.mouse.down();
+  await page.mouse.move(heroBox.x + heroBox.width * 0.25, y, { steps: 8 });
+  await page.mouse.up();
+
+  await expect(
+    page.getByRole("button", { name: "Ver hero 4" }),
+  ).toHaveAttribute("aria-current", "true");
+});
+
 test("shows the highlights hero slide", async ({ page }) => {
   await page.goto("/");
 
@@ -109,4 +153,53 @@ test("navigates from home to a main public section", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /Nodos territoriales/i }),
   ).toBeVisible();
+});
+
+test("shows institutional sponsor logos at the end of the home page", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const sponsors = page.getByRole("region", {
+    name: "Aliados institucionales",
+  });
+
+  await expect(sponsors).toBeVisible();
+  await expect(
+    sponsors.getByRole("img", { name: /Catamarca Gobierno/i }),
+  ).toBeVisible();
+  await expect(
+    sponsors.getByRole("img", { name: "Consejo Federal de Inversiones" }),
+  ).toBeVisible();
+  await expect(
+    sponsors.getByRole("img", { name: "Alwaleed Philanthropies" }),
+  ).toBeVisible();
+  await expect(sponsors.getByRole("img", { name: "Unesco" })).toBeVisible();
+  await expect(
+    sponsors.getByRole("img", { name: "Ruta del Telar" }),
+  ).toBeVisible();
+});
+
+test("shows the institutional footer with QR and social icons", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const footer = page.getByRole("contentinfo", {
+    name: "Informacion institucional",
+  });
+
+  await expect(footer).toBeVisible();
+  await expect(footer.getByRole("img", { name: /Vicuna/i })).toBeVisible();
+  await expect(footer.getByText("Direccion")).toBeVisible();
+  await expect(
+    footer.getByText(/Ministerio de Trabajo, Planificacion/i),
+  ).toBeVisible();
+  await expect(
+    footer.getByRole("img", { name: /QR para acceder/i }),
+  ).toBeVisible();
+  await expect(footer.getByText("Ruta del Telar")).toBeVisible();
+  await expect(footer.getByRole("img", { name: "Facebook" })).toBeVisible();
+  await expect(footer.getByRole("img", { name: "Instagram" })).toBeVisible();
+  await expect(footer.getByRole("img", { name: "YouTube" })).toBeVisible();
 });

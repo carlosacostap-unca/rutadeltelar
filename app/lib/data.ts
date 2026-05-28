@@ -1326,14 +1326,20 @@ function normalizeProduct(record: PocketBaseRecord): Product | null {
   };
 }
 
-export async function getProductsResult(): Promise<DataResult<Product>> {
+type ProductResultOptions = {
+  sort?: string;
+};
+
+export async function getProductsResult({
+  sort = "nombre",
+}: ProductResultOptions = {}): Promise<DataResult<Product>> {
   try {
     const response = await getPocketBaseList("products", {
       // Accept only approved records
       filter: 'estado = "aprobado"',
       expand: "categoria,subcategoria,estacion_id,estaciones_relacionadas,tecnicas,actores_relacionados",
       perPage: 100,
-      sort: "nombre",
+      sort,
     });
 
     if (!response) {

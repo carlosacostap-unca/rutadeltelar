@@ -71,16 +71,27 @@
 }
 
 html {
+  max-width: 100%;
+  overflow-x: clip;
   scroll-behavior: smooth;
 }
 
 body {
+  max-width: 100%;
+  overflow-x: clip;
   background:
     radial-gradient(ellipse at top center, rgba(145, 75, 48, 0.05) 0%, transparent 55%),
     linear-gradient(180deg, #fcf9f5 0%, #f6f3ef 100%);
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-neue-haas-display), system-ui, sans-serif;
+}
+
+@supports not (overflow: clip) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
 }
 
 * {
