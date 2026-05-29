@@ -207,16 +207,23 @@ function getDepartmentHref(departmentName: string) {
 function SectionTitle({
   eyebrow,
   title,
+  size = "default",
 }: {
   eyebrow: string;
   title: string;
+  size?: "default" | "compact";
 }) {
+  const titleSize =
+    size === "compact"
+      ? "text-[1.55rem] sm:text-[1.85rem] md:text-[2.05rem]"
+      : "text-[2rem] sm:text-[2.45rem]";
+
   return (
     <div className="mb-8">
       <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
         {eyebrow}
       </p>
-      <h2 className="brand-font mt-1 text-[2rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] sm:text-[2.45rem]">
+      <h2 className={`brand-font mt-1 font-normal uppercase leading-none tracking-normal text-[#f3d7b4] ${titleSize}`}>
         {title}
       </h2>
     </div>
@@ -443,7 +450,11 @@ export default async function Home() {
         <HomeHeroCarousel stationDepartmentLinks={stationDepartmentLinks} />
 
         <section className="mb-20">
-          <SectionTitle eyebrow="Territorio" title="Explora las estaciones" />
+          <SectionTitle
+            eyebrow="Territorio"
+            title="Explora las estaciones dentro de los 3 departamentos que conforman la Ruta del Telar"
+            size="compact"
+          />
           <div className="grid gap-10 md:grid-cols-3 md:gap-14">
             {featuredDepartments.map((department) => (
               <FeaturedCard
@@ -460,7 +471,11 @@ export default async function Home() {
         </section>
 
         <section className="mb-20">
-          <SectionTitle eyebrow="Artesanias" title="Productos destacados" />
+          <SectionTitle
+            eyebrow="Productos"
+            title="Artesanias y productos regionales destacados"
+            size="compact"
+          />
           <div className="grid max-w-5xl gap-10 sm:grid-cols-2 lg:grid-cols-3 md:gap-14">
             {featuredProducts.map((product) => (
               <FeaturedCard
@@ -478,7 +493,11 @@ export default async function Home() {
         </section>
 
         <section>
-          <SectionTitle eyebrow="Comunidad" title="Conoce a los artesanos" />
+          <SectionTitle
+            eyebrow="Comunidad"
+            title="Conoce a los actores de la Ruta del Telar"
+            size="compact"
+          />
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {featuredArtisans.map((artisan) => (
               <FeaturedCard
