@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import {
   type Artisan,
   type HighlightSpot,
@@ -32,6 +31,14 @@ const StationsTerritoryMapLeaflet = dynamic(
   },
 );
 
+function formatMapLocation(value: string) {
+  return value.replace(/,\s*Catamarca\.?$/i, "");
+}
+
+function formatMapStationName(value: string) {
+  return value.replace(/^Estaci[oó]n\s+/i, "");
+}
+
 export function StationsTerritoryMap({
   stations,
   activeSlug,
@@ -41,11 +48,18 @@ export function StationsTerritoryMap({
   highlightSpots,
 }: StationsTerritoryMapProps) {
   const [focusMode, setFocusMode] = useState<"all" | "active">("all");
+  const [localSelectedSlug, setLocalSelectedSlug] = useState<string>();
   const [visibleLayers, setVisibleLayers] = useState({
     stations: true,
     artisans: true,
     highlightSpots: true,
   });
+  const effectiveSelectedSlug = selectedSlug ?? localSelectedSlug;
+
+  function handleSelectStation(slug: string) {
+    setLocalSelectedSlug(slug);
+    onSelectStation?.(slug);
+  }
 
   const filteredStations = useMemo(() => {
     if (focusMode !== "active" || !activeSlug) {
@@ -79,7 +93,6 @@ export function StationsTerritoryMap({
     }),
     [filteredArtisans, filteredHighlightSpots, filteredStations],
   );
-
   const layerItems = [
     {
       key: "stations" as const,
@@ -105,13 +118,13 @@ export function StationsTerritoryMap({
   ];
 
   return (
-    <div className="rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-3 soft-shadow sm:p-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div className="rounded-[1.85rem] bg-[#efd4b0] p-4 text-[#123a55] shadow-sm sm:p-6">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+          <p className="text-sm font-black uppercase leading-none tracking-normal text-[#123a55]">
             Mapa territorial
           </p>
-          <p className="display-font mt-2 text-3xl text-[color:var(--foreground)]">
+          <p className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
             Estaciones conectadas por territorio
           </p>
         </div>
@@ -120,7 +133,7 @@ export function StationsTerritoryMap({
       <div
         role="group"
         aria-label="Controles del mapa territorial"
-        className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+        className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
       >
         {activeSlug ? (
           <>
@@ -128,10 +141,10 @@ export function StationsTerritoryMap({
               type="button"
               aria-pressed={focusMode === "all"}
               onClick={() => setFocusMode("all")}
-              className={`shrink-0 rounded-full border px-4 py-2 text-sm ${
+              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-black uppercase leading-none tracking-normal ${
                 focusMode === "all"
-                  ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)] text-[color:var(--foreground)]"
-                  : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
+                  ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
+                  : "border-[#123a55]/35 text-[#123a55] hover:border-[#123a55] hover:bg-[#123a55] hover:text-[#efd4b0]"
               }`}
             >
               Toda la ruta
@@ -140,10 +153,10 @@ export function StationsTerritoryMap({
               type="button"
               aria-pressed={focusMode === "active"}
               onClick={() => setFocusMode("active")}
-              className={`shrink-0 rounded-full border px-4 py-2 text-sm ${
+              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-black uppercase leading-none tracking-normal ${
                 focusMode === "active"
-                  ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)] text-[color:var(--foreground)]"
-                  : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
+                  ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
+                  : "border-[#123a55]/35 text-[#123a55] hover:border-[#123a55] hover:bg-[#123a55] hover:text-[#efd4b0]"
               }`}
             >
               Solo estacion activa
@@ -164,10 +177,10 @@ export function StationsTerritoryMap({
                   [item.key]: !current[item.key],
                 }))
               }
-              className={`shrink-0 rounded-full border px-4 py-2 text-sm ${
+              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-black uppercase leading-none tracking-normal ${
                 active
-                  ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)] text-[color:var(--foreground)]"
-                  : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
+                  ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
+                  : "border-[#123a55]/35 text-[#123a55] hover:border-[#123a55] hover:bg-[#123a55] hover:text-[#efd4b0]"
               }`}
             >
               {item.label} · {item.count}
@@ -176,17 +189,17 @@ export function StationsTerritoryMap({
         })}
       </div>
 
-      <div className="mb-4 grid gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 md:grid-cols-3">
+      <div className="mb-5 grid gap-4 rounded-[1.35rem] border border-[#123a55]/20 bg-[#123a55]/5 p-4 md:grid-cols-3">
         {layerItems.map((item) => (
           <div key={`legend-${item.key}`} className="flex items-start gap-3">
             <span
               className={`mt-1 inline-flex h-3 w-3 shrink-0 rounded-full ${item.colorClass}`}
             />
             <div>
-              <p className="text-sm font-semibold text-[color:var(--foreground)]">
+              <p className="text-sm font-black uppercase leading-none tracking-normal text-[#082d49]">
                 {item.label}
               </p>
-              <p className="text-xs leading-5 text-[color:var(--text-muted)]">
+              <p className="mt-1 text-xs font-medium leading-5 text-[#123a55]/75">
                 {item.helper}. Disponibles en mapa: {item.count}
               </p>
             </div>
@@ -198,7 +211,7 @@ export function StationsTerritoryMap({
         <StationsTerritoryMapLeaflet
           stations={filteredStations}
           activeSlug={activeSlug}
-          selectedSlug={selectedSlug}
+          selectedSlug={effectiveSelectedSlug}
           onSelectStation={onSelectStation}
           artisans={filteredArtisans}
           highlightSpots={filteredHighlightSpots}
@@ -208,30 +221,34 @@ export function StationsTerritoryMap({
         />
       </DeferredRender>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
         {stations.map((station) => {
-          const isActive = station.slug === activeSlug;
+          const isActive =
+            station.slug === activeSlug || station.slug === effectiveSelectedSlug;
 
           return (
-            <Link
+            <button
               key={station.slug}
-              href={`/estaciones/${station.slug}`}
-              className={`rounded-xl border px-4 py-3 text-sm ${
+              type="button"
+              onClick={() => handleSelectStation(station.slug)}
+              className={`rounded-[1.15rem] border px-4 py-4 text-left text-sm transition hover:-translate-y-0.5 ${
                 isActive
-                  ? "border-[color:var(--accent)] bg-[rgba(138,69,43,0.08)]"
-                  : "border-[color:var(--border)] bg-[color:var(--surface)]"
+                  ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
+                  : "border-[#123a55]/15 bg-[#123a55]/90 text-[#efd4b0] hover:bg-[#123a55]"
               }`}
             >
-              <p className="font-semibold text-[color:var(--foreground)]">
-                {station.locality}
+              {station.department ? (
+                <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
+                  {station.department}
+                </p>
+              ) : null}
+              <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
+                {formatMapStationName(station.name)}
               </p>
-              <p className="mt-1 text-[color:var(--text-muted)]">
-                {typeof station.latitude === "number" &&
-                typeof station.longitude === "number"
-                  ? `${station.latitude.toFixed(2)}, ${station.longitude.toFixed(2)}`
-                  : "Sin coordenadas"}
+              <p className="mt-1 text-xs font-medium leading-tight text-[#efd4b0]/75">
+                {formatMapLocation(station.locality)}
               </p>
-            </Link>
+            </button>
           );
         })}
       </div>

@@ -51,6 +51,14 @@ function getGeolocatedHighlightSpots(highlightSpots: HighlightSpot[]) {
   return highlightSpots.filter(hasValidCoordinates);
 }
 
+function formatStationMapLabel(station: Station) {
+  return station.name.replace(/^Estaci[oó]n\s+/i, "");
+}
+
+function formatStationMapLocation(value: string) {
+  return value.replace(/,\s*Catamarca\.?$/i, "");
+}
+
 function MapResizer() {
   const map = useMap();
 
@@ -66,6 +74,45 @@ function MapResizer() {
       window.removeEventListener("resize", resize);
     };
   }, [map]);
+
+  return null;
+}
+
+function SelectedStationFlyTo({
+  selectedSlug,
+  stations,
+}: {
+  selectedSlug?: string;
+  stations: Station[];
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!selectedSlug) {
+      return;
+    }
+
+    const station = stations.find(
+      (item) => item.slug === selectedSlug && hasValidCoordinates(item),
+    );
+
+    if (
+      !station ||
+      typeof station.latitude !== "number" ||
+      typeof station.longitude !== "number"
+    ) {
+      return;
+    }
+
+    map.flyTo(
+      [station.latitude, station.longitude],
+      Math.max(map.getZoom(), TERRITORY_MAP_SINGLE_POINT_ZOOM),
+      {
+        animate: true,
+        duration: 1.1,
+      },
+    );
+  }, [map, selectedSlug, stations]);
 
   return null;
 }
@@ -198,7 +245,7 @@ export function StationsTerritoryMapLeaflet({
   }, [geolocatedArtisans, geolocatedHighlightSpots, geolocatedStations]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[color:var(--border)]">
+    <div className="overflow-hidden rounded-[1.35rem] border border-[#123a55]/20 shadow-sm">
       <MapContainer
         center={center}
         zoom={
@@ -213,6 +260,10 @@ export function StationsTerritoryMapLeaflet({
         className="h-[360px] w-full sm:h-[460px]"
       >
         <MapResizer />
+        <SelectedStationFlyTo
+          selectedSlug={selectedSlug}
+          stations={geolocatedStations}
+        />
         <SatelliteReferenceTileLayers />
         <ScaleControl position="bottomleft" imperial={false} />
 
@@ -238,14 +289,18 @@ export function StationsTerritoryMapLeaflet({
               }}
             >
               <Tooltip direction="top" offset={[0, -8]} opacity={1}>
-                {station.locality}
+                {formatStationMapLabel(station)}
               </Tooltip>
               <Popup>
                 <div className="space-y-3 min-w-[180px]">
                   <PopupImage src={station.imageUrl} alt={station.name} focus={station.imageFocus} />
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold">{station.name}</p>
-                    <p className="text-xs text-[#725a49]">{station.locality}</p>
+                    <p className="text-sm font-semibold">
+                      {formatStationMapLabel(station)}
+                    </p>
+                    <p className="text-xs text-[#725a49]">
+                      {formatStationMapLocation(station.locality)}
+                    </p>
                     <p className="text-xs text-[#725a49]">
                       {station.slogan || "Nodo territorial de la ruta"}
                     </p>

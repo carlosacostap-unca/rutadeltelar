@@ -5,6 +5,7 @@ import {
   getProductsResult,
   getStationsResult,
 } from "@/app/lib/data";
+import { formatBrandFontText } from "@/app/lib/brand-font-text";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { HomeHeroCarousel } from "@/components/home-hero-carousel";
 import { MediaFallback } from "@/components/media-fallback";
@@ -224,9 +225,26 @@ function SectionTitle({
         {eyebrow}
       </p>
       <h2 className={`brand-font mt-1 font-normal uppercase leading-none tracking-normal text-[#f3d7b4] ${titleSize}`}>
-        {title}
+        {formatBrandFontText(title)}
       </h2>
     </div>
+  );
+}
+
+function SectionLinkButton({
+  href,
+  children,
+}: {
+  href: string;
+  children: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#efd4b0] px-6 py-3 text-sm font-black uppercase leading-none tracking-normal text-[#123a55] shadow-sm transition hover:-translate-y-0.5 hover:bg-white"
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -490,6 +508,11 @@ export default async function Home() {
               />
             ))}
           </div>
+          <div className="mt-10 flex max-w-5xl justify-center sm:justify-start">
+            <SectionLinkButton href="/productos">
+              Ver todos los productos
+            </SectionLinkButton>
+          </div>
         </section>
 
         <section>
@@ -511,6 +534,11 @@ export default async function Home() {
                 titleCase="natural"
               />
             ))}
+          </div>
+          <div className="mt-10 flex justify-center sm:justify-start">
+            <SectionLinkButton href="/artesanas">
+              Ver toda la comunidad
+            </SectionLinkButton>
           </div>
         </section>
       </div>

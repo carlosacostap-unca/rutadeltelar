@@ -3,12 +3,24 @@ import {
   getHighlightSpotsResult,
   getStationsResult,
 } from "@/app/lib/data";
+import { formatBrandFontText } from "@/app/lib/brand-font-text";
 import { Suspense } from "react";
 import { EstacionesClient } from "@/components/estaciones-client";
 import { DataSourceBadge } from "@/components/data-source-badge";
-import { SectionHeading } from "@/components/section-heading";
 
-export default async function EstacionesPage() {
+type EstacionesPageProps = {
+  searchParams?: Promise<{
+    departamento?: string | string[];
+  }>;
+};
+
+function getSingleParam(value?: string | string[]) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function EstacionesPage({
+  searchParams,
+}: EstacionesPageProps) {
   const [stationsResult, artisansResult, highlightSpotsResult] =
     await Promise.all([
       getStationsResult(),
@@ -22,38 +34,53 @@ export default async function EstacionesPage() {
   const departments = [
     ...new Set(stations.map((s) => s.department ?? "").filter(Boolean)),
   ].sort();
+  const query = searchParams ? await searchParams : {};
+  const requestedDepartment = getSingleParam(query.departamento);
+  const selectedDepartment =
+    requestedDepartment && departments.includes(requestedDepartment)
+      ? requestedDepartment
+      : undefined;
+  const pageTitle = selectedDepartment ?? "Todas las estaciones";
+  const pageDescription = selectedDepartment
+    ? "Recorre las estaciones del departamento y descubre sus actores, experiencias e imperdibles dentro de la Ruta del Telar."
+    : "Recorre todas las estaciones y descubre sus actores, experiencias e imperdibles dentro de la Ruta del Telar.";
 
   return (
-    <main className="flex flex-1 flex-col">
-      <header className="mb-6">
-        <SectionHeading
-          eyebrow="Estaciones"
-          title="Nodos territoriales de la ruta"
-          description="Cada estación organiza actores, experiencias e imperdibles dentro del territorio. Filtrá por departamento o buscá por nombre."
-        />
-        <div className="mt-4">
-          <DataSourceBadge
-            source={stationsResult.source}
-            error={stationsResult.error}
-          />
-        </div>
-      </header>
-
-      <Suspense
-        fallback={
-          <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-6 text-sm text-[color:var(--text-muted)]">
-            Cargando estaciones...
+    <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
+        <header className="mb-8">
+          <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
+            Estaciones
+          </p>
+          <h1 className="brand-font mt-1 max-w-4xl text-[2.35rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] sm:text-[3rem] md:text-[3.75rem]">
+            {formatBrandFontText(pageTitle)}
+          </h1>
+          <p className="mt-5 w-full text-justify text-base font-medium leading-tight text-white/85 sm:text-lg">
+            {pageDescription}
+          </p>
+          <div className="mt-4">
+            <DataSourceBadge
+              source={stationsResult.source}
+              error={stationsResult.error}
+            />
           </div>
-        }
-      >
-        <EstacionesClient
-          stations={stations}
-          artisans={artisans}
-          highlightSpots={highlightSpots}
-          departments={departments}
-        />
-      </Suspense>
+        </header>
+
+        <Suspense
+          fallback={
+            <div className="rounded-[1.85rem] bg-[#efd4b0] p-6 text-sm font-medium text-[#123a55]">
+              Cargando estaciones...
+            </div>
+          }
+        >
+          <EstacionesClient
+            stations={stations}
+            artisans={artisans}
+            highlightSpots={highlightSpots}
+            departments={departments}
+          />
+        </Suspense>
+      </div>
     </main>
   );
 }
-
