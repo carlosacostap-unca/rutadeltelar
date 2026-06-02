@@ -6,6 +6,7 @@ import {
   getHighlightSpotContextBySlug,
   getHighlightSpots,
 } from "@/app/lib/data";
+import { formatBrandFontText } from "@/app/lib/brand-font-text";
 import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
@@ -64,7 +65,9 @@ function formatEventDateLocal(iso: string) {
   });
 }
 
-export default async function HighlightSpotDetailPage({ params }: HighlightSpotDetailPageProps) {
+export default async function HighlightSpotDetailPage({
+  params,
+}: HighlightSpotDetailPageProps) {
   const { slug } = await params;
   const context = await getHighlightSpotContextBySlug(slug);
 
@@ -72,313 +75,402 @@ export default async function HighlightSpotDetailPage({ params }: HighlightSpotD
     notFound();
   }
 
-  const { spot, relatedArtisans, relatedExperiences, relatedStation, relatedProducts } = context;
+  const {
+    spot,
+    relatedArtisans,
+    relatedExperiences,
+    relatedStation,
+    relatedProducts,
+  } = context;
   const isEvent = spot.type.toLowerCase() === "evento";
 
   return (
-    <main className="flex flex-1 flex-col">
-      {/* Back + Compartir */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href="/imperdibles"
-          className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
-        >
-          ← Imperdibles
-        </Link>
-        <div className="flex items-center gap-2">
-          <FavoriteButton
-            item={{
-              type: "imperdible",
-              slug: spot.slug,
-              title: spot.title,
-              subtitle: spot.location,
-              href: `/imperdibles/${spot.slug}`,
-              imageUrl: spot.imageUrl,
-              imageFocus: spot.imageFocus,
-              datoDestacado: spot.datoDestacado,
-            }}
+    <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href="/imperdibles"
+            className="inline-flex rounded-full border border-[#efd4b0]/35 bg-[#efd4b0] px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#123a55] transition hover:-translate-y-0.5 hover:border-white hover:bg-white"
+          >
+            {"<- Imperdibles"}
+          </Link>
+          <div className="flex items-center gap-2">
+            <FavoriteButton
+              item={{
+                type: "imperdible",
+                slug: spot.slug,
+                title: spot.title,
+                subtitle: spot.location,
+                href: `/imperdibles/${spot.slug}`,
+                imageUrl: spot.imageUrl,
+                imageFocus: spot.imageFocus,
+                datoDestacado: spot.datoDestacado,
+              }}
+            />
+            <ShareButton title={spot.title} text={spot.subtitle} />
+          </div>
+        </div>
+
+        <section className="mb-10">
+          <DetailMediaGallery
+            title={spot.title}
+            fallbackLabel="Imperdible"
+            coverUrl={spot.imageUrl}
+            galleryUrls={spot.galleryUrls}
+            coverFocus={spot.imageFocus}
+            galleryImages={spot.galleryImages}
+            coverClassName="aspect-[16/9] w-full"
           />
-          <ShareButton title={spot.title} text={spot.subtitle} />
-        </div>
-      </div>
+        </section>
 
-      {/* Galería */}
-      <section className="mb-10">
-        <DetailMediaGallery
-          title={spot.title}
-          fallbackLabel="Imperdible"
-          coverUrl={spot.imageUrl}
-          galleryUrls={spot.galleryUrls}
-          coverFocus={spot.imageFocus}
-          galleryImages={spot.galleryImages}
-        />
-      </section>
-
-      {/* Título + subtítulo + tipo */}
-      <section className="mb-8">
-        <div className="mb-3 flex flex-wrap gap-2">
-          <span className="rounded-full bg-[color:var(--accent)] px-3 py-1 text-xs font-semibold text-white">
-            {spot.type}
-          </span>
-          {spot.priority && spot.priority !== "media" && (
-            <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-1 text-xs font-medium text-[color:var(--text-muted)]">
-              Prioridad {spot.priority}
+        <section className="mb-10">
+          <div className="mb-4 flex flex-wrap gap-2">
+            <span className="rounded-full bg-[#efd4b0] px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#123a55] shadow">
+              {spot.type}
             </span>
-          )}
-        </div>
-        <h1 className="display-font text-4xl leading-tight text-[color:var(--foreground)] sm:text-5xl">
-          {spot.title}
-        </h1>
-        {spot.subtitle && (
-          <p className="mt-2 text-base font-medium italic text-[color:var(--accent)]">
-            {spot.subtitle}
-          </p>
-        )}
-        {spot.location && (
-          <p className="mt-3 flex items-center gap-1.5 text-sm text-[color:var(--text-muted)]">
-            <svg className="h-3.5 w-3.5 shrink-0 text-[color:var(--accent-mid)]" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" />
-            </svg>
-            {spot.location}
-          </p>
-        )}
-      </section>
+            {spot.priority && spot.priority !== "media" ? (
+              <span className="rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+                Prioridad {spot.priority}
+              </span>
+            ) : null}
+          </div>
+          <h1 className="brand-font max-w-4xl text-[2.55rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] sm:text-[3.35rem] md:text-[4.25rem]">
+            {formatBrandFontText(spot.title)}
+          </h1>
+          {spot.subtitle ? (
+            <p className="mt-4 max-w-2xl text-base font-black uppercase leading-tight tracking-normal text-white sm:text-lg">
+              {spot.subtitle}
+            </p>
+          ) : null}
+          {spot.location ? (
+            <p className="mt-3 text-sm font-medium uppercase leading-tight tracking-normal text-[#efd4b0]">
+              {spot.location}
+            </p>
+          ) : null}
+        </section>
 
-      {/* Evento: fecha/hora prominente + botón ICS */}
-      {isEvent && spot.eventDate && (
-        <section className="mb-10">
-          <SurfaceCard className="border-[color:var(--accent)] bg-[color:var(--accent)]/5">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-                  Fecha y hora del evento
-                </p>
-                <p className="mt-1 text-lg font-semibold capitalize text-[color:var(--foreground)]">
-                  {formatEventDateLocal(spot.eventDate)}
-                </p>
-                <p className="mt-0.5 text-xs text-[color:var(--text-muted)]">
-                  (hora de Argentina)
-                </p>
+        {isEvent && spot.eventDate ? (
+          <section className="mb-10">
+            <div className="rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55]">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/75">
+                    Fecha y hora del evento
+                  </p>
+                  <p className="mt-2 text-lg font-black capitalize leading-tight text-[#082d49]">
+                    {formatEventDateLocal(spot.eventDate)}
+                  </p>
+                  <p className="mt-1 text-xs font-medium text-[#18364d]/75">
+                    Hora de Argentina
+                  </p>
+                </div>
+                <IcsDownloadButton
+                  title={spot.title}
+                  description={spot.description}
+                  location={spot.location}
+                  startIso={spot.eventDate}
+                />
               </div>
-              <IcsDownloadButton
-                title={spot.title}
-                description={spot.description}
-                location={spot.location}
-                startIso={spot.eventDate}
-              />
             </div>
-          </SurfaceCard>
+          </section>
+        ) : null}
+
+        <section className="mb-10 max-w-3xl">
+          <p className="text-justify text-base font-medium leading-tight text-white/85 sm:text-lg">
+            {spot.description}
+          </p>
+          <HighlightedData
+            value={spot.datoDestacado}
+            className="mt-5 max-w-2xl border-[#efd4b0]/35 bg-[#efd4b0]/10 text-[#f3d7b4]"
+          />
         </section>
-      )}
 
-      {/* Descripción */}
-      <section className="mb-10">
-        <p className="text-sm leading-7 text-[color:var(--text-muted)]">{spot.description}</p>
-        <HighlightedData value={spot.datoDestacado} className="mt-5 max-w-2xl" />
-      </section>
-
-      {hasValidCoordinates(spot) ? (
-        <section className="mb-10">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-            Ubicacion
-          </h2>
-          <SurfaceCard>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs text-[color:var(--text-muted)]">Coordenadas</p>
-                <p className="mt-1 font-mono text-sm font-semibold text-[color:var(--foreground)]">
-                  {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
-                </p>
-                <p className="mt-1 text-xs text-[color:var(--text-muted)]">
-                  {spot.location}
-                </p>
+        {hasValidCoordinates(spot) ? (
+          <section className="mb-10">
+            <h2 className="mb-4 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+              Ubicacion
+            </h2>
+            <div className="rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55]">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/75">
+                    Coordenadas
+                  </p>
+                  <p className="mt-2 font-mono text-sm font-black text-[#082d49]">
+                    {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
+                  </p>
+                  <p className="mt-1 text-xs font-medium text-[#18364d]/75">
+                    {spot.location}
+                  </p>
+                </div>
+                <SatelliteMapButton
+                  point={spot}
+                  className="border-[#123a55]/20 bg-[#123a55] text-[#efd4b0] hover:border-[#123a55] hover:text-white"
+                />
               </div>
-              <SatelliteMapButton point={spot} />
             </div>
-          </SurfaceCard>
-        </section>
-      ) : null}
+          </section>
+        ) : null}
 
-      {/* Datos prácticos */}
-      {(spot.horarios || spot.accesibilidad || spot.estacionalidad || spot.duracionSugerida || (spot.recomendaciones && spot.recomendaciones.length > 0)) && (
-        <section className="mb-10">
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-            Datos prácticos
-          </h2>
-          <SurfaceCard className="soft-shadow">
-            <div className="divide-y divide-[color:var(--border)]">
-              {spot.horarios && (
-                <div className="py-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Horarios</p>
-                  <p className="mt-1 text-sm text-[color:var(--foreground)]">{spot.horarios}</p>
-                </div>
-              )}
-              {spot.accesibilidad && (
-                <div className="py-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Accesibilidad</p>
-                  <p className="mt-1 text-sm text-[color:var(--foreground)]">{spot.accesibilidad}</p>
-                </div>
-              )}
-              {spot.estacionalidad && (
-                <div className="py-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Estacionalidad</p>
-                  <p className="mt-1 text-sm text-[color:var(--foreground)]">{spot.estacionalidad}</p>
-                </div>
-              )}
-              {spot.duracionSugerida && (
-                <div className="py-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Duración sugerida</p>
-                  <p className="mt-1 text-sm text-[color:var(--foreground)]">{spot.duracionSugerida}</p>
-                </div>
-              )}
-              {spot.recomendaciones && spot.recomendaciones.length > 0 && (
-                <div className="py-3">
-                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Recomendaciones</p>
-                  <ul className="space-y-1">
-                    {spot.recomendaciones.map((r) => (
-                      <li key={r} className="flex items-start gap-2 text-sm text-[color:var(--foreground)]">
-                        <span className="mt-0.5 text-[color:var(--accent)]">✓</span>
-                        {r}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+        {spot.horarios ||
+        spot.accesibilidad ||
+        spot.estacionalidad ||
+        spot.duracionSugerida ||
+        (spot.recomendaciones && spot.recomendaciones.length > 0) ? (
+          <section className="mb-10">
+            <h2 className="mb-4 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+              Datos practicos
+            </h2>
+            <div className="rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55]">
+              <div className="divide-y divide-[#123a55]/20">
+                {spot.horarios ? (
+                  <div className="py-3 first:pt-0">
+                    <p className="text-[10px] font-black uppercase tracking-normal text-[#123a55]/75">
+                      Horarios
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-[#082d49]">
+                      {spot.horarios}
+                    </p>
+                  </div>
+                ) : null}
+                {spot.accesibilidad ? (
+                  <div className="py-3">
+                    <p className="text-[10px] font-black uppercase tracking-normal text-[#123a55]/75">
+                      Accesibilidad
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-[#082d49]">
+                      {spot.accesibilidad}
+                    </p>
+                  </div>
+                ) : null}
+                {spot.estacionalidad ? (
+                  <div className="py-3">
+                    <p className="text-[10px] font-black uppercase tracking-normal text-[#123a55]/75">
+                      Estacionalidad
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-[#082d49]">
+                      {spot.estacionalidad}
+                    </p>
+                  </div>
+                ) : null}
+                {spot.duracionSugerida ? (
+                  <div className="py-3">
+                    <p className="text-[10px] font-black uppercase tracking-normal text-[#123a55]/75">
+                      Duracion sugerida
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-[#082d49]">
+                      {spot.duracionSugerida}
+                    </p>
+                  </div>
+                ) : null}
+                {spot.recomendaciones && spot.recomendaciones.length > 0 ? (
+                  <div className="py-3 last:pb-0">
+                    <p className="mb-2 text-[10px] font-black uppercase tracking-normal text-[#123a55]/75">
+                      Recomendaciones
+                    </p>
+                    <ul className="space-y-1">
+                      {spot.recomendaciones.map((recommendation) => (
+                        <li
+                          key={recommendation}
+                          className="text-sm font-medium text-[#082d49]"
+                        >
+                          - {recommendation}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
             </div>
-          </SurfaceCard>
-        </section>
-      )}
+          </section>
+        ) : null}
 
-      {/* Estación relacionada */}
-      {relatedStation && (
-        <section className="mb-10">
-          <SurfaceCard>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Estación</p>
-            <p className="mt-1 font-semibold text-[color:var(--foreground)]">{relatedStation.name}</p>
-            {relatedStation.slogan && (
-              <p className="mt-0.5 text-xs italic text-[color:var(--text-muted)]">{relatedStation.slogan}</p>
-            )}
-            <Link
-              href={`/estaciones/${relatedStation.slug}`}
-              className="mt-3 inline-flex text-xs font-semibold text-[color:var(--accent)] hover:underline"
-            >
-              Ver estación →
-            </Link>
-          </SurfaceCard>
-        </section>
-      )}
+        {relatedStation ? (
+          <section className="mb-10">
+            <div className="rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55]">
+              <p className="text-[10px] font-black uppercase tracking-normal text-[#123a55]/75">
+                Estacion
+              </p>
+              <p className="mt-1 text-xl font-black leading-tight text-[#082d49]">
+                {relatedStation.name}
+              </p>
+              {relatedStation.slogan ? (
+                <p className="mt-1 text-xs font-medium uppercase tracking-normal text-[#18364d]/75">
+                  {relatedStation.slogan}
+                </p>
+              ) : null}
+              <Link
+                href={`/estaciones/${relatedStation.slug}`}
+                className="mt-4 inline-flex rounded-full bg-[#123a55] px-4 py-2 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:-translate-y-0.5 hover:text-white"
+              >
+                Ver estacion -&gt;
+              </Link>
+            </div>
+          </section>
+        ) : null}
 
-      {/* Actores relacionados */}
-      {relatedArtisans.length > 0 && (
-        <HomeCarousel eyebrow="Comunidad" title="Actores relacionados" href="/artesanas" verTodosLabel="Ver todos">
-          {relatedArtisans.map((actor) => (
-            <Link
-              key={actor.slug}
-              href={`/artesanas/${actor.slug}`}
-              className="group w-[200px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
-                {actor.imageUrl ? (
-                  <div className="relative mb-3 h-14 w-14 overflow-hidden rounded-full border border-[color:var(--border)]">
-                    <Image
-                      src={withPocketBaseImageThumb(actor.imageUrl, "thumbnail")}
-                      alt={actor.name}
-                      fill
-                      className="object-cover"
-                      sizes="56px"
-                      style={getImageFocusStyle(actor.imageFocus)}
+        {relatedArtisans.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Comunidad"
+            title="Actores relacionados"
+            href="/artesanas"
+            verTodosLabel="Ver todos"
+            variant="onDark"
+          >
+            {relatedArtisans.map((actor) => (
+              <Link
+                key={actor.slug}
+                href={`/artesanas/${actor.slug}`}
+                className="group w-[200px] shrink-0 [scroll-snap-align:start]"
+              >
+                <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
+                  {actor.imageUrl ? (
+                    <div className="relative mb-3 h-14 w-14 overflow-hidden rounded-full border border-[color:var(--border)]">
+                      <Image
+                        src={withPocketBaseImageThumb(actor.imageUrl, "thumbnail")}
+                        alt={actor.name}
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                        style={getImageFocusStyle(actor.imageFocus)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="display-font mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--surface)] text-xl text-[color:var(--accent-strong)]">
+                      {actor.name[0]}
+                    </div>
+                  )}
+                  {actor.actorType ? (
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+                      {actor.actorType}
+                    </p>
+                  ) : null}
+                  <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">
+                    {actor.name}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">
+                    {actor.craft}
+                  </p>
+                  <HighlightedData
+                    value={actor.datoDestacado}
+                    compact
+                    className="mt-3"
+                  />
+                </SurfaceCard>
+              </Link>
+            ))}
+          </HomeCarousel>
+        ) : null}
+
+        {relatedProducts.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Artesania"
+            title="Productos relacionados"
+            href="/productos"
+            verTodosLabel="Ver todos"
+            variant="onDark"
+          >
+            {relatedProducts.map((product) => (
+              <Link
+                key={product.slug}
+                href={`/productos/${product.slug}`}
+                className="group w-[200px] shrink-0 [scroll-snap-align:start]"
+              >
+                <SurfaceCard className="h-full overflow-hidden !p-0 transition group-hover:border-[color:var(--accent)]">
+                  {product.imageUrl ? (
+                    <div className="relative aspect-square w-full overflow-hidden">
+                      <Image
+                        src={withPocketBaseImageThumb(
+                          product.imageUrl,
+                          "thumbnail",
+                        )}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition group-hover:scale-[1.03]"
+                        sizes="200px"
+                        style={getImageFocusStyle(product.imageFocus)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex aspect-square items-center justify-center bg-[color:var(--surface)] text-xs font-semibold uppercase text-[color:var(--accent-strong)]">
+                      Producto
+                    </div>
+                  )}
+                  <div className="p-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+                      {product.subcategory ?? product.category}
+                    </p>
+                    <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)] line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <HighlightedData
+                      value={product.datoDestacado}
+                      compact
+                      className="mt-3"
                     />
                   </div>
-                ) : (
-                  <div className="display-font mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--surface)] text-xl text-[color:var(--accent-strong)]">
-                    {actor.name[0]}
-                  </div>
-                )}
-                {actor.actorType && (
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{actor.actorType}</p>
-                )}
-                <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">{actor.name}</h3>
-                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{actor.craft}</p>
-                <HighlightedData value={actor.datoDestacado} compact className="mt-3" />
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
+                </SurfaceCard>
+              </Link>
+            ))}
+          </HomeCarousel>
+        ) : null}
 
-      {/* Productos relacionados */}
-      {relatedProducts.length > 0 && (
-        <HomeCarousel eyebrow="Artesanía" title="Productos relacionados" href="/productos" verTodosLabel="Ver todos">
-          {relatedProducts.map((product) => (
-            <Link
-              key={product.slug}
-              href={`/productos/${product.slug}`}
-              className="group w-[200px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="!p-0 h-full overflow-hidden transition group-hover:border-[color:var(--accent)]">
-                {product.imageUrl ? (
-                  <div className="relative aspect-square w-full overflow-hidden">
-                    <Image
-                      src={withPocketBaseImageThumb(product.imageUrl, "thumbnail")}
-                      alt={product.name}
-                      fill
-                      className="object-cover transition group-hover:scale-[1.03]"
-                      sizes="200px"
-                      style={getImageFocusStyle(product.imageFocus)}
-                    />
+        {relatedExperiences.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Vivencias"
+            title="Experiencias relacionadas"
+            href="/explorar"
+            verTodosLabel="Ver todas"
+            variant="onDark"
+          >
+            {relatedExperiences.map((exp) => (
+              <Link
+                key={exp.slug}
+                href={`/explorar/${exp.slug}`}
+                className="group w-[260px] shrink-0 [scroll-snap-align:start]"
+              >
+                <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
+                  {exp.imageUrl ? (
+                    <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
+                      <Image
+                        src={withPocketBaseImageThumb(exp.imageUrl, "thumbnail")}
+                        alt={exp.title}
+                        fill
+                        className="object-cover transition group-hover:scale-[1.03]"
+                        sizes="260px"
+                        style={getImageFocusStyle(exp.imageFocus)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-xs font-semibold uppercase text-[color:var(--accent-strong)]">
+                      Experiencia
+                    </div>
+                  )}
+                  <div className="mb-2 flex gap-2">
+                    <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] font-semibold text-[color:var(--accent-mid)]">
+                      {exp.tag}
+                    </span>
+                    <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] text-[color:var(--text-muted)]">
+                      {exp.duration}
+                    </span>
                   </div>
-                ) : (
-                  <div className="flex aspect-square items-center justify-center bg-[color:var(--surface)] text-3xl">🧵</div>
-                )}
-                <div className="p-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{product.subcategory ?? product.category}</p>
-                  <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)] line-clamp-2">{product.name}</h3>
-                  <HighlightedData value={product.datoDestacado} compact className="mt-3" />
-                </div>
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
-
-      {/* Experiencias relacionadas */}
-      {relatedExperiences.length > 0 && (
-        <HomeCarousel eyebrow="Vivencias" title="Experiencias relacionadas" href="/explorar" verTodosLabel="Ver todas">
-          {relatedExperiences.map((exp) => (
-            <Link
-              key={exp.slug}
-              href={`/explorar/${exp.slug}`}
-              className="group w-[260px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
-                {exp.imageUrl ? (
-                  <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
-                    <Image
-                      src={withPocketBaseImageThumb(exp.imageUrl, "thumbnail")}
-                      alt={exp.title}
-                      fill
-                      className="object-cover transition group-hover:scale-[1.03]"
-                      sizes="260px"
-                      style={getImageFocusStyle(exp.imageFocus)}
-                    />
-                  </div>
-                ) : (
-                  <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">🧭</div>
-                )}
-                <div className="mb-2 flex gap-2">
-                  <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] font-semibold text-[color:var(--accent-mid)]">{exp.tag}</span>
-                  <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] text-[color:var(--text-muted)]">{exp.duration}</span>
-                </div>
-                <h3 className="text-sm font-semibold leading-snug text-[color:var(--foreground)]">{exp.title}</h3>
-                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{exp.description}</p>
-                <HighlightedData value={exp.datoDestacado} compact className="mt-3" />
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
+                  <h3 className="text-sm font-semibold leading-snug text-[color:var(--foreground)]">
+                    {exp.title}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">
+                    {exp.description}
+                  </p>
+                  <HighlightedData
+                    value={exp.datoDestacado}
+                    compact
+                    className="mt-3"
+                  />
+                </SurfaceCard>
+              </Link>
+            ))}
+          </HomeCarousel>
+        ) : null}
+      </div>
     </main>
   );
 }
-
-

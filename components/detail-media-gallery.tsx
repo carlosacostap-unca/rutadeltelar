@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import { getImageFocusStyle, type FocusedImage, type ImageFocus } from "@/app/lib/image-focus";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { ImageLightbox, type LightboxImage } from "@/components/image-lightbox";
 import { MediaFallback } from "@/components/media-fallback";
+import { PbImage } from "@/components/pb-image";
 
 type DetailMediaGalleryProps = {
   title: string;
@@ -108,10 +108,10 @@ export function DetailMediaGallery({
         <button
           type="button"
           onClick={() => setActiveIndex(0)}
-          className={`group relative block overflow-hidden rounded-3xl border border-[color:var(--border)] text-left soft-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)] ${coverClassName}`}
+          className={`group relative block w-full overflow-hidden rounded-3xl border border-[color:var(--border)] text-left soft-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)] ${coverClassName}`}
           aria-label={`Ampliar imagen de ${title}`}
         >
-          <Image
+          <PbImage
             src={coverDisplayUrl}
             alt={title}
             fill
@@ -119,10 +119,11 @@ export function DetailMediaGallery({
             sizes={coverSizes}
             style={getImageFocusStyle(coverFocus)}
             priority
+            fallback={<MediaFallback label={fallbackLabel} />}
           />
         </button>
       ) : (
-        <div className={`overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow ${coverClassName}`}>
+        <div className={`w-full overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow ${coverClassName}`}>
           <MediaFallback label={fallbackLabel} />
         </div>
       )}
@@ -144,13 +145,14 @@ export function DetailMediaGallery({
                 className={`relative shrink-0 overflow-hidden rounded-2xl border border-[color:var(--border)] [scroll-snap-align:start] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)] ${thumbnailClassName}`}
                 aria-label={`Ampliar imagen ${index + 1} de ${title}`}
               >
-                <Image
+                <PbImage
                   src={image.url}
                   alt={`${title} galeria ${index + 1}`}
                   fill
                   className="object-cover"
                   sizes="220px"
                   style={getImageFocusStyle(image.focus)}
+                  fallback={<MediaFallback label={fallbackLabel} />}
                 />
               </button>
             ))}

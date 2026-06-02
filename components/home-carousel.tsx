@@ -8,6 +8,7 @@ type HomeCarouselProps = {
   title: string;
   href: string;
   verTodosLabel?: string;
+  variant?: "default" | "onDark";
   children: ReactNode;
 };
 
@@ -55,6 +56,7 @@ export function HomeCarousel({
   title,
   href,
   verTodosLabel = "Ver todos",
+  variant = "default",
   children,
 }: HomeCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -99,21 +101,32 @@ export function HomeCarousel({
       window.removeEventListener("resize", handleResize);
     };
   }, [children, updateScrollState]);
+  const onDark = variant === "onDark";
 
   return (
     <section className="mb-12">
       <div className="mb-5 flex items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+          <p
+            className={`text-xs font-semibold uppercase tracking-wider ${
+              onDark ? "text-[#efd4b0]" : "text-[color:var(--accent-mid)]"
+            }`}
+          >
             {eyebrow}
           </p>
-          <h2 className="display-font mt-1 text-2xl leading-tight text-[color:var(--foreground)]">
+          <h2
+            className={`display-font mt-1 text-2xl leading-tight ${
+              onDark ? "text-[#f3d7b4]" : "text-[color:var(--foreground)]"
+            }`}
+          >
             {title}
           </h2>
         </div>
         <Link
           href={href}
-          className="shrink-0 text-sm font-semibold text-[color:var(--accent)] transition hover:underline"
+          className={`shrink-0 text-sm font-semibold transition hover:underline ${
+            onDark ? "text-[#efd4b0]" : "text-[color:var(--accent)]"
+          }`}
         >
           {verTodosLabel} -&gt;
         </Link>

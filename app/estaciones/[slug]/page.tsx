@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { formatBrandFontText } from "@/app/lib/brand-font-text";
 import { getStationContextBySlug, getStations } from "@/app/lib/data";
 import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
@@ -11,10 +12,10 @@ import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
+import { MediaFallback } from "@/components/media-fallback";
 import { SatelliteMapButton } from "@/components/satellite-map-button";
 import { ShareButton } from "@/components/share-button";
 import { StationDetailMap } from "@/components/station-detail-map";
-import { SurfaceCard } from "@/components/surface-card";
 
 type StationDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -48,8 +49,96 @@ export async function generateMetadata({
   });
 }
 
+function formatStationTitle(value: string) {
+  return value.replace(/^Estaci[oó]n\s+/i, "");
+}
 
-export default async function StationDetailPage({ params }: StationDetailPageProps) {
+function DetailActionLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex rounded-full border border-[#efd4b0]/35 px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function RelatedCard({
+  href,
+  eyebrow,
+  title,
+  subtitle,
+  imageUrl,
+  imageAlt,
+  imageFocus,
+  fallbackLabel,
+  datoDestacado,
+}: {
+  href: string;
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  imageUrl?: string;
+  imageAlt: string;
+  imageFocus?: Parameters<typeof getImageFocusStyle>[0];
+  fallbackLabel: string;
+  datoDestacado?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group w-[230px] shrink-0 [scroll-snap-align:start]"
+    >
+      <article className="h-full overflow-hidden rounded-[1.35rem] bg-[#efd4b0] text-[#123a55] transition duration-200 group-hover:-translate-y-1">
+        <div className="relative aspect-[1.12] w-full overflow-hidden bg-[#123a55]/10">
+          {imageUrl ? (
+            <Image
+              src={withPocketBaseImageThumb(imageUrl, "thumbnail")}
+              alt={imageAlt}
+              fill
+              className="object-cover transition duration-500 group-hover:scale-[1.04]"
+              sizes="230px"
+              style={getImageFocusStyle(imageFocus)}
+            />
+          ) : (
+            <MediaFallback label={fallbackLabel} />
+          )}
+        </div>
+        <div className="p-4">
+          {eyebrow ? (
+            <p className="text-[0.68rem] font-medium uppercase leading-none tracking-normal text-[#123a55]/75">
+              {eyebrow}
+            </p>
+          ) : null}
+          <h3 className="mt-1 text-lg font-black leading-[0.95] tracking-normal text-[#082d49]">
+            {title}
+          </h3>
+          {subtitle ? (
+            <p className="mt-2 line-clamp-2 text-xs font-medium leading-4 text-[#123a55]/75">
+              {subtitle}
+            </p>
+          ) : null}
+          <HighlightedData
+            value={datoDestacado}
+            compact
+            className="mt-3 border-[#123a55]/20 bg-[#123a55]/5"
+          />
+        </div>
+      </article>
+    </Link>
+  );
+}
+
+export default async function StationDetailPage({
+  params,
+}: StationDetailPageProps) {
   const { slug } = await params;
   const context = await getStationContextBySlug(slug);
 
@@ -58,37 +147,69 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
   }
 
   const { station, artisans, products, experiences, highlightSpots } = context;
+  const stationTitle = formatStationTitle(station.locality || station.name);
 
   return (
-    <main className="flex flex-1 flex-col">
-      {/* Back + Compartir */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href="/estaciones"
-          className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
-        >
-          ← Estaciones
-        </Link>
-        <div className="flex items-center gap-2">
-          <FavoriteButton
-            item={{
-              type: "estacion",
-              slug: station.slug,
-              title: station.name,
-              subtitle: station.locality,
-              href: `/estaciones/${station.slug}`,
-              imageUrl: station.imageUrl,
-              imageFocus: station.imageFocus,
-              datoDestacado: station.datoDestacado,
-            }}
-          />
-          <ShareButton title={station.name} text={station.summary} />
+    <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+          <DetailActionLink href="/estaciones">Volver a estaciones</DetailActionLink>
+          <div className="flex flex-wrap items-center gap-2">
+            <FavoriteButton
+              variant="onDark"
+              item={{
+                type: "estacion",
+                slug: station.slug,
+                title: station.name,
+                subtitle: station.locality,
+                href: `/estaciones/${station.slug}`,
+                imageUrl: station.imageUrl,
+                imageFocus: station.imageFocus,
+                datoDestacado: station.datoDestacado,
+              }}
+            />
+            <ShareButton
+              title={station.name}
+              text={station.summary}
+              variant="onDark"
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Hero gallery */}
-      <section className="mb-10">
-        <div className="relative">
+        <section className="mb-12 grid gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:items-start">
+          <div className="pt-1">
+            <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
+              Estaciones
+            </p>
+            <h1 className="brand-font mt-1 text-[2.65rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] sm:text-[3.35rem] md:text-[4.35rem]">
+              {formatBrandFontText(stationTitle)}
+            </h1>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {station.department ? (
+                <span className="rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+                  {station.department}
+                </span>
+              ) : null}
+              {station.hasInauguratedStation ? (
+                <span className="rounded-full bg-[#efd4b0] px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
+                  Inaugurada
+                </span>
+              ) : null}
+            </div>
+            {station.slogan ? (
+              <p className="mt-5 text-lg font-black leading-tight text-white">
+                {station.slogan}
+              </p>
+            ) : null}
+            <p className="mt-4 w-full text-justify text-base font-medium leading-7 text-white/85">
+              {station.summary}
+            </p>
+            <HighlightedData
+              value={station.datoDestacado}
+              className="mt-5 max-w-xl border-[#efd4b0]/25 bg-[#efd4b0]/10 text-[#efd4b0]"
+            />
+          </div>
+
           <DetailMediaGallery
             title={station.name}
             fallbackLabel="Estacion"
@@ -96,238 +217,151 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
             galleryUrls={station.galleryUrls}
             coverFocus={station.imageFocus}
             galleryImages={station.galleryImages}
+            coverClassName="aspect-[1.12] rounded-[1.85rem] border-[#efd4b0]/25"
+            coverSizes="(max-width: 1024px) 100vw, 56vw"
+            thumbnailClassName="aspect-[4/3] w-[180px] rounded-[1.1rem] border-[#efd4b0]/25"
           />
-          {station.hasInauguratedStation && (
-            <span className="absolute left-4 top-4 rounded-full bg-[color:var(--accent)] px-3 py-1 text-xs font-semibold text-white shadow">
-              Inaugurada
-            </span>
-          )}
-        </div>
-      </section>
-
-      {/* Título y descripción */}
-      <section className="mb-10">
-        <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-          {station.department ? `${station.department} · ` : ""}{station.locality}
-        </p>
-        <h1 className="display-font mt-2 text-4xl leading-tight text-[color:var(--foreground)] sm:text-5xl">
-          {station.name}
-        </h1>
-        {station.slogan && (
-          <p className="mt-2 text-base font-medium italic text-[color:var(--accent)]">
-            {station.slogan}
-          </p>
-        )}
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--text-muted)]">
-          {station.summary}
-        </p>
-        <HighlightedData value={station.datoDestacado} className="mt-5 max-w-2xl" />
-      </section>
-
-      {/* Mapa embebido */}
-      {hasValidCoordinates(station) ? (
-        <section className="mb-10">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-            Ubicación
-          </h2>
-          <div className="overflow-hidden rounded-3xl border border-[color:var(--border)]">
-            <StationDetailMap lat={station.latitude} lng={station.longitude} label={station.name} />
-          </div>
         </section>
-      ) : null}
 
-      {/* Actores */}
-      {artisans.length > 0 && (
-        <HomeCarousel eyebrow="Comunidad" title="Actores en esta estación" href="/artesanas" verTodosLabel="Ver todos">
-          {artisans.map((actor) => (
-            <Link
-              key={actor.slug}
-              href={`/artesanas/${actor.slug}`}
-              className="group w-[200px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
-                {actor.imageUrl ? (
-                  <div className="relative mb-3 h-14 w-14 overflow-hidden rounded-full border border-[color:var(--border)]">
-                    <Image
-                      src={withPocketBaseImageThumb(actor.imageUrl, "thumbnail")}
-                      alt={actor.name}
-                      fill
-                      className="object-cover"
-                      sizes="56px"
-                      style={getImageFocusStyle(actor.imageFocus)}
-                    />
-                  </div>
-                ) : (
-                  <div className="display-font mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--surface)] text-xl text-[color:var(--accent-strong)]">
-                    {actor.name[0]}
-                  </div>
-                )}
-                {actor.actorType && (
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-                    {actor.actorType}
-                  </p>
-                )}
-                <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">
-                  {actor.name}
-                </h3>
-                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">
-                  {actor.craft}
-                </p>
-                <HighlightedData value={actor.datoDestacado} compact className="mt-3" />
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
-
-      {/* Productos */}
-      {products.length > 0 && (
-        <HomeCarousel eyebrow="Artesanía" title="Productos de la estación" href="/productos" verTodosLabel="Ver todos">
-          {products.map((product) => (
-            <Link
-              key={product.slug}
-              href={`/productos/${product.slug}`}
-              className="group w-[200px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="!p-0 h-full overflow-hidden transition group-hover:border-[color:var(--accent)]">
-                {product.imageUrl ? (
-                  <div className="relative aspect-square w-full overflow-hidden">
-                    <Image
-                      src={withPocketBaseImageThumb(product.imageUrl, "thumbnail")}
-                      alt={product.name}
-                      fill
-                      className="object-cover transition group-hover:scale-[1.03]"
-                      sizes="200px"
-                      style={getImageFocusStyle(product.imageFocus)}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex aspect-square items-center justify-center bg-[color:var(--surface)] text-3xl">
-                    🧵
-                  </div>
-                )}
-                <div className="p-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-                    {product.subcategory ?? product.category}
-                  </p>
-                  <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)] line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <HighlightedData value={product.datoDestacado} compact className="mt-3" />
-                </div>
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
-
-      {/* Experiencias */}
-      {experiences.length > 0 && (
-        <HomeCarousel eyebrow="Vivencias" title="Experiencias disponibles" href="/explorar" verTodosLabel="Ver todas">
-          {experiences.map((exp) => (
-            <Link
-              key={exp.slug}
-              href={`/explorar/${exp.slug}`}
-              className="group w-[260px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
-                {exp.imageUrl ? (
-                  <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
-                    <Image
-                      src={withPocketBaseImageThumb(exp.imageUrl, "thumbnail")}
-                      alt={exp.title}
-                      fill
-                      className="object-cover transition group-hover:scale-[1.03]"
-                      sizes="260px"
-                      style={getImageFocusStyle(exp.imageFocus)}
-                    />
-                  </div>
-                ) : (
-                  <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">🧭</div>
-                )}
-                <div className="mb-2 flex gap-2">
-                  <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] font-semibold text-[color:var(--accent-mid)]">{exp.tag}</span>
-                  <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] text-[color:var(--text-muted)]">{exp.duration}</span>
-                </div>
-                <h3 className="text-sm font-semibold leading-snug text-[color:var(--foreground)]">{exp.title}</h3>
-                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{exp.description}</p>
-                <HighlightedData value={exp.datoDestacado} compact className="mt-3" />
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
-
-      {/* Imperdibles */}
-      {highlightSpots.length > 0 && (
-        <HomeCarousel eyebrow="Destacados" title="Imperdibles de la estación" href="/imperdibles">
-          {highlightSpots.map((spot) => (
-            <Link
-              key={spot.slug}
-              href={`/imperdibles/${spot.slug}`}
-              className="group w-[240px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
-                {spot.imageUrl ? (
-                  <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
-                    <Image
-                      src={withPocketBaseImageThumb(spot.imageUrl, "thumbnail")}
-                      alt={spot.title}
-                      fill
-                      className="object-cover transition group-hover:scale-[1.03]"
-                      sizes="240px"
-                      style={getImageFocusStyle(spot.imageFocus)}
-                    />
-                  </div>
-                ) : (
-                  <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">⭐</div>
-                )}
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{spot.type}</p>
-                <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">{spot.title}</h3>
-                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{spot.subtitle}</p>
-                <HighlightedData value={spot.datoDestacado} compact className="mt-3" />
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
-
-      {/* Cómo llegar */}
-      <section className="mb-10">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-          Cómo llegar
-        </h2>
-        <SurfaceCard>
-          {hasValidCoordinates(station) ? (
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {hasValidCoordinates(station) ? (
+          <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-4 text-[#123a55] shadow-sm sm:p-6">
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
               <div>
-                <p className="text-xs text-[color:var(--text-muted)]">Coordenadas</p>
-                <p className="mt-1 font-mono text-sm font-semibold text-[color:var(--foreground)]">
-                  {station.latitude.toFixed(5)}, {station.longitude.toFixed(5)}
+                <p className="text-sm font-black uppercase leading-none tracking-normal text-[#123a55]">
+                  Ubicacion
                 </p>
-                <p className="mt-1 text-xs text-[color:var(--text-muted)]">
-                  {station.locality}{station.department ? `, ${station.department}` : ""}
-                </p>
+                <h2 className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
+                  Como llegar
+                </h2>
               </div>
               <SatelliteMapButton point={station} />
             </div>
-          ) : (
-            <p className="text-sm text-[color:var(--text-muted)]">
-              Coordenadas no disponibles aún. Buscá{" "}
-              <span className="font-semibold">{station.name}</span> en{" "}
-              <a
-                href={`https://www.google.com/maps/search/${encodeURIComponent(station.name + " " + station.locality)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[color:var(--accent)] underline"
-              >
-                Google Maps
-              </a>
-              .
+            <div className="overflow-hidden rounded-[1.35rem] border border-[#123a55]/20 shadow-sm">
+              <StationDetailMap
+                lat={station.latitude}
+                lng={station.longitude}
+                label={station.name}
+              />
+            </div>
+            <div className="mt-4 rounded-[1.15rem] bg-[#123a55] px-4 py-3 text-[#efd4b0]">
+              <p className="text-[0.7rem] font-medium leading-none tracking-normal text-[#efd4b0]/75">
+                Coordenadas
+              </p>
+              <p className="mt-1 font-mono text-sm font-semibold">
+                {station.latitude.toFixed(5)}, {station.longitude.toFixed(5)}
+              </p>
+            </div>
+          </section>
+        ) : (
+          <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55]">
+            <p className="text-sm font-black uppercase leading-none tracking-normal">
+              Ubicacion
             </p>
-          )}
-        </SurfaceCard>
-      </section>
+            <p className="mt-2 text-sm font-medium">
+              Coordenadas no disponibles aun.
+            </p>
+          </section>
+        )}
+
+        {artisans.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Comunidad"
+            title="Actores en esta estacion"
+            href="/artesanas"
+            verTodosLabel="Ver todos"
+            variant="onDark"
+          >
+            {artisans.map((actor) => (
+              <RelatedCard
+                key={actor.slug}
+                href={`/artesanas/${actor.slug}`}
+                eyebrow={actor.actorType}
+                title={actor.name}
+                subtitle={actor.craft}
+                imageUrl={actor.imageUrl}
+                imageAlt={actor.name}
+                imageFocus={actor.imageFocus}
+                fallbackLabel="Actor"
+                datoDestacado={actor.datoDestacado}
+              />
+            ))}
+          </HomeCarousel>
+        ) : null}
+
+        {products.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Artesania"
+            title="Productos de la estacion"
+            href="/productos"
+            verTodosLabel="Ver todos"
+            variant="onDark"
+          >
+            {products.map((product) => (
+              <RelatedCard
+                key={product.slug}
+                href={`/productos/${product.slug}`}
+                eyebrow={product.subcategory ?? product.category}
+                title={product.name}
+                subtitle={product.description}
+                imageUrl={product.imageUrl}
+                imageAlt={product.name}
+                imageFocus={product.imageFocus}
+                fallbackLabel="Producto"
+                datoDestacado={product.datoDestacado}
+              />
+            ))}
+          </HomeCarousel>
+        ) : null}
+
+        {experiences.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Vivencias"
+            title="Experiencias disponibles"
+            href="/explorar"
+            verTodosLabel="Ver todas"
+            variant="onDark"
+          >
+            {experiences.map((experience) => (
+              <RelatedCard
+                key={experience.slug}
+                href={`/explorar/${experience.slug}`}
+                eyebrow={`${experience.tag} · ${experience.duration}`}
+                title={experience.title}
+                subtitle={experience.description}
+                imageUrl={experience.imageUrl}
+                imageAlt={experience.title}
+                imageFocus={experience.imageFocus}
+                fallbackLabel="Experiencia"
+                datoDestacado={experience.datoDestacado}
+              />
+            ))}
+          </HomeCarousel>
+        ) : null}
+
+        {highlightSpots.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Destacados"
+            title="Imperdibles de la estacion"
+            href="/imperdibles"
+            variant="onDark"
+          >
+            {highlightSpots.map((spot) => (
+              <RelatedCard
+                key={spot.slug}
+                href={`/imperdibles/${spot.slug}`}
+                eyebrow={spot.type}
+                title={spot.title}
+                subtitle={spot.subtitle}
+                imageUrl={spot.imageUrl}
+                imageAlt={spot.title}
+                imageFocus={spot.imageFocus}
+                fallbackLabel="Imperdible"
+                datoDestacado={spot.datoDestacado}
+              />
+            ))}
+          </HomeCarousel>
+        ) : null}
+      </div>
     </main>
   );
 }

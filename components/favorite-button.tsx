@@ -36,8 +36,15 @@ export function getFavoriteKey(item: Pick<FavoriteItem, "type" | "slug">) {
   return `${item.type}:${item.slug}`;
 }
 
-export function FavoriteButton({ item }: { item: FavoriteItem }) {
+export function FavoriteButton({
+  item,
+  variant = "default",
+}: {
+  item: FavoriteItem;
+  variant?: "default" | "onDark";
+}) {
   const [saved, setSaved] = useState(false);
+  const onDark = variant === "onDark";
 
   useEffect(() => {
     const sync = () => {
@@ -75,8 +82,12 @@ export function FavoriteButton({ item }: { item: FavoriteItem }) {
       aria-label={`${saved ? "Quitar de favoritos" : "Guardar favorito"}: ${item.title}`}
       className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5 active:scale-95 ${
         saved
-          ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
-          : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] hover:border-[color:var(--accent)]"
+          ? onDark
+            ? "border-[#efd4b0] bg-[#efd4b0] text-[#123a55]"
+            : "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
+          : onDark
+            ? "border-[#efd4b0]/35 bg-[#efd4b0]/10 text-[#efd4b0] hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+            : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] hover:border-[color:var(--accent)]"
       }`}
     >
       <svg className="h-4 w-4" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} aria-hidden="true">

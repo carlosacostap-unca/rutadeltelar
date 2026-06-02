@@ -1,7 +1,10 @@
 import Image from "next/image";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { type Artisan, type Product, type Station } from "@/app/lib/content";
+import { formatBrandFontText } from "@/app/lib/brand-font-text";
 import { getProductContextBySlug, getProducts } from "@/app/lib/data";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
@@ -10,7 +13,6 @@ import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { ShareButton } from "@/components/share-button";
-import { SurfaceCard } from "@/components/surface-card";
 
 type ProductDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -44,7 +46,153 @@ export async function generateMetadata({
   });
 }
 
-export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+function ProductTag({
+  children,
+  variant = "light",
+}: {
+  children: ReactNode;
+  variant?: "dark" | "light";
+}) {
+  return (
+    <span
+      className={`rounded-full px-3 py-1 text-xs font-black uppercase leading-none tracking-normal ${
+        variant === "dark"
+          ? "bg-[#123a55] text-[#efd4b0]"
+          : "bg-[#123a55]/10 text-[#123a55]"
+      }`}
+    >
+      {children}
+    </span>
+  );
+}
+
+function RelatedStationCard({ station }: { station: Station }) {
+  return (
+    <div className="mt-6 rounded-[1.4rem] border border-[#123a55]/15 bg-[#123a55]/5 p-5">
+      <p className="text-[0.7rem] font-black uppercase leading-none tracking-normal text-[#18364d]/80">
+        Encontralo en
+      </p>
+      <Link
+        href={`/estaciones/${station.slug}`}
+        className="mt-2 inline-flex text-lg font-black leading-tight text-[#082d49] transition hover:text-[#123a55]/75"
+      >
+        {station.name}
+      </Link>
+      {station.locality ? (
+        <p className="mt-1 text-sm font-medium text-[#18364d]/75">
+          {station.locality}
+        </p>
+      ) : null}
+      {station.slogan ? (
+        <p className="mt-3 text-[0.78rem] font-medium uppercase leading-snug tracking-normal text-[#18364d]/70">
+          {station.slogan}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function ProductHeroInfo({
+  product,
+  relatedStation,
+}: {
+  product: Product;
+  relatedStation?: Station | null;
+}) {
+  return (
+    <article className="h-full rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#0d314a] sm:p-8">
+      <div className="flex flex-wrap gap-2">
+        <ProductTag variant="dark">{product.category}</ProductTag>
+        {product.subcategory ? (
+          <ProductTag>{product.subcategory}</ProductTag>
+        ) : null}
+      </div>
+
+      <h1 className="brand-font mt-5 text-[2.45rem] font-normal uppercase leading-none tracking-normal text-[#082d49] sm:text-[3.15rem]">
+        {formatBrandFontText(product.name)}
+      </h1>
+
+      <p className="mt-5 text-base font-medium leading-tight text-[#18364d]/85">
+        {product.description}
+      </p>
+
+      {product.techniques.length > 0 ? (
+        <div className="mt-6">
+          <p className="text-[0.7rem] font-black uppercase leading-none tracking-normal text-[#18364d]/80">
+            Tecnicas
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {product.techniques.map((technique) => (
+              <ProductTag key={technique}>{technique}</ProductTag>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <HighlightedData
+        value={product.datoDestacado}
+        className="mt-6 border-[#123a55]/20 bg-[#123a55]/5"
+      />
+
+      {relatedStation ? <RelatedStationCard station={relatedStation} /> : null}
+    </article>
+  );
+}
+
+function RelatedActorCard({ actor }: { actor: Artisan }) {
+  return (
+    <Link href={`/artesanas/${actor.slug}`} className="group block">
+      <article className="h-full rounded-[1.85rem] bg-[#efd4b0] p-5 text-[#0d314a] transition duration-200 group-hover:-translate-y-1 sm:p-6">
+        <div className="flex items-center gap-4">
+          {actor.imageUrl ? (
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-[1.25rem] border border-[#123a55]/15">
+              <Image
+                src={withPocketBaseImageThumb(actor.imageUrl, "thumbnail")}
+                alt={actor.name}
+                fill
+                className="object-cover"
+                sizes="80px"
+                style={getImageFocusStyle(actor.imageFocus)}
+              />
+            </div>
+          ) : (
+            <div className="brand-font flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.25rem] bg-[#123a55]/10 text-4xl font-normal uppercase leading-none text-[#082d49]">
+              {actor.name[0]}
+            </div>
+          )}
+          <div className="min-w-0">
+            {actor.actorType ? (
+              <p className="text-[0.7rem] font-black uppercase leading-none tracking-normal text-[#18364d]/75">
+                {actor.actorType}
+              </p>
+            ) : null}
+            <h3 className="mt-1 text-xl font-black leading-none text-[#082d49]">
+              {actor.name}
+            </h3>
+            <p className="mt-1 text-sm font-medium text-[#18364d]/75">
+              {actor.place}
+            </p>
+          </div>
+        </div>
+        <p className="mt-4 text-sm font-medium leading-snug text-[#18364d]/80 line-clamp-3">
+          {actor.craft}
+        </p>
+        <HighlightedData
+          value={actor.datoDestacado}
+          compact
+          className="mt-4 border-[#123a55]/20 bg-[#123a55]/5"
+        />
+        <span className="mt-4 inline-flex text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
+          Ver perfil
+        </span>
+      </article>
+    </Link>
+  );
+}
+
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
   const { slug } = await params;
   const context = await getProductContextBySlug(slug);
 
@@ -55,160 +203,78 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const { product, relatedStation, relatedActors } = context;
 
   return (
-    <main className="flex flex-1 flex-col">
-      {/* Back + Compartir */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href="/productos"
-          className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
-        >
-          ← Productos
-        </Link>
-        <div className="flex items-center gap-2">
-          <FavoriteButton
-            item={{
-              type: "producto",
-              slug: product.slug,
-              title: product.name,
-              subtitle: product.stationName,
-              href: `/productos/${product.slug}`,
-              imageUrl: product.imageUrl,
-              imageFocus: product.imageFocus,
-              datoDestacado: product.datoDestacado,
-            }}
-          />
-          <ShareButton title={product.name} text={product.description} />
+    <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href="/productos"
+            className="inline-flex rounded-full border border-[#efd4b0]/35 px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:-translate-y-0.5 hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+          >
+            {"<-"} Productos
+          </Link>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <FavoriteButton
+              item={{
+                type: "producto",
+                slug: product.slug,
+                title: product.name,
+                subtitle: product.stationName,
+                href: `/productos/${product.slug}`,
+                imageUrl: product.imageUrl,
+                imageFocus: product.imageFocus,
+                datoDestacado: product.datoDestacado,
+              }}
+            />
+            <ShareButton title={product.name} text={product.description} />
+          </div>
         </div>
-      </div>
 
-      {/* Galería + info */}
-      <section className="mb-10 grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-start">
-        <DetailMediaGallery
-          title={product.name}
-          fallbackLabel="Producto"
-          coverUrl={product.imageUrl}
-          galleryUrls={product.galleryUrls}
-          coverFocus={product.imageFocus}
-          galleryImages={product.galleryImages}
-          coverClassName="aspect-square"
-          coverSizes="(max-width: 1024px) 100vw, 50vw"
-        />
-
-        {/* Info */}
-        <div>
-          {/* Tags: categoría / subcategoría / técnicas */}
-          <div className="mb-4 flex flex-wrap gap-2">
-            <span className="rounded-full bg-[color:var(--accent)] px-3 py-1 text-xs font-semibold text-white">
-              {product.category}
-            </span>
-            {product.subcategory && (
-              <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-1 text-xs font-medium text-[color:var(--accent-strong)]">
-                {product.subcategory}
-              </span>
-            )}
-            {product.techniques.map((t) => (
-              <span
-                key={t}
-                className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-1 text-xs text-[color:var(--text-muted)]"
-              >
-                {t}
-              </span>
-            ))}
+        <section className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:items-start">
+          <div className="min-w-0">
+            <p className="mb-4 text-xl font-black uppercase leading-none tracking-normal text-white">
+              Producto
+            </p>
+            <DetailMediaGallery
+              title={product.name}
+              fallbackLabel="Producto"
+              coverUrl={product.imageUrl}
+              galleryUrls={product.galleryUrls}
+              coverFocus={product.imageFocus}
+              galleryImages={product.galleryImages}
+              coverClassName="aspect-[4/3] w-full sm:aspect-square"
+              coverSizes="(max-width: 1024px) 100vw, 52vw"
+              thumbnailClassName="aspect-square w-[150px]"
+            />
           </div>
 
-          <h1 className="display-font text-4xl leading-tight text-[color:var(--foreground)] sm:text-5xl">
-            {product.name}
-          </h1>
-
-          <p className="mt-5 text-sm leading-7 text-[color:var(--text-muted)]">
-            {product.description}
-          </p>
-          <HighlightedData value={product.datoDestacado} className="mt-5" />
-
-          {/* Estación de origen */}
-          {relatedStation && (
-            <div className="mt-6">
-              <SurfaceCard>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-                  Encontralo en
-                </p>
-                <Link
-                  href={`/estaciones/${relatedStation.slug}`}
-                  className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-[color:var(--accent)] transition hover:underline"
-                >
-                  <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" />
-                  </svg>
-                  {relatedStation.name}
-                </Link>
-                {relatedStation.slogan && (
-                  <p className="mt-1 text-xs italic text-[color:var(--text-muted)]">{relatedStation.slogan}</p>
-                )}
-              </SurfaceCard>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Hecho por — actores relacionados */}
-      {relatedActors.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-1 text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-            Hecho por
-          </h2>
-          <p className="mb-5 text-2xl font-semibold text-[color:var(--foreground)] display-font">
-            {relatedActors.length === 1 ? "El artesano detrás de esta pieza" : "Quiénes hacen esta pieza"}
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {relatedActors.map((actor) => (
-              <Link
-                key={actor.slug}
-                href={`/artesanas/${actor.slug}`}
-                className="group"
-              >
-                <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
-                  <div className="flex items-center gap-4">
-                    {actor.imageUrl ? (
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-[color:var(--border)]">
-                        <Image
-                          src={withPocketBaseImageThumb(actor.imageUrl, "thumbnail")}
-                          alt={actor.name}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                          style={getImageFocusStyle(actor.imageFocus)}
-                        />
-                      </div>
-                    ) : (
-                      <div className="display-font flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[color:var(--surface)] text-2xl text-[color:var(--accent-strong)]">
-                        {actor.name[0]}
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      {actor.actorType && (
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-                          {actor.actorType}
-                        </p>
-                      )}
-                      <h3 className="mt-0.5 truncate font-semibold text-[color:var(--foreground)] group-hover:text-[color:var(--accent)]">
-                        {actor.name}
-                      </h3>
-                      <p className="text-xs text-[color:var(--text-muted)]">{actor.place}</p>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-[color:var(--text-muted)] line-clamp-2">
-                    {actor.craft}
-                  </p>
-                  <HighlightedData value={actor.datoDestacado} compact className="mt-3" />
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--accent)] group-hover:underline">
-                    Ver perfil →
-                  </span>
-                </SurfaceCard>
-              </Link>
-            ))}
+          <div className="min-w-0">
+            <ProductHeroInfo
+              product={product}
+              relatedStation={relatedStation}
+            />
           </div>
         </section>
-      )}
+
+        {relatedActors.length > 0 ? (
+          <section className="mt-14">
+            <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
+              Hecho por
+            </p>
+            <h2 className="brand-font mt-1 max-w-4xl text-[2.25rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] sm:text-[3rem]">
+              {formatBrandFontText(
+                relatedActors.length === 1
+                  ? "El actor detras de esta pieza"
+                  : "Quienes hacen esta pieza",
+              )}
+            </h2>
+            <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {relatedActors.map((actor) => (
+                <RelatedActorCard key={actor.slug} actor={actor} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+      </div>
     </main>
   );
 }

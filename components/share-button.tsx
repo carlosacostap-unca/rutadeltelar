@@ -7,6 +7,7 @@ type ShareButtonProps = {
   text?: string;
   label?: string;
   url?: string;
+  variant?: "default" | "onDark";
 };
 
 export function ShareButton({
@@ -14,8 +15,10 @@ export function ShareButton({
   text,
   label = "Compartir",
   url,
+  variant = "default",
 }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
+  const onDark = variant === "onDark";
 
   async function handleShare() {
     const shareUrl = url ?? window.location.href;
@@ -43,11 +46,15 @@ export function ShareButton({
       type="button"
       onClick={handleShare}
       aria-label={`${label}: ${title}`}
-      className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)] active:scale-95"
+      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5 active:scale-95 ${
+        onDark
+          ? "border-[#efd4b0]/35 bg-[#efd4b0]/10 text-[#efd4b0] hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+          : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] hover:border-[color:var(--accent)]"
+      }`}
     >
       {copied ? (
         <>
-          <svg className="h-4 w-4 text-[color:var(--accent)]" viewBox="0 0 24 24" fill="none">
+          <svg className={`h-4 w-4 ${onDark ? "" : "text-[color:var(--accent)]"}`} viewBox="0 0 24 24" fill="none">
             <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           ¡Copiado!

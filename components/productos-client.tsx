@@ -1,18 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { type Product, type Station } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { HighlightedData } from "@/components/highlighted-data";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
-import { SurfaceCard } from "@/components/surface-card";
 
 type Props = {
   products: Product[];
   stations: Station[];
-  categories: string[]; // from categorias_producto catalog (derived from live data)
+  categories: string[];
 };
 
 function FilterChip({
@@ -22,21 +21,86 @@ function FilterChip({
 }: {
   active: boolean;
   onClick: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <button
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+      className={`shrink-0 rounded-full border px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
         active
-          ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
-          : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
+          ? "border-[#efd4b0] bg-[#efd4b0] text-[#123a55]"
+          : "border-[#efd4b0]/35 text-[#efd4b0] hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
       }`}
     >
       {children}
     </button>
+  );
+}
+
+function formatStationLabel(value?: string) {
+  return value?.replace(/^Estacion\s+/i, "").trim() ?? "";
+}
+
+function ProductCard({ product }: { product: Product }) {
+  const stationLabel = formatStationLabel(product.stationName);
+
+  return (
+    <Link href={`/productos/${product.slug}`} className="group block">
+      <article className="h-full overflow-hidden rounded-[1.85rem] bg-[#efd4b0] text-[#0d314a] transition duration-200 group-hover:-translate-y-1">
+        <div className="relative aspect-[0.95] w-full overflow-hidden">
+          {product.imageUrl ? (
+            <PbImage
+              src={product.imageUrl}
+              alt={product.name}
+              fill
+              className="object-cover transition duration-500 group-hover:scale-[1.04]"
+              sizes="(max-width: 768px) 100vw, 33vw"
+              usage="small"
+              quality={90}
+              style={getImageFocusStyle(product.imageFocus)}
+              fallback={<MediaFallback label="Producto" />}
+            />
+          ) : (
+            <MediaFallback label="Producto" />
+          )}
+          <div className="absolute left-4 top-4 flex max-w-[calc(100%-2rem)] flex-wrap gap-2">
+            <span className="rounded-full bg-[#123a55] px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] shadow">
+              {product.category}
+            </span>
+            {product.subcategory ? (
+              <span className="rounded-full bg-[#efd4b0]/90 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#123a55] shadow">
+                {product.subcategory}
+              </span>
+            ) : null}
+          </div>
+        </div>
+        <div className="p-6">
+          {stationLabel ? (
+            <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#18364d]/80">
+              {stationLabel}
+            </p>
+          ) : null}
+          <h3 className="mt-1 text-[1.75rem] font-black leading-[0.92] tracking-normal text-[#082d49]">
+            {product.name}
+          </h3>
+          <p className="mt-3 text-[0.82rem] font-medium leading-snug text-[#18364d]/75 line-clamp-3">
+            {product.description}
+          </p>
+          {product.techniques.length > 0 ? (
+            <p className="mt-3 text-[0.72rem] font-medium uppercase tracking-normal text-[#18364d]/75 line-clamp-2">
+              {product.techniques.join(" / ")}
+            </p>
+          ) : null}
+          <HighlightedData
+            value={product.datoDestacado}
+            compact
+            className="mt-4 border-[#123a55]/20 bg-[#123a55]/5"
+          />
+        </div>
+      </article>
+    </Link>
   );
 }
 
@@ -46,12 +110,12 @@ export function ProductosClient({ products, stations, categories }: Props) {
   const [subcategory, setSubcategory] = useState("todas");
   const [stationSlug, setStationSlug] = useState("todas");
 
-  // Subcategories contextual to selected category
   const subcategories = useMemo(() => {
     const pool =
       category === "todas"
         ? products
         : products.filter((p) => p.category === category);
+
     return [
       ...new Set(pool.map((p) => p.subcategory ?? "").filter(Boolean)),
     ].sort();
@@ -59,46 +123,30 @@ export function ProductosClient({ products, stations, categories }: Props) {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
-    return products.filter((p) => {
+
+    return products.filter((product) => {
       const matchSearch =
         !q ||
-        p.name.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q) ||
-        (p.datoDestacado ?? "").toLowerCase().includes(q) ||
-        p.techniques.some((t) => t.toLowerCase().includes(q));
-      const matchCat = category === "todas" || p.category === category;
+        product.name.toLowerCase().includes(q) ||
+        product.description.toLowerCase().includes(q) ||
+        (product.datoDestacado ?? "").toLowerCase().includes(q) ||
+        product.techniques.some((technique) =>
+          technique.toLowerCase().includes(q),
+        );
+      const matchCat = category === "todas" || product.category === category;
       const matchSub =
-        subcategory === "todas" || p.subcategory === subcategory;
+        subcategory === "todas" || product.subcategory === subcategory;
       const matchStation =
-        stationSlug === "todas" || p.stationSlug === stationSlug;
+        stationSlug === "todas" || product.stationSlug === stationSlug;
+
       return matchSearch && matchCat && matchSub && matchStation;
     });
   }, [products, search, category, subcategory, stationSlug]);
 
-  // When category changes, reset subcategory
-  function handleCategoryChange(c: string) {
-    setCategory(c);
+  function handleCategoryChange(value: string) {
+    setCategory(value);
     setSubcategory("todas");
   }
-
-  const activeFilters = [
-    category !== "todas"
-      ? { key: "cat", label: category, clear: () => handleCategoryChange("todas") }
-      : null,
-    subcategory !== "todas"
-      ? { key: "sub", label: subcategory, clear: () => setSubcategory("todas") }
-      : null,
-    stationSlug !== "todas"
-      ? {
-          key: "station",
-          label:
-            stations.find((s) => s.slug === stationSlug)?.locality ?? stationSlug,
-          clear: () => setStationSlug("todas"),
-        }
-      : null,
-  ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
-
-  const hasFilters = search.trim() !== "" || activeFilters.length > 0;
 
   function clearAll() {
     setSearch("");
@@ -107,9 +155,38 @@ export function ProductosClient({ products, stations, categories }: Props) {
     setStationSlug("todas");
   }
 
+  const activeFilters = [
+    category !== "todas"
+      ? {
+          key: "cat",
+          label: category,
+          clear: () => handleCategoryChange("todas"),
+        }
+      : null,
+    subcategory !== "todas"
+      ? {
+          key: "sub",
+          label: subcategory,
+          clear: () => setSubcategory("todas"),
+        }
+      : null,
+    stationSlug !== "todas"
+      ? {
+          key: "station",
+          label:
+            formatStationLabel(
+              stations.find((station) => station.slug === stationSlug)
+                ?.locality,
+            ) || stationSlug,
+          clear: () => setStationSlug("todas"),
+        }
+      : null,
+  ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
+
+  const hasFilters = search.trim() !== "" || activeFilters.length > 0;
+
   return (
     <>
-      {/* Búsqueda */}
       <div className="mb-5">
         <label htmlFor="products-search" className="sr-only">
           Buscar productos por nombre, tecnica o descripcion
@@ -117,20 +194,18 @@ export function ProductosClient({ products, stations, categories }: Props) {
         <input
           id="products-search"
           type="search"
-          placeholder="Buscar por nombre, técnica o descripción…"
+          placeholder="Buscar por nombre, tecnica o descripcion..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2.5 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--accent)] focus:outline-none"
+          onChange={(event) => setSearch(event.target.value)}
+          className="w-full rounded-full border border-[#efd4b0]/30 bg-[#efd4b0] px-5 py-3 text-sm font-medium text-[#123a55] placeholder:text-[#123a55]/65 focus:border-white focus:outline-none"
         />
       </div>
 
-      {/* Filtros cerrados (catálogo) */}
-      <div className="mb-4 flex flex-col gap-3">
-        {/* Categoría */}
-        {categories.length > 0 && (
+      <div className="mb-8 flex flex-col gap-4">
+        {categories.length > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-              Categoría
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+              Categoria
             </p>
             <div
               role="group"
@@ -143,24 +218,23 @@ export function ProductosClient({ products, stations, categories }: Props) {
               >
                 Todas
               </FilterChip>
-              {categories.map((c) => (
+              {categories.map((item) => (
                 <FilterChip
-                  key={c}
-                  active={category === c}
-                  onClick={() => handleCategoryChange(c)}
+                  key={item}
+                  active={category === item}
+                  onClick={() => handleCategoryChange(item)}
                 >
-                  {c}
+                  {item}
                 </FilterChip>
               ))}
             </div>
           </div>
-        )}
+        ) : null}
 
-        {/* Subcategoría (contextual) */}
-        {subcategories.length > 0 && (
+        {subcategories.length > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-              Subcategoría
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+              Subcategoria
             </p>
             <div
               role="group"
@@ -173,24 +247,23 @@ export function ProductosClient({ products, stations, categories }: Props) {
               >
                 Todas
               </FilterChip>
-              {subcategories.map((s) => (
+              {subcategories.map((item) => (
                 <FilterChip
-                  key={s}
-                  active={subcategory === s}
-                  onClick={() => setSubcategory(s)}
+                  key={item}
+                  active={subcategory === item}
+                  onClick={() => setSubcategory(item)}
                 >
-                  {s}
+                  {item}
                 </FilterChip>
               ))}
             </div>
           </div>
-        )}
+        ) : null}
 
-        {/* Estación */}
-        {stations.length > 0 && (
+        {stations.length > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-              Estación
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+              Estacion
             </p>
             <div
               role="group"
@@ -203,124 +276,72 @@ export function ProductosClient({ products, stations, categories }: Props) {
               >
                 Todas
               </FilterChip>
-              {stations.map((s) => (
+              {stations.map((station) => (
                 <FilterChip
-                  key={s.slug}
-                  active={stationSlug === s.slug}
-                  onClick={() => setStationSlug(s.slug)}
+                  key={station.slug}
+                  active={stationSlug === station.slug}
+                  onClick={() => setStationSlug(station.slug)}
                 >
-                  {s.locality}
+                  {formatStationLabel(station.locality)}
                 </FilterChip>
               ))}
             </div>
           </div>
-        )}
+        ) : null}
       </div>
 
-      {/* Chips activos + Limpiar */}
-      {hasFilters && (
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          {activeFilters.map((f) => (
+      {hasFilters ? (
+        <div className="mb-5 flex flex-wrap items-center gap-2">
+          {activeFilters.map((filter) => (
             <span
-              key={f.key}
-              className="flex items-center gap-1.5 rounded-full bg-[color:var(--accent)]/10 px-3 py-1 text-xs font-semibold text-[color:var(--accent)]"
+              key={filter.key}
+              className="flex items-center gap-1.5 rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]"
             >
-              {f.label}
+              {filter.label}
               <button
                 type="button"
-                onClick={f.clear}
-                aria-label={`Quitar filtro: ${f.label}`}
-                className="hover:text-[color:var(--accent-strong)]"
+                onClick={filter.clear}
+                aria-label={`Quitar filtro: ${filter.label}`}
+                className="leading-none text-[#efd4b0] transition hover:text-white"
               >
-                ✕
+                x
               </button>
             </span>
           ))}
           <button
             type="button"
             onClick={clearAll}
-            className="rounded-full border border-[color:var(--border)] px-3 py-1 text-xs font-semibold text-[color:var(--text-muted)] transition hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
+            className="rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
           >
             Limpiar
           </button>
         </div>
-      )}
+      ) : null}
 
-      {/* Conteo */}
-      <p className="mb-4 text-sm text-[color:var(--text-muted)]" role="status" aria-live="polite">
+      <p className="sr-only" role="status" aria-live="polite">
+        {filtered.length} productos disponibles.
+      </p>
+      <p className="mb-5 text-sm font-medium text-[#efd4b0]/85">
         {filtered.length} producto{filtered.length !== 1 ? "s" : ""}
       </p>
 
-      {/* Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-10 sm:grid-cols-2 md:gap-14 lg:grid-cols-3">
         {filtered.map((product) => (
-          <Link key={product.slug} href={`/productos/${product.slug}`} className="group">
-            <SurfaceCard className="soft-shadow h-full overflow-hidden !p-0 transition group-hover:border-[color:var(--accent)]">
-              {product.imageUrl ? (
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <PbImage
-                    src={product.imageUrl}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition group-hover:scale-[1.03]"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                    usage="small"
-                    style={getImageFocusStyle(product.imageFocus)}
-                    fallback={
-                      <div className="aspect-[4/3] overflow-hidden">
-                        <MediaFallback label="Producto" />
-                        {/*
-                        🧵
-                        */}
-                      </div>
-                    }
-                  />
-                </div>
-              ) : (
-                <div className="aspect-[4/3] overflow-hidden">
-                  <MediaFallback label="Producto" />
-                  {/*
-                  🧵
-                  */}
-                </div>
-              )}
-              <div className="p-4">
-                <div className="mb-2 flex flex-wrap gap-1.5">
-                  <span className="rounded-full bg-[color:var(--accent)]/10 px-2.5 py-0.5 text-[10px] font-semibold text-[color:var(--accent)]">
-                    {product.category}
-                  </span>
-                  {product.subcategory && (
-                    <span className="rounded-full border border-[color:var(--border)] px-2.5 py-0.5 text-[10px] text-[color:var(--text-muted)]">
-                      {product.subcategory}
-                    </span>
-                  )}
-                </div>
-                <h2 className="font-semibold text-[color:var(--foreground)] group-hover:text-[color:var(--accent)] line-clamp-2">
-                  {product.name}
-                </h2>
-                {product.stationName && (
-                  <p className="mt-1 text-xs text-[color:var(--text-muted)]">
-                    {product.stationName}
-                  </p>
-                )}
-                <HighlightedData value={product.datoDestacado} compact className="mt-3" />
-              </div>
-            </SurfaceCard>
-          </Link>
+          <ProductCard key={product.slug} product={product} />
         ))}
 
-        {filtered.length === 0 && (
-          <p className="col-span-full py-12 text-center text-sm text-[color:var(--text-muted)]">
-            Sin resultados.{" "}
+        {filtered.length === 0 ? (
+          <div className="col-span-full py-16 text-center text-sm text-[#efd4b0]">
+            <p>No hay productos que coincidan con tu busqueda.</p>
             <button
               type="button"
               onClick={clearAll}
-              className="text-[color:var(--accent)] underline"
+              className="mt-3 rounded-full border border-[#efd4b0]/35 px-4 py-2 text-xs font-black uppercase leading-none tracking-normal transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
             >
               Limpiar filtros
             </button>
-          </p>
-        )}
+          </div>
+        ) : null}
       </div>
     </>
   );

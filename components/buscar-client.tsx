@@ -1,14 +1,19 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { type Artisan, type Experience, type HighlightSpot, type Product, type Station } from "@/app/lib/content";
+import {
+  type Artisan,
+  type Experience,
+  type HighlightSpot,
+  type Product,
+  type Station,
+} from "@/app/lib/content";
 import { getImageFocusStyle, type ImageFocus } from "@/app/lib/image-focus";
-import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { HighlightedData } from "@/components/highlighted-data";
-import { SurfaceCard } from "@/components/surface-card";
+import { MediaFallback } from "@/components/media-fallback";
+import { PbImage } from "@/components/pb-image";
 
 type SearchData = {
   stations: Station[];
@@ -58,6 +63,10 @@ function matches(query: string, ...fields: SearchableValue[]) {
   return flattenSearchValues(fields).some((field) => normalize(field).includes(q));
 }
 
+function formatResultTag(value?: string) {
+  return value?.replace(/,\s*Catamarca\.?$/i, "");
+}
+
 function buildGroups(data: SearchData, query: string): ResultGroup[] {
   if (!query.trim()) return [];
 
@@ -87,8 +96,14 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       imageFocus: s.imageFocus,
       datoDestacado: s.datoDestacado,
     }));
-  if (estaciones.length)
-    groups.push({ type: "estacion", label: "Estaciones", count: estaciones.length, items: estaciones });
+  if (estaciones.length) {
+    groups.push({
+      type: "estacion",
+      label: "Estaciones",
+      count: estaciones.length,
+      items: estaciones,
+    });
+  }
 
   const actores = data.artisans
     .filter((a) =>
@@ -137,8 +152,14 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       imageFocus: a.imageFocus,
       datoDestacado: a.datoDestacado,
     }));
-  if (actores.length)
-    groups.push({ type: "actor", label: "Actores", count: actores.length, items: actores });
+  if (actores.length) {
+    groups.push({
+      type: "actor",
+      label: "Actores",
+      count: actores.length,
+      items: actores,
+    });
+  }
 
   const prods = data.products
     .filter((p) =>
@@ -164,8 +185,14 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       imageFocus: p.imageFocus,
       datoDestacado: p.datoDestacado,
     }));
-  if (prods.length)
-    groups.push({ type: "producto", label: "Productos", count: prods.length, items: prods });
+  if (prods.length) {
+    groups.push({
+      type: "producto",
+      label: "Productos",
+      count: prods.length,
+      items: prods,
+    });
+  }
 
   const exps = data.experiences
     .filter((e) =>
@@ -196,8 +223,14 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       imageFocus: e.imageFocus,
       datoDestacado: e.datoDestacado,
     }));
-  if (exps.length)
-    groups.push({ type: "experiencia", label: "Experiencias", count: exps.length, items: exps });
+  if (exps.length) {
+    groups.push({
+      type: "experiencia",
+      label: "Experiencias",
+      count: exps.length,
+      items: exps,
+    });
+  }
 
   const spots = data.spots
     .filter((s) =>
@@ -229,68 +262,118 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
       imageFocus: s.imageFocus,
       datoDestacado: s.datoDestacado,
     }));
-  if (spots.length)
-    groups.push({ type: "imperdible", label: "Imperdibles", count: spots.length, items: spots });
+  if (spots.length) {
+    groups.push({
+      type: "imperdible",
+      label: "Imperdibles",
+      count: spots.length,
+      items: spots,
+    });
+  }
 
   return groups;
 }
 
+function getSingularLabel(type: ResultGroup["type"]) {
+  switch (type) {
+    case "estacion":
+      return "Estacion";
+    case "actor":
+      return "Actor";
+    case "producto":
+      return "Producto";
+    case "experiencia":
+      return "Experiencia";
+    case "imperdible":
+      return "Imperdible";
+  }
+}
+
+function ResultCard({
+  item,
+  type,
+}: {
+  item: ResultItem;
+  type: ResultGroup["type"];
+}) {
+  const label = getSingularLabel(type);
+  const tag = formatResultTag(item.tag);
+
+  return (
+    <Link href={item.href} className="group block">
+      <article className="h-full overflow-hidden rounded-[1.85rem] bg-[#efd4b0] text-[#0d314a] transition duration-200 group-hover:-translate-y-1">
+        <div className="relative aspect-[0.95] w-full overflow-hidden">
+          {item.imageUrl ? (
+            <PbImage
+              src={item.imageUrl}
+              alt={item.title}
+              fill
+              className="object-cover transition duration-500 group-hover:scale-[1.04]"
+              sizes="(max-width: 768px) 100vw, 33vw"
+              usage="small"
+              quality={90}
+              style={getImageFocusStyle(item.imageFocus)}
+              fallback={<MediaFallback label={label} />}
+            />
+          ) : (
+            <MediaFallback label={label} />
+          )}
+          <span className="absolute left-4 top-4 rounded-full bg-[#123a55] px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] shadow">
+            {label}
+          </span>
+        </div>
+        <div className="p-6">
+          {tag ? (
+            <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#18364d]/80">
+              {tag}
+            </p>
+          ) : null}
+          <h3 className="mt-1 text-[1.75rem] font-black leading-[0.92] tracking-normal text-[#082d49]">
+            {item.title}
+          </h3>
+          {item.subtitle ? (
+            <p className="mt-3 text-[0.72rem] font-medium uppercase tracking-normal text-[#18364d]/75">
+              {item.subtitle}
+            </p>
+          ) : null}
+          <HighlightedData
+            value={item.datoDestacado}
+            compact
+            className="mt-4 border-[#123a55]/20 bg-[#123a55]/5"
+          />
+        </div>
+      </article>
+    </Link>
+  );
+}
+
 function GroupSection({ group }: { group: ResultGroup }) {
   return (
-    <section className="mb-10">
-      <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-        {group.label}
-        <span className="rounded-full bg-[color:var(--surface)] px-2 py-0.5 text-[10px] font-semibold">
+    <section className="mb-12">
+      <div className="mb-4 flex items-center gap-3">
+        <h2 className="text-xl font-black uppercase leading-none tracking-normal text-[#f3d7b4]">
+          {group.label}
+        </h2>
+        <span className="rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
           {group.count}
         </span>
-      </h2>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {group.items.slice(0, 9).map((item) => (
-          <Link key={item.href} href={item.href} className="group">
-            <SurfaceCard className="flex h-full items-center gap-3 !py-3 transition group-hover:border-[color:var(--accent)]">
-              {item.imageUrl ? (
-                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[color:var(--border)]">
-                  <Image
-                    src={withPocketBaseImageThumb(item.imageUrl, "thumbnail")}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                    sizes="48px"
-                    style={getImageFocusStyle(item.imageFocus)}
-                  />
-                </div>
-              ) : (
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[color:var(--surface)] text-xl">
-                  {group.type === "estacion" && "📍"}
-                  {group.type === "actor" && "🧶"}
-                  {group.type === "producto" && "🧵"}
-                  {group.type === "experiencia" && "🧭"}
-                  {group.type === "imperdible" && "⭐"}
-                </div>
-              )}
-              <div className="min-w-0">
-                {item.tag && (
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-                    {item.tag}
-                  </p>
-                )}
-                <p className="truncate text-sm font-semibold text-[color:var(--foreground)] group-hover:text-[color:var(--accent)]">
-                  {item.title}
-                </p>
-                {item.subtitle && (
-                  <p className="truncate text-xs text-[color:var(--text-muted)]">{item.subtitle}</p>
-                )}
-                <HighlightedData value={item.datoDestacado} compact className="mt-2" />
-              </div>
-            </SurfaceCard>
-          </Link>
+      </div>
+      <div className="grid gap-10 sm:grid-cols-2 md:gap-14 lg:grid-cols-3">
+        {group.items.map((item) => (
+          <ResultCard key={item.href} item={item} type={group.type} />
         ))}
       </div>
     </section>
   );
 }
 
-export function BuscarClient(data: SearchData) {
+export function BuscarClient({
+  stations,
+  artisans,
+  products,
+  experiences,
+  spots,
+}: SearchData) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
@@ -305,81 +388,114 @@ export function BuscarClient(data: SearchData) {
       } else {
         params.delete("q");
       }
-      router.replace(`/buscar?${params.toString()}`, { scroll: false });
+
+      const paramString = params.toString();
+      router.replace(paramString ? `/buscar?${paramString}` : "/buscar", {
+        scroll: false,
+      });
     });
   }
 
-  const groups = useMemo(() => buildGroups(data, query), [data, query]);
+  const groups = useMemo(
+    () =>
+      buildGroups(
+        {
+          stations,
+          artisans,
+          products,
+          experiences,
+          spots,
+        },
+        query,
+      ),
+    [artisans, experiences, products, query, spots, stations],
+  );
   const totalResults = groups.reduce((sum, g) => sum + g.count, 0);
+  const hasQuery = query.trim().length > 0;
 
   return (
     <>
-      {/* Campo de búsqueda */}
-      <div className="relative mb-8">
+      <div className="mb-5">
         <label htmlFor="global-search" className="sr-only">
           Buscar en toda la ruta
         </label>
-        <svg
-          className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--text-muted)]"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.35-4.35" />
-        </svg>
-        <input
-          id="global-search"
-          type="search"
-          autoFocus
-          placeholder="Buscar en la ruta..."
-          value={query}
-          onChange={(e) => handleChange(e.target.value)}
-          className="w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] py-3 pl-11 pr-4 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--accent)] focus:outline-none"
-        />
-        {query && (
-          <button
-            type="button"
-            onClick={() => handleChange("")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--text-muted)] hover:text-[color:var(--foreground)]"
-            aria-label="Limpiar búsqueda"
+        <div className="relative">
+          <svg
+            className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#123a55]/70"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
           >
-            ✕
-          </button>
-        )}
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input
+            id="global-search"
+            type="search"
+            placeholder="Buscar en toda la ruta..."
+            value={query}
+            onChange={(e) => handleChange(e.target.value)}
+            className="w-full rounded-full border border-[#efd4b0]/30 bg-[#efd4b0] py-3 pl-11 pr-5 text-sm font-medium text-[#123a55] placeholder:text-[#123a55]/65 focus:border-white focus:outline-none"
+          />
+        </div>
       </div>
 
-      {/* Resultados */}
-      {query.trim() && (
-        <p className="mb-6 text-sm text-[color:var(--text-muted)]" role="status" aria-live="polite">
+      {hasQuery && groups.length > 0 ? (
+        <div className="mb-8 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+          {groups.map((group) => (
+            <span
+              key={group.type}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#efd4b0]/35 px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0]"
+            >
+              <span>{group.label}</span>
+              <span>{group.count}</span>
+            </span>
+          ))}
+        </div>
+      ) : null}
+
+      {hasQuery ? (
+        <p
+          className="mb-8 text-sm font-medium text-[#efd4b0]"
+          role="status"
+          aria-live="polite"
+        >
           {totalResults > 0
             ? `${totalResults} resultado${totalResults !== 1 ? "s" : ""} para "${query}"`
             : `Sin resultados para "${query}"`}
         </p>
-      )}
+      ) : null}
 
-      {groups.length > 0 && groups.map((g) => <GroupSection key={g.type} group={g} />)}
+      {groups.map((group) => (
+        <GroupSection key={group.type} group={group} />
+      ))}
 
-      {query.trim() && groups.length === 0 && (
-        <div className="py-16 text-center">
-          <p className="text-4xl">🔍</p>
-          <p className="mt-4 text-base font-semibold text-[color:var(--foreground)]">
+      {hasQuery && groups.length === 0 ? (
+        <div className="py-16 text-center text-[#efd4b0]">
+          <p className="text-xl font-black uppercase leading-none tracking-normal">
             Sin resultados
           </p>
-          <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-            Probá con otro término o explorá las secciones desde el menú.
+          <p className="mx-auto mt-3 max-w-md text-sm font-medium text-white/75">
+            Proba con otro termino o explora las secciones desde el menu.
           </p>
         </div>
-      )}
+      ) : null}
 
-      {!query.trim() && (
-        <div className="py-12 text-center text-sm text-[color:var(--text-muted)]">
-          Escribí algo para buscar en toda la ruta.
+      {!hasQuery ? (
+        <div className="py-16 text-center text-[#efd4b0]">
+          <p className="text-xl font-black uppercase leading-none tracking-normal">
+            Empeza con una busqueda
+          </p>
+          <p className="mx-auto mt-3 max-w-md text-sm font-medium text-white/75">
+            Escribi una palabra para encontrar estaciones, actores, productos,
+            experiencias e imperdibles.
+          </p>
         </div>
-      )}
+      ) : null}
     </>
   );
 }

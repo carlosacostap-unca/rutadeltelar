@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { type Artisan } from "@/app/lib/content";
 import { getArtisanContextBySlug, getArtisans } from "@/app/lib/data";
+import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle, type FocusedImage } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
@@ -12,7 +13,9 @@ import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
+import { SatelliteMapButton } from "@/components/satellite-map-button";
 import { ShareButton } from "@/components/share-button";
+import { StationDetailMap } from "@/components/station-detail-map";
 import { SurfaceCard } from "@/components/surface-card";
 
 type ArtisanDetailPageProps = {
@@ -181,6 +184,15 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
   const { artisan, relatedExperiences, relatedHighlightSpots, relatedStation, relatedProducts } = context;
   const galleryImages: FocusedImage[] =
     artisan.galleryImages ?? artisan.galleryUrls?.map((url) => ({ url })) ?? [];
+  const hasContact =
+    !!artisan.contactPhone ||
+    !!artisan.contactEmail ||
+    !!artisan.address ||
+    !!artisan.facebook_url ||
+    !!artisan.instagram_url ||
+    !!artisan.pagina_web_url;
+  const locationLabel =
+    relatedStation?.name ?? artisan.stationName ?? artisan.place;
 
   return (
     <main className="flex flex-1 flex-col">
@@ -209,10 +221,9 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
         </div>
       </div>
 
-      {/* Cabecera */}
-      <section className="mb-10 grid gap-6 lg:grid-cols-[auto_1fr] lg:items-start">
-        {/* Foto */}
-        <div className="w-36 shrink-0 sm:w-44">
+      {/* Hero gallery */}
+      <section className="mb-10">
+        <div className="relative">
           <DetailMediaGallery
             title={artisan.name}
             fallbackLabel="Actor"
@@ -220,54 +231,118 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
             galleryUrls={artisan.galleryUrls}
             coverFocus={artisan.imageFocus}
             galleryImages={galleryImages}
-            coverClassName="aspect-square w-36 sm:w-44"
-            coverSizes="176px"
-            thumbnailClassName="aspect-[4/3] w-36 sm:w-44"
           />
-        </div>
-
-        {/* Info */}
-        <div>
-          {artisan.actorType && (
-            <span className="inline-block rounded-full bg-[color:var(--accent)] px-3 py-1 text-xs font-semibold text-white">
+          {artisan.actorType ? (
+            <span className="absolute left-4 top-4 rounded-full bg-[color:var(--accent)] px-3 py-1 text-xs font-semibold text-white shadow">
               {artisan.actorType}
             </span>
-          )}
-          <h1 className="display-font mt-3 text-4xl leading-tight text-[color:var(--foreground)] sm:text-5xl">
-            {artisan.name}
-          </h1>
-          {relatedStation ? (
-            <Link
-              href={`/estaciones/${relatedStation.slug}`}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--accent)] transition hover:underline"
-            >
-              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" />
-              </svg>
-              {relatedStation.name}
-            </Link>
-          ) : artisan.stationName ? (
-            <p className="mt-2 text-sm text-[color:var(--text-muted)]">{artisan.stationName}</p>
           ) : null}
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--text-muted)]">{artisan.bio}</p>
-          <HighlightedData value={artisan.datoDestacado} className="mt-5 max-w-2xl" />
-
-          {/* Contacto */}
-          <ContactButtons
-            phone={artisan.contactPhone}
-            email={artisan.contactEmail}
-            address={artisan.address}
-            mapPoint={artisan}
-            facebook_url={artisan.facebook_url}
-            instagram_url={artisan.instagram_url}
-            pagina_web_url={artisan.pagina_web_url}
-          />
         </div>
       </section>
+
+      {/* Titulo y descripcion */}
+      <section className="mb-10">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
+          {artisan.actorType ? `${artisan.actorType} · ` : ""}{locationLabel}
+        </p>
+        <h1 className="display-font mt-2 text-4xl leading-tight text-[color:var(--foreground)] sm:text-5xl">
+          {artisan.name}
+        </h1>
+        <p className="mt-2 text-base font-medium italic text-[color:var(--accent)]">
+          {artisan.craft}
+        </p>
+        {relatedStation ? (
+          <Link
+            href={`/estaciones/${relatedStation.slug}`}
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--accent)] transition hover:underline"
+          >
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" />
+            </svg>
+            {relatedStation.name}
+          </Link>
+        ) : null}
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--text-muted)]">
+          {artisan.bio}
+        </p>
+        <HighlightedData value={artisan.datoDestacado} className="mt-5 max-w-2xl" />
+      </section>
+
+      {hasContact ? (
+        <section className="mb-10">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+            Contacto
+          </h2>
+          <SurfaceCard>
+            <div className="[&>div]:mt-0">
+              <ContactButtons
+                phone={artisan.contactPhone}
+                email={artisan.contactEmail}
+                address={artisan.address}
+                mapPoint={artisan}
+                facebook_url={artisan.facebook_url}
+                instagram_url={artisan.instagram_url}
+                pagina_web_url={artisan.pagina_web_url}
+              />
+            </div>
+          </SurfaceCard>
+        </section>
+      ) : null}
+
+      {hasValidCoordinates(artisan) ? (
+        <section className="mb-10">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+            Ubicación
+          </h2>
+          <div className="overflow-hidden rounded-3xl border border-[color:var(--border)]">
+            <StationDetailMap lat={artisan.latitude} lng={artisan.longitude} label={artisan.name} />
+          </div>
+        </section>
+      ) : null}
 
       {/* Ficha por subtipo */}
       <section className="mb-10">
         <ActorFicha actor={artisan} />
+      </section>
+
+      {/* Como llegar */}
+      <section className="mb-10">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+          Cómo llegar
+        </h2>
+        <SurfaceCard>
+          {hasValidCoordinates(artisan) ? (
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs text-[color:var(--text-muted)]">Coordenadas</p>
+                <p className="mt-1 font-mono text-sm font-semibold text-[color:var(--foreground)]">
+                  {artisan.latitude.toFixed(5)}, {artisan.longitude.toFixed(5)}
+                </p>
+                <p className="mt-1 text-xs text-[color:var(--text-muted)]">
+                  {artisan.address ?? locationLabel}
+                </p>
+              </div>
+              <SatelliteMapButton point={artisan} />
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm text-[color:var(--text-muted)]">
+                Coordenadas no disponibles aún.
+                {artisan.address ? ` Referencia: ${artisan.address}.` : ""}
+              </p>
+              {artisan.address ? (
+                <div className="mt-4 [&>div]:mt-0">
+                  <ContactButtons
+                    phone={undefined}
+                    email={undefined}
+                    address={artisan.address}
+                    mapPoint={undefined}
+                  />
+                </div>
+              ) : null}
+            </div>
+          )}
+        </SurfaceCard>
       </section>
 
       {/* Productos de este actor */}

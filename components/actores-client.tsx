@@ -5,14 +5,18 @@ import { useMemo, useState } from "react";
 import { type Artisan, type Station } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { HighlightedData } from "@/components/highlighted-data";
+import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
-import { SurfaceCard } from "@/components/surface-card";
 
 type Props = {
   artisans: Artisan[];
   stations: Station[];
   tipos: string[]; // from tipos_actor catalog (derived from live data)
 };
+
+function formatActorLocation(value?: string) {
+  return (value ?? "").replace(/,\s*Catamarca\.?$/i, "");
+}
 
 function FilterChip({
   active,
@@ -28,14 +32,65 @@ function FilterChip({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+      className={`shrink-0 rounded-full border px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
         active
-          ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
-          : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
+          ? "border-[#efd4b0] bg-[#efd4b0] text-[#123a55]"
+          : "border-[#efd4b0]/35 text-[#efd4b0] hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
       }`}
     >
       {children}
     </button>
+  );
+}
+
+function ActorCard({ item }: { item: Artisan }) {
+  const location = formatActorLocation(item.stationName ?? item.place);
+
+  return (
+    <Link href={`/artesanas/${item.slug}`} className="group block">
+      <article className="h-full overflow-hidden rounded-[1.85rem] bg-[#efd4b0] text-[#0d314a] transition duration-200 group-hover:-translate-y-1">
+        <div className="relative aspect-[0.95] w-full overflow-hidden">
+          {item.imageUrl ? (
+            <PbImage
+              src={item.imageUrl}
+              alt={item.name}
+              fill
+              className="object-cover transition duration-500 group-hover:scale-[1.04]"
+              sizes="(max-width: 768px) 100vw, 33vw"
+              usage="small"
+              quality={90}
+              style={getImageFocusStyle(item.imageFocus)}
+              fallback={<MediaFallback label="Actor" />}
+            />
+          ) : (
+            <MediaFallback label="Actor" />
+          )}
+          {item.actorType ? (
+            <span className="absolute left-4 top-4 rounded-full bg-[#123a55] px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] shadow">
+              {item.actorType}
+            </span>
+          ) : null}
+        </div>
+        <div className="p-6">
+          {location ? (
+            <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#18364d]/80">
+              {location}
+            </p>
+          ) : null}
+          <h3 className="mt-1 text-[1.75rem] font-black leading-[0.92] tracking-normal text-[#082d49]">
+            {item.name}
+          </h3>
+          <p className="mt-3 line-clamp-3 text-[0.78rem] font-medium uppercase leading-tight tracking-normal text-[#18364d]/75">
+            {item.craft}
+          </p>
+          <HighlightedData
+            value={item.datoDestacado}
+            compact
+            className="mt-4 border-[#123a55]/20 bg-[#123a55]/5"
+          />
+        </div>
+      </article>
+    </Link>
   );
 }
 
@@ -46,20 +101,29 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
+
     return artisans.filter((a) => {
+      const selectedStation = stations.find((s) => s.slug === stationSlug);
       const matchSearch =
         !q ||
         a.name.toLowerCase().includes(q) ||
         a.craft.toLowerCase().includes(q) ||
+        a.place.toLowerCase().includes(q) ||
+        (a.actorType ?? "").toLowerCase().includes(q) ||
+        (a.stationName ?? "").toLowerCase().includes(q) ||
         (a.datoDestacado ?? "").toLowerCase().includes(q);
       const matchTipo =
         tipo === "todos" ||
         (a.actorType ?? "").toLowerCase() === tipo.toLowerCase();
       const matchStation =
-        stationSlug === "todas" || a.stationSlug === stationSlug;
+        stationSlug === "todas" ||
+        a.stationSlug === stationSlug ||
+        (!!selectedStation?.recordId &&
+          a.stationRecordId === selectedStation.recordId);
+
       return matchSearch && matchTipo && matchStation;
     });
-  }, [artisans, search, tipo, stationSlug]);
+  }, [artisans, search, tipo, stationSlug, stations]);
 
   const activeFilters = [
     tipo !== "todos"
@@ -86,7 +150,6 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
 
   return (
     <>
-      {/* Búsqueda */}
       <div className="mb-5">
         <label htmlFor="actors-search" className="sr-only">
           Buscar actores por nombre u oficio
@@ -94,21 +157,24 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
         <input
           id="actors-search"
           type="search"
-          placeholder="Buscar por nombre u oficio…"
+          placeholder="Buscar por nombre u oficio..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2.5 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--text-muted)] focus:border-[color:var(--accent)] focus:outline-none"
+          className="w-full rounded-full border border-[#efd4b0]/30 bg-[#efd4b0] px-5 py-3 text-sm font-medium text-[#123a55] placeholder:text-[#123a55]/65 focus:border-white focus:outline-none"
         />
       </div>
 
-      {/* Filtros cerrados (catálogo) */}
-      <div className="mb-4 flex flex-col gap-3">
-        {tipos.length > 0 && (
+      <div className="mb-6 flex flex-col gap-4">
+        {tipos.length > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]/80">
               Tipo de actor
             </p>
-            <div role="group" aria-label="Filtrar actores por tipo" className="flex flex-wrap gap-2">
+            <div
+              role="group"
+              aria-label="Filtrar actores por tipo"
+              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+            >
               <FilterChip
                 active={tipo === "todos"}
                 onClick={() => setTipo("todos")}
@@ -126,14 +192,18 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
               ))}
             </div>
           </div>
-        )}
+        ) : null}
 
-        {stations.length > 0 && (
+        {stations.length > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]/80">
               Estación
             </p>
-            <div role="group" aria-label="Filtrar actores por estacion" className="flex flex-wrap gap-2">
+            <div
+              role="group"
+              aria-label="Filtrar actores por estación"
+              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+            >
               <FilterChip
                 active={stationSlug === "todas"}
                 onClick={() => setStationSlug("todas")}
@@ -146,108 +216,63 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
                   active={stationSlug === s.slug}
                   onClick={() => setStationSlug(s.slug)}
                 >
-                  {s.locality}
+                  {formatActorLocation(s.locality)}
                 </FilterChip>
               ))}
             </div>
           </div>
-        )}
+        ) : null}
       </div>
 
-      {/* Chips de filtros activos + Limpiar */}
-      {hasFilters && (
+      {hasFilters ? (
         <div className="mb-4 flex flex-wrap items-center gap-2">
           {activeFilters.map((f) => (
             <span
               key={f.key}
-              className="flex items-center gap-1.5 rounded-full bg-[color:var(--accent)]/10 px-3 py-1 text-xs font-semibold text-[color:var(--accent)]"
+              className="flex items-center gap-1.5 rounded-full bg-[#efd4b0]/15 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]"
             >
-              {f.label}
+              {formatActorLocation(f.label)}
               <button
                 type="button"
                 onClick={f.clear}
                 aria-label={`Quitar filtro: ${f.label}`}
-                className="hover:text-[color:var(--accent-strong)]"
+                className="hover:text-white"
               >
-                ✕
+                x
               </button>
             </span>
           ))}
           <button
             type="button"
             onClick={clearAll}
-            className="rounded-full border border-[color:var(--border)] px-3 py-1 text-xs font-semibold text-[color:var(--text-muted)] transition hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]"
+            className="rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
           >
             Limpiar
           </button>
         </div>
-      )}
+      ) : null}
 
-      {/* Conteo */}
-      <p className="mb-4 text-sm text-[color:var(--text-muted)]" role="status" aria-live="polite">
-        {filtered.length} actor{filtered.length !== 1 ? "es" : ""}
+      <p className="sr-only" role="status" aria-live="polite">
+        {filtered.length} actor{filtered.length !== 1 ? "es" : ""} disponibles.
       </p>
 
-      {/* Grid */}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-10 sm:grid-cols-2 md:gap-14 lg:grid-cols-3">
         {filtered.map((item) => (
-          <Link key={item.slug} href={`/artesanas/${item.slug}`} className="group">
-            <SurfaceCard className="soft-shadow h-full transition group-hover:border-[color:var(--accent)]">
-              <div className="mb-4 flex items-center gap-3">
-                {item.imageUrl ? (
-                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-[color:var(--border)]">
-                    <PbImage
-                      src={item.imageUrl}
-                      alt={item.name}
-                      fill
-                      className="object-cover"
-                      sizes="48px"
-                      usage="thumbnail"
-                      style={getImageFocusStyle(item.imageFocus)}
-                      fallback={
-                        <div className="display-font flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--surface)] text-lg text-[color:var(--accent-strong)]">
-                          {item.name[0]}
-                        </div>
-                      }
-                    />
-                  </div>
-                ) : (
-                  <div className="display-font flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[color:var(--surface)] text-lg text-[color:var(--accent-strong)]">
-                    {item.name[0]}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  {item.actorType && (
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-                      {item.actorType}
-                    </p>
-                  )}
-                  <h2 className="truncate font-semibold text-[color:var(--foreground)] group-hover:text-[color:var(--accent)]">
-                    {item.name}
-                  </h2>
-                </div>
-              </div>
-              <p className="text-xs text-[color:var(--text-muted)]">{item.place}</p>
-              <p className="mt-1 text-sm leading-relaxed text-[color:var(--foreground)] line-clamp-2">
-                {item.craft}
-              </p>
-              <HighlightedData value={item.datoDestacado} compact className="mt-3" />
-            </SurfaceCard>
-          </Link>
+          <ActorCard key={item.slug} item={item} />
         ))}
 
-        {filtered.length === 0 && (
-          <p className="col-span-full py-12 text-center text-sm text-[color:var(--text-muted)]">
+        {filtered.length === 0 ? (
+          <p className="col-span-full py-16 text-center text-sm text-[#efd4b0]">
             Sin resultados.{" "}
             <button
               type="button"
               onClick={clearAll}
-              className="text-[color:var(--accent)] underline"
+              className="font-semibold text-white underline"
             >
               Limpiar filtros
             </button>
           </p>
-        )}
+        ) : null}
       </div>
     </>
   );
