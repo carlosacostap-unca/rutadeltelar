@@ -20,6 +20,7 @@ import {
 import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle, type ImageFocus } from "@/app/lib/image-focus";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
+import { SATELLITE_REFERENCE_MAX_ZOOM } from "@/app/lib/map-tile-layers";
 import { SatelliteReferenceTileLayers } from "@/components/satellite-reference-tile-layers";
 import { SatelliteMapButton } from "@/components/satellite-map-button";
 
@@ -255,6 +256,7 @@ export function StationsTerritoryMapLeaflet({
         }
         bounds={bounds}
         boundsOptions={{ padding: [18, 18], maxZoom: TERRITORY_MAP_MAX_BOUNDS_ZOOM }}
+        maxZoom={SATELLITE_REFERENCE_MAX_ZOOM}
         scrollWheelZoom={false}
         zoomControl
         className="h-[360px] w-full sm:h-[460px]"
@@ -282,10 +284,7 @@ export function StationsTerritoryMapLeaflet({
                 weight: 2,
               }}
               eventHandlers={{
-                click: () =>
-                  onSelectStation
-                    ? onSelectStation(station.slug)
-                    : router.push(`/estaciones/${station.slug}`),
+                click: () => onSelectStation?.(station.slug),
               }}
             >
               <Tooltip direction="top" offset={[0, -8]} opacity={1}>
@@ -310,10 +309,6 @@ export function StationsTerritoryMapLeaflet({
                       </p>
                     ) : null}
                   </div>
-                  <PopupAction
-                    label="Ver estacion"
-                    onClick={() => router.push(`/estaciones/${station.slug}`)}
-                  />
                   <SatelliteMapButton point={station} compact className="w-full" />
                 </div>
               </Popup>

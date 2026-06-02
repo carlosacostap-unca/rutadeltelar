@@ -3,6 +3,7 @@
 import { MapContainer, Marker, Popup, ScaleControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { SATELLITE_REFERENCE_MAX_ZOOM } from "@/app/lib/map-tile-layers";
 import { SatelliteReferenceTileLayers } from "@/components/satellite-reference-tile-layers";
 
 // Fix leaflet default icon
@@ -27,6 +28,7 @@ export default function StationDetailMapLeaflet({ lat, lng, label }: Props) {
     <MapContainer
       center={[lat, lng]}
       zoom={16}
+      maxZoom={SATELLITE_REFERENCE_MAX_ZOOM}
       style={{ height: "280px", width: "100%" }}
       scrollWheelZoom={false}
     >

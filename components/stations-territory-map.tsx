@@ -31,10 +31,6 @@ const StationsTerritoryMapLeaflet = dynamic(
   },
 );
 
-function formatMapLocation(value: string) {
-  return value.replace(/,\s*Catamarca\.?$/i, "");
-}
-
 function formatMapStationName(value: string) {
   return value.replace(/^Estaci[oó]n\s+/i, "");
 }
@@ -212,7 +208,7 @@ export function StationsTerritoryMap({
           stations={filteredStations}
           activeSlug={activeSlug}
           selectedSlug={effectiveSelectedSlug}
-          onSelectStation={onSelectStation}
+          onSelectStation={handleSelectStation}
           artisans={filteredArtisans}
           highlightSpots={filteredHighlightSpots}
           showStations={visibleLayers.stations}
@@ -238,15 +234,12 @@ export function StationsTerritoryMap({
               }`}
             >
               {station.department ? (
-                <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
+                <p className="text-[0.7rem] font-medium leading-none tracking-normal text-[#efd4b0]/75">
                   {station.department}
                 </p>
               ) : null}
               <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
                 {formatMapStationName(station.name)}
-              </p>
-              <p className="mt-1 text-xs font-medium leading-tight text-[#efd4b0]/75">
-                {formatMapLocation(station.locality)}
               </p>
             </button>
           );

@@ -36,6 +36,8 @@ type ResultItem = {
   datoDestacado?: string;
 };
 
+type SearchableValue = string | null | undefined | SearchableValue[];
+
 function normalize(s: string) {
   return s
     .toLowerCase()
@@ -43,9 +45,17 @@ function normalize(s: string) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-function matches(query: string, ...fields: (string | undefined)[]) {
+function flattenSearchValues(values: SearchableValue[]): string[] {
+  return values.flatMap((value): string[] => {
+    if (typeof value === "string") return [value];
+    if (Array.isArray(value)) return flattenSearchValues(value);
+    return [];
+  });
+}
+
+function matches(query: string, ...fields: SearchableValue[]) {
   const q = normalize(query);
-  return fields.some((f) => f && normalize(f).includes(q));
+  return flattenSearchValues(fields).some((field) => normalize(field).includes(q));
 }
 
 function buildGroups(data: SearchData, query: string): ResultGroup[] {
@@ -54,7 +64,19 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
   const groups: ResultGroup[] = [];
 
   const estaciones = data.stations
-    .filter((s) => matches(query, s.name, s.locality, s.slogan, s.department, s.datoDestacado))
+    .filter((s) =>
+      matches(
+        query,
+        s.name,
+        s.locality,
+        s.department,
+        s.slogan,
+        s.summary,
+        s.datoDestacado,
+        s.dato_destacado,
+        s.status,
+      ),
+    )
     .map((s): ResultItem => ({
       slug: s.slug,
       href: `/estaciones/${s.slug}`,
@@ -69,7 +91,42 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
     groups.push({ type: "estacion", label: "Estaciones", count: estaciones.length, items: estaciones });
 
   const actores = data.artisans
-    .filter((a) => matches(query, a.name, a.craft, a.actorType, a.place, a.datoDestacado))
+    .filter((a) =>
+      matches(
+        query,
+        a.name,
+        a.place,
+        a.craft,
+        a.actorType,
+        a.bio,
+        a.techniques,
+        a.years,
+        a.featuredPiece,
+        a.datoDestacado,
+        a.dato_destacado,
+        a.stationName,
+        a.contactPhone,
+        a.contactEmail,
+        a.address,
+        a.materials,
+        a.productosOfrecidos,
+        a.visitasDisponibles,
+        a.rubroProductivo,
+        a.escalaProduccion,
+        a.modalidadVenta,
+        a.tipoHospedaje,
+        a.capacidad,
+        a.servicios,
+        a.horarios,
+        a.tipoPropuesta,
+        a.especialidades,
+        a.platosDestacados,
+        a.idiomas,
+        a.recorridosOfrecidos,
+        a.zonaCobertura,
+        a.puntoEncuentro,
+      ),
+    )
     .map((a): ResultItem => ({
       slug: a.slug,
       href: `/artesanas/${a.slug}`,
@@ -84,7 +141,19 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
     groups.push({ type: "actor", label: "Actores", count: actores.length, items: actores });
 
   const prods = data.products
-    .filter((p) => matches(query, p.name, p.category, p.subcategory, p.description, p.datoDestacado, ...p.techniques))
+    .filter((p) =>
+      matches(
+        query,
+        p.name,
+        p.description,
+        p.category,
+        p.subcategory,
+        p.techniques,
+        p.datoDestacado,
+        p.dato_destacado,
+        p.stationName,
+      ),
+    )
     .map((p): ResultItem => ({
       slug: p.slug,
       href: `/productos/${p.slug}`,
@@ -99,7 +168,24 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
     groups.push({ type: "producto", label: "Productos", count: prods.length, items: prods });
 
   const exps = data.experiences
-    .filter((e) => matches(query, e.title, e.tag, e.location, e.description, e.datoDestacado))
+    .filter((e) =>
+      matches(
+        query,
+        e.title,
+        e.description,
+        e.tag,
+        e.duration,
+        e.location,
+        e.intensity,
+        e.summary,
+        e.datoDestacado,
+        e.dato_destacado,
+        e.includes,
+        e.stops,
+        e.stationName,
+        e.responsibleName,
+      ),
+    )
     .map((e): ResultItem => ({
       slug: e.slug,
       href: `/explorar/${e.slug}`,
@@ -114,7 +200,25 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
     groups.push({ type: "experiencia", label: "Experiencias", count: exps.length, items: exps });
 
   const spots = data.spots
-    .filter((s) => matches(query, s.title, s.subtitle, s.type, s.location, s.description, s.datoDestacado))
+    .filter((s) =>
+      matches(
+        query,
+        s.title,
+        s.subtitle,
+        s.description,
+        s.datoDestacado,
+        s.dato_destacado,
+        s.type,
+        s.location,
+        s.priority,
+        s.stationName,
+        s.horarios,
+        s.accesibilidad,
+        s.estacionalidad,
+        s.duracionSugerida,
+        s.recomendaciones,
+      ),
+    )
     .map((s): ResultItem => ({
       slug: s.slug,
       href: `/imperdibles/${s.slug}`,

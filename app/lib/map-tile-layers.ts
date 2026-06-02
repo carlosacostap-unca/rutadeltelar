@@ -5,6 +5,8 @@ export type MapTileLayerConfig = {
   opacity?: number;
 };
 
+export const SATELLITE_REFERENCE_MAX_ZOOM = 17;
+
 const ESRI_IMAGERY_ATTRIBUTION =
   "Tiles &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community";
 

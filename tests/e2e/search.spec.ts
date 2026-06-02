@@ -18,6 +18,15 @@ test.describe("global search", () => {
     await expect(page.locator('a[href="/estaciones/belen-catamarca"]')).toBeVisible();
   });
 
+  test("matches body text beyond titles", async ({ page }) => {
+    await page.goto("/buscar");
+
+    await page.getByRole("searchbox").fill("nuevas tejedoras");
+
+    await expect(page.getByRole("heading", { name: /Actores/i })).toBeVisible();
+    await expect(page.locator('a[href="/artesanas/juana-mamani"]')).toBeVisible();
+  });
+
   test("shows no-results state for unmatched terms", async ({ page }) => {
     await page.goto("/buscar");
 

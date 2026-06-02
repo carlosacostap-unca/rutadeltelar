@@ -1,7 +1,10 @@
 "use client";
 
 import { TileLayer } from "react-leaflet";
-import { SATELLITE_REFERENCE_TILE_LAYERS } from "@/app/lib/map-tile-layers";
+import {
+  SATELLITE_REFERENCE_MAX_ZOOM,
+  SATELLITE_REFERENCE_TILE_LAYERS,
+} from "@/app/lib/map-tile-layers";
 
 export function SatelliteReferenceTileLayers() {
   return (
@@ -13,6 +16,8 @@ export function SatelliteReferenceTileLayers() {
           opacity={layer.opacity}
           url={layer.url}
           zIndex={index + 1}
+          maxNativeZoom={SATELLITE_REFERENCE_MAX_ZOOM}
+          maxZoom={SATELLITE_REFERENCE_MAX_ZOOM}
         />
       ))}
     </>
