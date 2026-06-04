@@ -137,44 +137,6 @@ function RelatedCard({
   );
 }
 
-function EmptyRelatedSection({
-  eyebrow,
-  title,
-  href,
-  linkLabel,
-  message,
-}: {
-  eyebrow: string;
-  title: string;
-  href: string;
-  linkLabel: string;
-  message: string;
-}) {
-  return (
-    <section className="mb-12">
-      <div className="mb-5 flex items-end justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#efd4b0]">
-            {eyebrow}
-          </p>
-          <h2 className="display-font mt-1 text-2xl leading-tight text-[#f3d7b4]">
-            {title}
-          </h2>
-        </div>
-        <Link
-          href={href}
-          className="shrink-0 text-sm font-semibold text-[#efd4b0] transition hover:underline"
-        >
-          {linkLabel} -&gt;
-        </Link>
-      </div>
-      <div className="rounded-[1.35rem] border border-[#efd4b0]/25 bg-[#efd4b0]/10 px-5 py-4 text-[#efd4b0]">
-        <p className="text-sm font-semibold leading-6">{message}</p>
-      </div>
-    </section>
-  );
-}
-
 export default async function StationDetailPage({
   params,
 }: StationDetailPageProps) {
@@ -318,15 +280,7 @@ export default async function StationDetailPage({
               />
             ))}
           </HomeCarousel>
-        ) : (
-          <EmptyRelatedSection
-            eyebrow="Comunidad"
-            title="Actores en esta estacion"
-            href="/artesanas"
-            linkLabel="Ver todos"
-            message="Todavia no hay actores vinculados a esta estacion."
-          />
-        )}
+        ) : null}
 
         {products.length > 0 ? (
           <HomeCarousel
@@ -351,15 +305,7 @@ export default async function StationDetailPage({
               />
             ))}
           </HomeCarousel>
-        ) : (
-          <EmptyRelatedSection
-            eyebrow="Artesania"
-            title="Productos de la estacion"
-            href="/productos"
-            linkLabel="Ver todos"
-            message="Todavia no hay productos vinculados a esta estacion."
-          />
-        )}
+        ) : null}
 
         {experiences.length > 0 ? (
           <HomeCarousel
@@ -384,15 +330,7 @@ export default async function StationDetailPage({
               />
             ))}
           </HomeCarousel>
-        ) : (
-          <EmptyRelatedSection
-            eyebrow="Vivencias"
-            title="Experiencias disponibles"
-            href="/explorar"
-            linkLabel="Ver todas"
-            message="Todavia no hay experiencias vinculadas a esta estacion."
-          />
-        )}
+        ) : null}
 
         {highlightSpots.length > 0 ? (
           <HomeCarousel
@@ -416,15 +354,7 @@ export default async function StationDetailPage({
               />
             ))}
           </HomeCarousel>
-        ) : (
-          <EmptyRelatedSection
-            eyebrow="Destacados"
-            title="Imperdibles de la estacion"
-            href="/imperdibles"
-            linkLabel="Ver todos"
-            message="Todavia no hay imperdibles vinculados a esta estacion."
-          />
-        )}
+        ) : null}
       </div>
     </main>
   );
