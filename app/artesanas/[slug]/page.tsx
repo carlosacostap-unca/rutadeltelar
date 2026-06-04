@@ -1,7 +1,7 @@
-import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { formatBrandFontText } from "@/app/lib/brand-font-text";
 import { type Artisan } from "@/app/lib/content";
 import { getArtisanContextBySlug, getArtisans } from "@/app/lib/data";
 import { hasValidCoordinates } from "@/app/lib/geo";
@@ -13,10 +13,11 @@ import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
+import { MediaFallback } from "@/components/media-fallback";
+import { PbImage } from "@/components/pb-image";
 import { SatelliteMapButton } from "@/components/satellite-map-button";
 import { ShareButton } from "@/components/share-button";
 import { StationDetailMap } from "@/components/station-detail-map";
-import { SurfaceCard } from "@/components/surface-card";
 
 type ArtisanDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -50,10 +51,16 @@ export async function generateMetadata({
   });
 }
 
-// Helpers
+function normalizeLabel(value?: string) {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full bg-[color:var(--surface)] px-3 py-1 text-xs font-medium text-[color:var(--accent-strong)]">
+    <span className="rounded-full border border-[#123a55]/20 bg-[#123a55]/5 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
       {children}
     </span>
   );
@@ -61,116 +68,271 @@ function Tag({ children }: { children: React.ReactNode }) {
 
 function FichaRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5 border-b border-[color:var(--border)] py-3 last:border-0">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">{label}</p>
-      <p className="text-sm text-[color:var(--foreground)]">{value}</p>
+    <div className="flex flex-col gap-1 border-b border-[#123a55]/15 py-3 last:border-0">
+      <p className="text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+        {label}
+      </p>
+      <p className="text-sm font-medium leading-6 text-[#123a55]">{value}</p>
     </div>
   );
 }
 
+function FichaPanel({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55] shadow-sm sm:p-7">
+      <p className="text-sm font-black uppercase leading-none tracking-normal text-[#123a55]">
+        Ficha
+      </p>
+      <h2 className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
+        {title}
+      </h2>
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
 function ActorFicha({ actor }: { actor: Artisan }) {
-  const type = (actor.actorType ?? "").toLowerCase();
+  const type = normalizeLabel(actor.actorType);
 
   if (type.includes("artesan")) {
     return (
-      <SurfaceCard className="soft-shadow">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">Ficha · Artesano/a</p>
-        {actor.techniques.length > 0 && (
+      <FichaPanel title="Artesano/a">
+        {actor.techniques.length > 0 ? (
           <div className="mb-4">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Técnicas</p>
-            <div className="flex flex-wrap gap-2">{actor.techniques.map((t) => <Tag key={t}>{t}</Tag>)}</div>
+            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+              Tecnicas
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {actor.techniques.map((technique) => (
+                <Tag key={technique}>{technique}</Tag>
+              ))}
+            </div>
           </div>
-        )}
-        {actor.materials && actor.materials.length > 0 && (
+        ) : null}
+        {actor.materials && actor.materials.length > 0 ? (
           <div className="mb-4">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Materiales</p>
-            <div className="flex flex-wrap gap-2">{actor.materials.map((m) => <Tag key={m}>{m}</Tag>)}</div>
+            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+              Materiales
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {actor.materials.map((material) => (
+                <Tag key={material}>{material}</Tag>
+              ))}
+            </div>
           </div>
-        )}
-        {actor.visitasDisponibles && <FichaRow label="Visitas / demostraciones" value={actor.visitasDisponibles} />}
-        {actor.productosOfrecidos && actor.productosOfrecidos.length > 0 && (
+        ) : null}
+        {actor.visitasDisponibles ? (
+          <FichaRow label="Visitas / demostraciones" value={actor.visitasDisponibles} />
+        ) : null}
+        {actor.productosOfrecidos && actor.productosOfrecidos.length > 0 ? (
           <div className="pt-3">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Productos ofrecidos</p>
-            <div className="flex flex-wrap gap-2">{actor.productosOfrecidos.map((p) => <Tag key={p}>{p}</Tag>)}</div>
+            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+              Productos ofrecidos
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {actor.productosOfrecidos.map((product) => (
+                <Tag key={product}>{product}</Tag>
+              ))}
+            </div>
           </div>
-        )}
-      </SurfaceCard>
+        ) : null}
+      </FichaPanel>
     );
   }
 
   if (type.includes("productor")) {
     return (
-      <SurfaceCard className="soft-shadow">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">Ficha · Productor/a</p>
-        {actor.rubroProductivo && <FichaRow label="Rubro" value={actor.rubroProductivo} />}
-        {actor.escalaProduccion && <FichaRow label="Escala de producción" value={actor.escalaProduccion} />}
-        {actor.modalidadVenta && <FichaRow label="Modalidad de venta" value={actor.modalidadVenta} />}
-        {actor.visitasDisponibles && <FichaRow label="Visitas / demostraciones" value={actor.visitasDisponibles} />}
-        {actor.productosOfrecidos && actor.productosOfrecidos.length > 0 && (
+      <FichaPanel title="Productor/a">
+        {actor.rubroProductivo ? <FichaRow label="Rubro" value={actor.rubroProductivo} /> : null}
+        {actor.escalaProduccion ? (
+          <FichaRow label="Escala de produccion" value={actor.escalaProduccion} />
+        ) : null}
+        {actor.modalidadVenta ? (
+          <FichaRow label="Modalidad de venta" value={actor.modalidadVenta} />
+        ) : null}
+        {actor.visitasDisponibles ? (
+          <FichaRow label="Visitas / demostraciones" value={actor.visitasDisponibles} />
+        ) : null}
+        {actor.productosOfrecidos && actor.productosOfrecidos.length > 0 ? (
           <div className="pt-3">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Productos ofrecidos</p>
-            <div className="flex flex-wrap gap-2">{actor.productosOfrecidos.map((p) => <Tag key={p}>{p}</Tag>)}</div>
+            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+              Productos ofrecidos
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {actor.productosOfrecidos.map((product) => (
+                <Tag key={product}>{product}</Tag>
+              ))}
+            </div>
           </div>
-        )}
-      </SurfaceCard>
+        ) : null}
+      </FichaPanel>
     );
   }
 
   if (type.includes("hospedaje")) {
     return (
-      <SurfaceCard className="soft-shadow">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">Ficha · Hospedaje</p>
-        {actor.tipoHospedaje && <FichaRow label="Tipo" value={actor.tipoHospedaje} />}
-        {actor.capacidad && <FichaRow label="Capacidad" value={actor.capacidad} />}
-        {actor.servicios && <FichaRow label="Servicios" value={actor.servicios} />}
-        {actor.horarios && <FichaRow label="Horarios" value={actor.horarios} />}
-      </SurfaceCard>
+      <FichaPanel title="Hospedaje">
+        {actor.tipoHospedaje ? <FichaRow label="Tipo" value={actor.tipoHospedaje} /> : null}
+        {actor.capacidad ? <FichaRow label="Capacidad" value={actor.capacidad} /> : null}
+        {actor.servicios ? <FichaRow label="Servicios" value={actor.servicios} /> : null}
+        {actor.horarios ? <FichaRow label="Horarios" value={actor.horarios} /> : null}
+      </FichaPanel>
     );
   }
 
   if (type.includes("gastron")) {
     return (
-      <SurfaceCard className="soft-shadow">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">Ficha · Gastronómico</p>
-        {actor.tipoPropuesta && <FichaRow label="Propuesta" value={actor.tipoPropuesta} />}
-        {actor.especialidades && <FichaRow label="Especialidades" value={actor.especialidades} />}
-        {actor.platosDestacados && <FichaRow label="Platos destacados" value={actor.platosDestacados} />}
-        {actor.modalidadVenta && <FichaRow label="Modalidad de servicio" value={actor.modalidadVenta} />}
-        {actor.horarios && <FichaRow label="Horarios" value={actor.horarios} />}
-      </SurfaceCard>
+      <FichaPanel title="Gastronomico">
+        {actor.tipoPropuesta ? <FichaRow label="Propuesta" value={actor.tipoPropuesta} /> : null}
+        {actor.especialidades ? (
+          <FichaRow label="Especialidades" value={actor.especialidades} />
+        ) : null}
+        {actor.platosDestacados ? (
+          <FichaRow label="Platos destacados" value={actor.platosDestacados} />
+        ) : null}
+        {actor.modalidadVenta ? (
+          <FichaRow label="Modalidad de servicio" value={actor.modalidadVenta} />
+        ) : null}
+        {actor.horarios ? <FichaRow label="Horarios" value={actor.horarios} /> : null}
+      </FichaPanel>
     );
   }
 
-  if (type.includes("guía") || type.includes("guia")) {
+  if (type.includes("guia")) {
     return (
-      <SurfaceCard className="soft-shadow">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">Ficha · Guía</p>
-        {actor.especialidades && <FichaRow label="Especialidad" value={actor.especialidades} />}
-        {actor.idiomas && actor.idiomas.length > 0 && (
-          <div className="border-b border-[color:var(--border)] py-3">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">Idiomas</p>
-            <div className="flex flex-wrap gap-2">{actor.idiomas.map((l) => <Tag key={l}>{l}</Tag>)}</div>
+      <FichaPanel title="Guia">
+        {actor.especialidades ? (
+          <FichaRow label="Especialidad" value={actor.especialidades} />
+        ) : null}
+        {actor.idiomas && actor.idiomas.length > 0 ? (
+          <div className="border-b border-[#123a55]/15 py-3">
+            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+              Idiomas
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {actor.idiomas.map((language) => (
+                <Tag key={language}>{language}</Tag>
+              ))}
+            </div>
           </div>
-        )}
-        {actor.recorridosOfrecidos && <FichaRow label="Recorridos" value={actor.recorridosOfrecidos} />}
-        {actor.zonaCobertura && <FichaRow label="Zona de cobertura" value={actor.zonaCobertura} />}
-        {actor.puntoEncuentro && <FichaRow label="Punto de encuentro" value={actor.puntoEncuentro} />}
-        {actor.horarios && <FichaRow label="Horarios" value={actor.horarios} />}
-      </SurfaceCard>
+        ) : null}
+        {actor.recorridosOfrecidos ? (
+          <FichaRow label="Recorridos" value={actor.recorridosOfrecidos} />
+        ) : null}
+        {actor.zonaCobertura ? (
+          <FichaRow label="Zona de cobertura" value={actor.zonaCobertura} />
+        ) : null}
+        {actor.puntoEncuentro ? (
+          <FichaRow label="Punto de encuentro" value={actor.puntoEncuentro} />
+        ) : null}
+        {actor.horarios ? <FichaRow label="Horarios" value={actor.horarios} /> : null}
+      </FichaPanel>
     );
   }
 
-  // Fallback: show techniques if any
   if (actor.techniques.length > 0) {
     return (
-      <SurfaceCard className="soft-shadow">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">Ficha</p>
-        <div className="flex flex-wrap gap-2">{actor.techniques.map((t) => <Tag key={t}>{t}</Tag>)}</div>
-      </SurfaceCard>
+      <FichaPanel title="Datos del actor">
+        <div className="flex flex-wrap gap-2">
+          {actor.techniques.map((technique) => (
+            <Tag key={technique}>{technique}</Tag>
+          ))}
+        </div>
+      </FichaPanel>
     );
   }
 
   return null;
+}
+
+function DetailActionLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex rounded-full border border-[#efd4b0]/35 px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function RelatedCard({
+  href,
+  eyebrow,
+  title,
+  subtitle,
+  imageUrl,
+  imageAlt,
+  imageFocus,
+  fallbackLabel,
+  datoDestacado,
+}: {
+  href: string;
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  imageUrl?: string;
+  imageAlt: string;
+  imageFocus?: Parameters<typeof getImageFocusStyle>[0];
+  fallbackLabel: string;
+  datoDestacado?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group w-[230px] shrink-0 [scroll-snap-align:start]"
+    >
+      <article className="h-full overflow-hidden rounded-[1.35rem] bg-[#efd4b0] text-[#123a55] transition duration-200 group-hover:-translate-y-1">
+        <div className="relative aspect-[1.12] w-full overflow-hidden bg-[#123a55]/10">
+          {imageUrl ? (
+            <PbImage
+              src={withPocketBaseImageThumb(imageUrl, "thumbnail")}
+              alt={imageAlt}
+              fill
+              className="object-cover transition duration-500 group-hover:scale-[1.04]"
+              sizes="230px"
+              style={getImageFocusStyle(imageFocus)}
+              fallback={<MediaFallback label={fallbackLabel} />}
+            />
+          ) : (
+            <MediaFallback label={fallbackLabel} />
+          )}
+        </div>
+        <div className="p-4">
+          {eyebrow ? (
+            <p className="text-[0.68rem] font-medium uppercase leading-none tracking-normal text-[#123a55]/75">
+              {eyebrow}
+            </p>
+          ) : null}
+          <h3 className="mt-1 text-lg font-black leading-[0.95] tracking-normal text-[#082d49]">
+            {title}
+          </h3>
+          {subtitle ? (
+            <p className="mt-2 line-clamp-2 text-xs font-medium leading-4 text-[#123a55]/75">
+              {subtitle}
+            </p>
+          ) : null}
+          <HighlightedData
+            value={datoDestacado}
+            compact
+            className="mt-3 border-[#123a55]/20 bg-[#123a55]/5"
+          />
+        </div>
+      </article>
+    </Link>
+  );
 }
 
 export default async function ArtisanDetailPage({ params }: ArtisanDetailPageProps) {
@@ -181,7 +343,13 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
     notFound();
   }
 
-  const { artisan, relatedExperiences, relatedHighlightSpots, relatedStation, relatedProducts } = context;
+  const {
+    artisan,
+    relatedExperiences,
+    relatedHighlightSpots,
+    relatedStation,
+    relatedProducts,
+  } = context;
   const galleryImages: FocusedImage[] =
     artisan.galleryImages ?? artisan.galleryUrls?.map((url) => ({ url })) ?? [];
   const hasContact =
@@ -195,35 +363,77 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
     relatedStation?.name ?? artisan.stationName ?? artisan.place;
 
   return (
-    <main className="flex flex-1 flex-col">
-      {/* Back + Compartir */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href="/artesanas"
-          className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
-        >
-          ← Actores
-        </Link>
-        <div className="flex items-center gap-2">
-          <FavoriteButton
-            item={{
-              type: "actor",
-              slug: artisan.slug,
-              title: artisan.name,
-              subtitle: artisan.craft,
-              href: `/artesanas/${artisan.slug}`,
-              imageUrl: artisan.imageUrl,
-              imageFocus: artisan.imageFocus,
-              datoDestacado: artisan.datoDestacado,
-            }}
-          />
-          <ShareButton title={artisan.name} text={artisan.craft} />
+    <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+          <DetailActionLink href="/artesanas">Volver a actores</DetailActionLink>
+          <div className="flex flex-wrap items-center gap-2">
+            <FavoriteButton
+              variant="onDark"
+              item={{
+                type: "actor",
+                slug: artisan.slug,
+                title: artisan.name,
+                subtitle: artisan.craft,
+                href: `/artesanas/${artisan.slug}`,
+                imageUrl: artisan.imageUrl,
+                imageFocus: artisan.imageFocus,
+                datoDestacado: artisan.datoDestacado,
+              }}
+            />
+            <ShareButton
+              title={artisan.name}
+              text={artisan.craft}
+              variant="onDark"
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Hero gallery */}
-      <section className="mb-10">
-        <div className="relative">
+        <section className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:items-start">
+          <div className="min-w-0 pt-1">
+            <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
+              Actores
+            </p>
+            <h1 className="brand-font mt-1 max-w-full break-words text-[2.65rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] [overflow-wrap:anywhere] sm:text-[3.35rem] md:text-[4.35rem]">
+              {formatBrandFontText(artisan.name)}
+            </h1>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {artisan.actorType ? (
+                <span className="rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+                  {artisan.actorType}
+                </span>
+              ) : null}
+              {locationLabel ? (
+                <span className="rounded-full bg-[#efd4b0] px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
+                  {locationLabel}
+                </span>
+              ) : null}
+            </div>
+            {artisan.craft ? (
+              <p className="mt-5 text-lg font-black leading-tight text-white">
+                {artisan.craft}
+              </p>
+            ) : null}
+            {relatedStation ? (
+              <Link
+                href={`/estaciones/${relatedStation.slug}`}
+                className="mt-3 inline-flex rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+              >
+                Ver estacion
+              </Link>
+            ) : null}
+            {artisan.bio ? (
+              <p className="mt-4 w-full text-justify text-base font-medium leading-7 text-white/85">
+                {artisan.bio}
+              </p>
+            ) : null}
+            <HighlightedData
+              value={artisan.datoDestacado}
+              variant="onDark"
+              className="mt-5 max-w-xl"
+            />
+          </div>
+
           <DetailMediaGallery
             title={artisan.name}
             fallbackLabel="Actor"
@@ -231,50 +441,21 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
             galleryUrls={artisan.galleryUrls}
             coverFocus={artisan.imageFocus}
             galleryImages={galleryImages}
+            coverClassName="aspect-[1.12] rounded-[1.85rem] border-[#efd4b0]/25"
+            coverSizes="(max-width: 1024px) 100vw, 56vw"
+            thumbnailClassName="aspect-[4/3] w-[180px] rounded-[1.1rem] border-[#efd4b0]/25"
           />
-          {artisan.actorType ? (
-            <span className="absolute left-4 top-4 rounded-full bg-[color:var(--accent)] px-3 py-1 text-xs font-semibold text-white shadow">
-              {artisan.actorType}
-            </span>
-          ) : null}
-        </div>
-      </section>
+        </section>
 
-      {/* Titulo y descripcion */}
-      <section className="mb-10">
-        <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-          {artisan.actorType ? `${artisan.actorType} · ` : ""}{locationLabel}
-        </p>
-        <h1 className="display-font mt-2 text-4xl leading-tight text-[color:var(--foreground)] sm:text-5xl">
-          {artisan.name}
-        </h1>
-        <p className="mt-2 text-base font-medium italic text-[color:var(--accent)]">
-          {artisan.craft}
-        </p>
-        {relatedStation ? (
-          <Link
-            href={`/estaciones/${relatedStation.slug}`}
-            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--accent)] transition hover:underline"
-          >
-            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" />
-            </svg>
-            {relatedStation.name}
-          </Link>
-        ) : null}
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--text-muted)]">
-          {artisan.bio}
-        </p>
-        <HighlightedData value={artisan.datoDestacado} className="mt-5 max-w-2xl" />
-      </section>
-
-      {hasContact ? (
-        <section className="mb-10">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-            Contacto
-          </h2>
-          <SurfaceCard>
-            <div className="[&>div]:mt-0">
+        {hasContact ? (
+          <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55] shadow-sm sm:p-7">
+            <p className="text-sm font-black uppercase leading-none tracking-normal text-[#123a55]">
+              Contacto
+            </p>
+            <h2 className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
+              Datos para coordinar
+            </h2>
+            <div className="mt-4 [&>div]:mt-0">
               <ContactButtons
                 phone={artisan.contactPhone}
                 email={artisan.contactEmail}
@@ -285,171 +466,130 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
                 pagina_web_url={artisan.pagina_web_url}
               />
             </div>
-          </SurfaceCard>
-        </section>
-      ) : null}
+          </section>
+        ) : null}
 
-      {hasValidCoordinates(artisan) ? (
-        <section className="mb-10">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-            Ubicación
-          </h2>
-          <div className="overflow-hidden rounded-3xl border border-[color:var(--border)]">
-            <StationDetailMap lat={artisan.latitude} lng={artisan.longitude} label={artisan.name} />
-          </div>
-        </section>
-      ) : null}
-
-      {/* Ficha por subtipo */}
-      <section className="mb-10">
-        <ActorFicha actor={artisan} />
-      </section>
-
-      {/* Como llegar */}
-      <section className="mb-10">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--text-muted)]">
-          Cómo llegar
-        </h2>
-        <SurfaceCard>
-          {hasValidCoordinates(artisan) ? (
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {hasValidCoordinates(artisan) ? (
+          <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-4 text-[#123a55] shadow-sm sm:p-6">
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
               <div>
-                <p className="text-xs text-[color:var(--text-muted)]">Coordenadas</p>
-                <p className="mt-1 font-mono text-sm font-semibold text-[color:var(--foreground)]">
-                  {artisan.latitude.toFixed(5)}, {artisan.longitude.toFixed(5)}
+                <p className="text-sm font-black uppercase leading-none tracking-normal text-[#123a55]">
+                  Ubicacion
                 </p>
-                <p className="mt-1 text-xs text-[color:var(--text-muted)]">
-                  {artisan.address ?? locationLabel}
-                </p>
+                <h2 className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
+                  Como llegar
+                </h2>
               </div>
               <SatelliteMapButton point={artisan} />
             </div>
-          ) : (
-            <div>
-              <p className="text-sm text-[color:var(--text-muted)]">
-                Coordenadas no disponibles aún.
-                {artisan.address ? ` Referencia: ${artisan.address}.` : ""}
-              </p>
-              {artisan.address ? (
-                <div className="mt-4 [&>div]:mt-0">
-                  <ContactButtons
-                    phone={undefined}
-                    email={undefined}
-                    address={artisan.address}
-                    mapPoint={undefined}
-                  />
-                </div>
-              ) : null}
+            <div className="overflow-hidden rounded-[1.35rem] border border-[#123a55]/20 shadow-sm">
+              <StationDetailMap
+                lat={artisan.latitude}
+                lng={artisan.longitude}
+                label={artisan.name}
+              />
             </div>
-          )}
-        </SurfaceCard>
-      </section>
+            {artisan.address ? (
+              <p className="mt-3 text-sm font-medium leading-6 text-[#123a55]/75">
+                {artisan.address}
+              </p>
+            ) : null}
+          </section>
+        ) : (
+          <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55]">
+            <p className="text-sm font-black uppercase leading-none tracking-normal">
+              Ubicacion
+            </p>
+            <p className="mt-2 text-sm font-medium">
+              Coordenadas no disponibles aun.
+              {artisan.address ? ` Referencia: ${artisan.address}.` : ""}
+            </p>
+            {artisan.address ? (
+              <div className="mt-4 [&>div]:mt-0">
+                <ContactButtons
+                  address={artisan.address}
+                />
+              </div>
+            ) : null}
+          </section>
+        )}
 
-      {/* Productos de este actor */}
-      {relatedProducts.length > 0 && (
-        <HomeCarousel eyebrow="Artesanía" title="Productos de este actor" href="/productos" verTodosLabel="Ver todos">
-          {relatedProducts.map((product) => (
-            <Link
-              key={product.slug}
-              href={`/productos/${product.slug}`}
-              className="group w-[200px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="!p-0 h-full overflow-hidden transition group-hover:border-[color:var(--accent)]">
-                {product.imageUrl ? (
-                  <div className="relative aspect-square w-full overflow-hidden">
-                    <Image
-                      src={withPocketBaseImageThumb(product.imageUrl, "thumbnail")}
-                      alt={product.name}
-                      fill
-                      className="object-cover transition group-hover:scale-[1.03]"
-                      sizes="200px"
-                      style={getImageFocusStyle(product.imageFocus)}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex aspect-square items-center justify-center bg-[color:var(--surface)] text-3xl">🧵</div>
-                )}
-                <div className="p-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{product.subcategory ?? product.category}</p>
-                  <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)] line-clamp-2">{product.name}</h3>
-                  <HighlightedData value={product.datoDestacado} compact className="mt-3" />
-                </div>
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
+        <ActorFicha actor={artisan} />
 
-      {/* Imperdibles relacionados */}
-      {relatedHighlightSpots.length > 0 && (
-        <HomeCarousel eyebrow="Destacados" title="Imperdibles relacionados" href="/imperdibles">
-          {relatedHighlightSpots.map((spot) => (
-            <Link
-              key={spot.slug}
-              href={`/imperdibles/${spot.slug}`}
-              className="group w-[240px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
-                {spot.imageUrl ? (
-                  <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
-                    <Image
-                      src={withPocketBaseImageThumb(spot.imageUrl, "thumbnail")}
-                      alt={spot.title}
-                      fill
-                      className="object-cover transition group-hover:scale-[1.03]"
-                      sizes="240px"
-                      style={getImageFocusStyle(spot.imageFocus)}
-                    />
-                  </div>
-                ) : (
-                  <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">⭐</div>
-                )}
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">{spot.type}</p>
-                <h3 className="mt-1 text-sm font-semibold leading-snug text-[color:var(--foreground)]">{spot.title}</h3>
-                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{spot.subtitle}</p>
-                <HighlightedData value={spot.datoDestacado} compact className="mt-3" />
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
+        {relatedProducts.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Artesania"
+            title="Productos de este actor"
+            href="/productos"
+            verTodosLabel="Ver todos"
+            variant="onDark"
+          >
+            {relatedProducts.map((product) => (
+              <RelatedCard
+                key={product.slug}
+                href={`/productos/${product.slug}`}
+                eyebrow={product.subcategory ?? product.category}
+                title={product.name}
+                subtitle={product.description}
+                imageUrl={product.imageUrl}
+                imageAlt={product.name}
+                imageFocus={product.imageFocus}
+                fallbackLabel="Producto"
+                datoDestacado={product.datoDestacado}
+              />
+            ))}
+          </HomeCarousel>
+        ) : null}
 
-      {/* Experiencias relacionadas */}
-      {relatedExperiences.length > 0 && (
-        <HomeCarousel eyebrow="Vivencias" title="Experiencias relacionadas" href="/explorar" verTodosLabel="Ver todas">
-          {relatedExperiences.map((exp) => (
-            <Link
-              key={exp.slug}
-              href={`/explorar/${exp.slug}`}
-              className="group w-[260px] shrink-0 [scroll-snap-align:start]"
-            >
-              <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
-                {exp.imageUrl ? (
-                  <div className="relative mb-3 aspect-[3/2] overflow-hidden rounded-xl">
-                    <Image
-                      src={withPocketBaseImageThumb(exp.imageUrl, "thumbnail")}
-                      alt={exp.title}
-                      fill
-                      className="object-cover transition group-hover:scale-[1.03]"
-                      sizes="260px"
-                      style={getImageFocusStyle(exp.imageFocus)}
-                    />
-                  </div>
-                ) : (
-                  <div className="mb-3 flex aspect-[3/2] items-center justify-center rounded-xl bg-[color:var(--surface)] text-3xl">🧭</div>
-                )}
-                <div className="mb-2 flex gap-2">
-                  <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] font-semibold text-[color:var(--accent-mid)]">{exp.tag}</span>
-                  <span className="rounded-full bg-[color:var(--surface)] px-2.5 py-0.5 text-[10px] text-[color:var(--text-muted)]">{exp.duration}</span>
-                </div>
-                <h3 className="text-sm font-semibold leading-snug text-[color:var(--foreground)]">{exp.title}</h3>
-                <p className="mt-0.5 text-xs text-[color:var(--text-muted)] line-clamp-2">{exp.description}</p>
-                <HighlightedData value={exp.datoDestacado} compact className="mt-3" />
-              </SurfaceCard>
-            </Link>
-          ))}
-        </HomeCarousel>
-      )}
+        {relatedHighlightSpots.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Destacados"
+            title="Imperdibles relacionados"
+            href="/imperdibles"
+            variant="onDark"
+          >
+            {relatedHighlightSpots.map((spot) => (
+              <RelatedCard
+                key={spot.slug}
+                href={`/imperdibles/${spot.slug}`}
+                eyebrow={spot.type}
+                title={spot.title}
+                subtitle={spot.subtitle}
+                imageUrl={spot.imageUrl}
+                imageAlt={spot.title}
+                imageFocus={spot.imageFocus}
+                fallbackLabel="Imperdible"
+                datoDestacado={spot.datoDestacado}
+              />
+            ))}
+          </HomeCarousel>
+        ) : null}
+
+        {relatedExperiences.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Vivencias"
+            title="Experiencias relacionadas"
+            href="/explorar"
+            verTodosLabel="Ver todas"
+            variant="onDark"
+          >
+            {relatedExperiences.map((experience) => (
+              <RelatedCard
+                key={experience.slug}
+                href={`/explorar/${experience.slug}`}
+                eyebrow={`${experience.tag} - ${experience.duration}`}
+                title={experience.title}
+                subtitle={experience.description}
+                imageUrl={experience.imageUrl}
+                imageAlt={experience.title}
+                imageFocus={experience.imageFocus}
+                fallbackLabel="Experiencia"
+                datoDestacado={experience.datoDestacado}
+              />
+            ))}
+          </HomeCarousel>
+        ) : null}
+      </div>
     </main>
   );
 }

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,6 +12,7 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
 import { MediaFallback } from "@/components/media-fallback";
+import { PbImage } from "@/components/pb-image";
 import { SatelliteMapButton } from "@/components/satellite-map-button";
 import { ShareButton } from "@/components/share-button";
 import { StationDetailMap } from "@/components/station-detail-map";
@@ -99,13 +99,14 @@ function RelatedCard({
       <article className="h-full overflow-hidden rounded-[1.35rem] bg-[#efd4b0] text-[#123a55] transition duration-200 group-hover:-translate-y-1">
         <div className="relative aspect-[1.12] w-full overflow-hidden bg-[#123a55]/10">
           {imageUrl ? (
-            <Image
+            <PbImage
               src={withPocketBaseImageThumb(imageUrl, "thumbnail")}
               alt={imageAlt}
               fill
               className="object-cover transition duration-500 group-hover:scale-[1.04]"
               sizes="230px"
               style={getImageFocusStyle(imageFocus)}
+              fallback={<MediaFallback label={fallbackLabel} />}
             />
           ) : (
             <MediaFallback label={fallbackLabel} />
@@ -133,6 +134,44 @@ function RelatedCard({
         </div>
       </article>
     </Link>
+  );
+}
+
+function EmptyRelatedSection({
+  eyebrow,
+  title,
+  href,
+  linkLabel,
+  message,
+}: {
+  eyebrow: string;
+  title: string;
+  href: string;
+  linkLabel: string;
+  message: string;
+}) {
+  return (
+    <section className="mb-12">
+      <div className="mb-5 flex items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#efd4b0]">
+            {eyebrow}
+          </p>
+          <h2 className="display-font mt-1 text-2xl leading-tight text-[#f3d7b4]">
+            {title}
+          </h2>
+        </div>
+        <Link
+          href={href}
+          className="shrink-0 text-sm font-semibold text-[#efd4b0] transition hover:underline"
+        >
+          {linkLabel} -&gt;
+        </Link>
+      </div>
+      <div className="rounded-[1.35rem] border border-[#efd4b0]/25 bg-[#efd4b0]/10 px-5 py-4 text-[#efd4b0]">
+        <p className="text-sm font-semibold leading-6">{message}</p>
+      </div>
+    </section>
   );
 }
 
@@ -176,12 +215,12 @@ export default async function StationDetailPage({
           </div>
         </div>
 
-        <section className="mb-12 grid gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:items-start">
-          <div className="pt-1">
+        <section className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:items-start">
+          <div className="min-w-0 pt-1">
             <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
               Estaciones
             </p>
-            <h1 className="brand-font mt-1 text-[2.65rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] sm:text-[3.35rem] md:text-[4.35rem]">
+            <h1 className="brand-font mt-1 max-w-full break-words text-[2.65rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] [overflow-wrap:anywhere] sm:text-[3.35rem] md:text-[4.35rem]">
               {formatBrandFontText(stationTitle)}
             </h1>
             <div className="mt-5 flex flex-wrap gap-2">
@@ -206,7 +245,8 @@ export default async function StationDetailPage({
             </p>
             <HighlightedData
               value={station.datoDestacado}
-              className="mt-5 max-w-xl border-[#efd4b0]/25 bg-[#efd4b0]/10 text-[#efd4b0]"
+              variant="onDark"
+              className="mt-5 max-w-xl"
             />
           </div>
 
@@ -243,14 +283,6 @@ export default async function StationDetailPage({
                 label={station.name}
               />
             </div>
-            <div className="mt-4 rounded-[1.15rem] bg-[#123a55] px-4 py-3 text-[#efd4b0]">
-              <p className="text-[0.7rem] font-medium leading-none tracking-normal text-[#efd4b0]/75">
-                Coordenadas
-              </p>
-              <p className="mt-1 font-mono text-sm font-semibold">
-                {station.latitude.toFixed(5)}, {station.longitude.toFixed(5)}
-              </p>
-            </div>
           </section>
         ) : (
           <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55]">
@@ -286,7 +318,15 @@ export default async function StationDetailPage({
               />
             ))}
           </HomeCarousel>
-        ) : null}
+        ) : (
+          <EmptyRelatedSection
+            eyebrow="Comunidad"
+            title="Actores en esta estacion"
+            href="/artesanas"
+            linkLabel="Ver todos"
+            message="Todavia no hay actores vinculados a esta estacion."
+          />
+        )}
 
         {products.length > 0 ? (
           <HomeCarousel
@@ -311,7 +351,15 @@ export default async function StationDetailPage({
               />
             ))}
           </HomeCarousel>
-        ) : null}
+        ) : (
+          <EmptyRelatedSection
+            eyebrow="Artesania"
+            title="Productos de la estacion"
+            href="/productos"
+            linkLabel="Ver todos"
+            message="Todavia no hay productos vinculados a esta estacion."
+          />
+        )}
 
         {experiences.length > 0 ? (
           <HomeCarousel
@@ -336,7 +384,15 @@ export default async function StationDetailPage({
               />
             ))}
           </HomeCarousel>
-        ) : null}
+        ) : (
+          <EmptyRelatedSection
+            eyebrow="Vivencias"
+            title="Experiencias disponibles"
+            href="/explorar"
+            linkLabel="Ver todas"
+            message="Todavia no hay experiencias vinculadas a esta estacion."
+          />
+        )}
 
         {highlightSpots.length > 0 ? (
           <HomeCarousel
@@ -360,7 +416,15 @@ export default async function StationDetailPage({
               />
             ))}
           </HomeCarousel>
-        ) : null}
+        ) : (
+          <EmptyRelatedSection
+            eyebrow="Destacados"
+            title="Imperdibles de la estacion"
+            href="/imperdibles"
+            linkLabel="Ver todos"
+            message="Todavia no hay imperdibles vinculados a esta estacion."
+          />
+        )}
       </div>
     </main>
   );

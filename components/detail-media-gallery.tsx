@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getImageFocusStyle, type FocusedImage, type ImageFocus } from "@/app/lib/image-focus";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { ImageLightbox, type LightboxImage } from "@/components/image-lightbox";
@@ -70,6 +70,10 @@ export function DetailMediaGallery({
   thumbnailClassName = "aspect-[4/3] w-[220px]",
 }: DetailMediaGalleryProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [thumbnailScrollState, setThumbnailScrollState] = useState({
+    canScrollLeft: false,
+    canScrollRight: false,
+  });
   const thumbnailScrollRef = useRef<HTMLDivElement>(null);
   const images: FocusedImage[] = useMemo(
     () => galleryImages ?? galleryUrls.map((url) => ({ url })),
@@ -95,6 +99,57 @@ export function DetailMediaGallery({
     [coverUrl, images, title],
   );
   const galleryIndexOffset = coverUrl ? 1 : 0;
+  const updateThumbnailScrollState = useCallback(() => {
+    const scrollContainer = thumbnailScrollRef.current;
+
+    if (!scrollContainer) {
+      setThumbnailScrollState({
+        canScrollLeft: false,
+        canScrollRight: false,
+      });
+      return;
+    }
+
+    const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+    const nextScrollState = {
+      canScrollLeft: scrollContainer.scrollLeft > 1,
+      canScrollRight: scrollContainer.scrollLeft < maxScrollLeft - 1,
+    };
+
+    setThumbnailScrollState((currentScrollState) =>
+      currentScrollState.canScrollLeft === nextScrollState.canScrollLeft &&
+      currentScrollState.canScrollRight === nextScrollState.canScrollRight
+        ? currentScrollState
+        : nextScrollState,
+    );
+  }, []);
+
+  useEffect(() => {
+    const scrollContainer = thumbnailScrollRef.current;
+
+    if (!scrollContainer) {
+      updateThumbnailScrollState();
+      return;
+    }
+
+    updateThumbnailScrollState();
+    scrollContainer.addEventListener("scroll", updateThumbnailScrollState, { passive: true });
+    window.addEventListener("resize", updateThumbnailScrollState);
+
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(updateThumbnailScrollState)
+        : null;
+
+    resizeObserver?.observe(scrollContainer);
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", updateThumbnailScrollState);
+      window.removeEventListener("resize", updateThumbnailScrollState);
+      resizeObserver?.disconnect();
+    };
+  }, [thumbnailImages.length, thumbnailClassName, updateThumbnailScrollState]);
+
   const scrollThumbnails = (direction: "left" | "right") => {
     thumbnailScrollRef.current?.scrollBy({
       left: direction === "left" ? -260 : 260,
@@ -130,7 +185,7 @@ export function DetailMediaGallery({
 
       {thumbnailImages.length > 0 && (
         <div className="relative">
-          {thumbnailImages.length > 1 ? (
+          {thumbnailScrollState.canScrollLeft ? (
             <ScrollArrow direction="left" onClick={() => scrollThumbnails("left")} />
           ) : null}
           <div
@@ -157,7 +212,7 @@ export function DetailMediaGallery({
               </button>
             ))}
           </div>
-          {thumbnailImages.length > 1 ? (
+          {thumbnailScrollState.canScrollRight ? (
             <ScrollArrow direction="right" onClick={() => scrollThumbnails("right")} />
           ) : null}
         </div>
