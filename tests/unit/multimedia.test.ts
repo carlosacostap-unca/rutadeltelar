@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   getEntityCoverImage,
+  getEntityCoverImageRef,
   getEntityGalleryImages,
+  getEntityGalleryImageRefs,
 } from "../../app/lib/multimedia.ts";
 
 describe("entity multimedia helpers", () => {
@@ -51,5 +53,46 @@ describe("entity multimedia helpers", () => {
 
     assert.equal(getEntityCoverImage(record), null);
     assert.deepEqual(getEntityGalleryImages(record), ["gallery-1.webp"]);
+  });
+
+  it("prefers mapped optimized files for display without changing original file names", () => {
+    const record = {
+      foto_portada: "cover.jpg",
+      galeria_fotos: ["gallery.jpg"],
+      media_optimizados: ["cover-optimized.webp", "gallery-optimized.webp"],
+      media_optimizados_map: {
+        "foto_portada:cover.jpg": "cover-optimized.webp",
+        "galeria_fotos:gallery.jpg": "gallery-optimized.webp",
+      },
+    };
+
+    assert.deepEqual(getEntityCoverImageRef(record), {
+      fileName: "cover.jpg",
+      displayFileName: "cover-optimized.webp",
+      sourceField: "foto_portada",
+    });
+    assert.deepEqual(getEntityGalleryImageRefs(record), [
+      {
+        fileName: "gallery.jpg",
+        displayFileName: "gallery-optimized.webp",
+        sourceField: "galeria_fotos",
+      },
+    ]);
+  });
+
+  it("ignores optimized map entries when the mapped file is not attached", () => {
+    const record = {
+      foto_portada: "cover.jpg",
+      media_optimizados: [],
+      media_optimizados_map: {
+        "foto_portada:cover.jpg": "missing-optimized.webp",
+      },
+    };
+
+    assert.deepEqual(getEntityCoverImageRef(record), {
+      fileName: "cover.jpg",
+      displayFileName: "cover.jpg",
+      sourceField: "foto_portada",
+    });
   });
 });

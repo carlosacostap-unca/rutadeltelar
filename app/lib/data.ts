@@ -18,8 +18,8 @@ import {
 import { toValidIsoDate } from "@/app/lib/dates";
 import { normalizeHighlightedData } from "@/app/lib/highlighted-data";
 import {
-  getEntityCoverImage,
-  getEntityGalleryImages,
+  getEntityCoverImageRef,
+  getEntityGalleryImageRefs,
   type EntityMediaFields,
 } from "@/app/lib/multimedia";
 import {
@@ -281,9 +281,9 @@ function getEntityCoverImageUrl(
   record: PocketBaseRecord & EntityMediaFields,
   usage: PocketBaseImageUsage = "medium",
 ) {
-  const fileName = getEntityCoverImage(record);
+  const image = getEntityCoverImageRef(record);
 
-  return fileName ? getFileUrl(record, fileName, usage) : undefined;
+  return image ? getFileUrl(record, image.displayFileName, usage) : undefined;
 }
 
 function getEntityCoverFocus(record: PocketBaseRecord): ImageFocus | undefined {
@@ -305,17 +305,17 @@ function getEntityGalleryImageItems(
 ): FocusedImage[] {
   const images: FocusedImage[] = [];
 
-  for (const fileName of getEntityGalleryImages(record)) {
-    const url = getFileUrl(record, fileName, "medium");
+  for (const image of getEntityGalleryImageRefs(record)) {
+    const url = getFileUrl(record, image.displayFileName, "medium");
 
     if (!url) {
       continue;
     }
 
-    const focus = getGalleryImageFocus(fileName, focusMap);
+    const focus = getGalleryImageFocus(image.fileName, focusMap);
     images.push({
       url,
-      fileName,
+      fileName: image.fileName,
       ...(focus ? { focus } : {}),
     });
   }
