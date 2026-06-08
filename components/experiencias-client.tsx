@@ -236,7 +236,7 @@ function FilterGroup({
       <div
         role="group"
         aria-label={ariaLabel}
-        className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+        className="flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
       >
         {children}
       </div>

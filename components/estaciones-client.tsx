@@ -164,6 +164,7 @@ export function EstacionesClient({
   const useHomeStyle = true;
   const [view, setView] = useState<"lista" | "mapa">("lista");
   const [search, setSearch] = useState("");
+  const hasFilters = search.trim() !== "" || dept !== "todas";
 
   function handleDepartmentChange(value: string) {
     startTransition(() => {
@@ -180,6 +181,11 @@ export function EstacionesClient({
         scroll: false,
       });
     });
+  }
+
+  function clearFilters() {
+    setSearch("");
+    handleDepartmentChange("todas");
   }
 
   const filtered = useMemo(() => {
@@ -265,7 +271,7 @@ export function EstacionesClient({
         <div
           role="group"
           aria-label="Filtrar estaciones por departamento"
-          className="mb-8 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+          className="mb-8 flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
         >
           <button
             type="button"
@@ -316,6 +322,20 @@ export function EstacionesClient({
           <p className="sr-only" aria-live="polite">
             {filtered.length} estaciones disponibles.
           </p>
+          <div className="mb-5 flex flex-wrap items-center gap-2">
+            <p className="text-sm font-medium text-[#efd4b0]/85">
+              {filtered.length} estacion{filtered.length !== 1 ? "es" : ""}
+            </p>
+            {hasFilters ? (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+              >
+                Limpiar filtros
+              </button>
+            ) : null}
+          </div>
           <div
             className={
               useHomeStyle

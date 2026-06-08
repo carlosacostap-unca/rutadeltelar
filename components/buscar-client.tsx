@@ -445,7 +445,7 @@ export function BuscarClient({
       </div>
 
       {hasQuery && groups.length > 0 ? (
-        <div className="mb-8 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
+        <div className="mb-8 flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0">
           {groups.map((group) => (
             <span
               key={group.type}

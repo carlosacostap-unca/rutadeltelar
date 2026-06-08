@@ -161,6 +161,16 @@ textarea:focus-visible {
   width: 0;
 }
 
+.scroll-fade-x {
+  mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent);
+}
+
+@media (min-width: 640px) {
+  .scroll-fade-x {
+    mask-image: none;
+  }
+}
+
 /* ── Leaflet overrides ───────────────────────────────────────────── */
 .leaflet-container {
   font: inherit;

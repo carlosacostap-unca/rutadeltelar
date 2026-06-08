@@ -173,7 +173,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
             <div
               role="group"
               aria-label="Filtrar actores por tipo"
-              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+              className="flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
             >
               <FilterChip
                 active={tipo === "todos"}
@@ -202,7 +202,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
             <div
               role="group"
               aria-label="Filtrar actores por estación"
-              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+              className="flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
             >
               <FilterChip
                 active={stationSlug === "todas"}

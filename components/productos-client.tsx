@@ -210,7 +210,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <div
               role="group"
               aria-label="Filtrar productos por categoria"
-              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+              className="flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
             >
               <FilterChip
                 active={category === "todas"}
@@ -239,7 +239,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <div
               role="group"
               aria-label="Filtrar productos por subcategoria"
-              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+              className="flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
             >
               <FilterChip
                 active={subcategory === "todas"}
@@ -268,7 +268,7 @@ export function ProductosClient({ products, stations, categories }: Props) {
             <div
               role="group"
               aria-label="Filtrar productos por estacion"
-              className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+              className="flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
             >
               <FilterChip
                 active={stationSlug === "todas"}

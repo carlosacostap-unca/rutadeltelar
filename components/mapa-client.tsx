@@ -75,7 +75,7 @@ export function MapaClient({ stations, artisans, highlightSpots }: Props) {
         <div
           role="group"
           aria-label="Capas visibles del mapa"
-          className="flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+          className="flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
         >
           {LAYERS.map((layer) => (
             <button

@@ -215,7 +215,7 @@ export function StationsTerritoryMap({
       <div
         role="group"
         aria-label="Controles del mapa territorial"
-        className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+        className="mb-5 flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
       >
         {activeSlug ? (
           <>
@@ -271,7 +271,21 @@ export function StationsTerritoryMap({
         })}
       </div>
 
-      <div className="mb-5 grid gap-4 rounded-[1.35rem] border border-[#123a55]/20 bg-[#123a55]/5 p-4 md:grid-cols-3">
+      <DeferredRender fallback={<MapLoadingPlaceholder label="Mapa listo al acercarte..." />}>
+        <StationsTerritoryMapLeaflet
+          stations={filteredStations}
+          activeSlug={activeSlug}
+          selectedSlug={effectiveSelectedSlug}
+          onSelectStation={handleSelectStation}
+          artisans={filteredArtisans}
+          highlightSpots={filteredHighlightSpots}
+          showStations={visibleLayers.stations}
+          showArtisans={visibleLayers.artisans}
+          showHighlightSpots={visibleLayers.highlightSpots}
+        />
+      </DeferredRender>
+
+      <div className="mt-5 grid gap-4 rounded-[1.35rem] border border-[#123a55]/20 bg-[#123a55]/5 p-4 md:grid-cols-3">
         {layerItems.map((item) => (
           <div key={`legend-${item.key}`} className="flex items-start gap-3">
             <span
@@ -289,20 +303,6 @@ export function StationsTerritoryMap({
         ))}
       </div>
 
-      <DeferredRender fallback={<MapLoadingPlaceholder label="Mapa listo al acercarte..." />}>
-        <StationsTerritoryMapLeaflet
-          stations={filteredStations}
-          activeSlug={activeSlug}
-          selectedSlug={effectiveSelectedSlug}
-          onSelectStation={handleSelectStation}
-          artisans={filteredArtisans}
-          highlightSpots={filteredHighlightSpots}
-          showStations={visibleLayers.stations}
-          showArtisans={visibleLayers.artisans}
-          showHighlightSpots={visibleLayers.highlightSpots}
-        />
-      </DeferredRender>
-
       <div className="mt-5 rounded-[1.35rem] border border-[#123a55]/15 bg-[#f5dfbd] p-3 sm:p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -318,7 +318,7 @@ export function StationsTerritoryMap({
           <div
             role="tablist"
             aria-label="Tipo de contenido para navegar"
-            className="flex gap-2 overflow-x-auto pb-1 scrollbar-none"
+            className="flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:pr-0"
           >
             {navigationItems.map((item) => {
               const active = navigationTab === item.key;
@@ -345,7 +345,7 @@ export function StationsTerritoryMap({
 
         <div
           aria-label="Estaciones para enfocar en el mapa"
-          className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none"
+          className="mt-4 flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:pr-0"
         >
           {stations.map((station) => {
             const isActive =

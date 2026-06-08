@@ -212,17 +212,19 @@ export default async function StationDetailPage({
             />
           </div>
 
-          <DetailMediaGallery
-            title={station.name}
-            fallbackLabel="Estacion"
-            coverUrl={station.imageUrl}
-            galleryUrls={station.galleryUrls}
-            coverFocus={station.imageFocus}
-            galleryImages={station.galleryImages}
-            coverClassName="aspect-[1.12] rounded-[1.85rem] border-[#efd4b0]/25"
-            coverSizes="(max-width: 1024px) 100vw, 56vw"
-            thumbnailClassName="aspect-[4/3] w-[180px] rounded-[1.1rem] border-[#efd4b0]/25"
-          />
+          <div className="order-first lg:order-none">
+            <DetailMediaGallery
+              title={station.name}
+              fallbackLabel="Estacion"
+              coverUrl={station.imageUrl}
+              galleryUrls={station.galleryUrls}
+              coverFocus={station.imageFocus}
+              galleryImages={station.galleryImages}
+              coverClassName="aspect-[1.12] rounded-[1.85rem] border-[#efd4b0]/25"
+              coverSizes="(max-width: 1024px) 100vw, 56vw"
+              thumbnailClassName="aspect-[4/3] w-[180px] rounded-[1.1rem] border-[#efd4b0]/25"
+            />
+          </div>
         </section>
 
         {hasValidCoordinates(station) ? (

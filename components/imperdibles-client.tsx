@@ -143,7 +143,7 @@ export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
             <div
               role="group"
               aria-label="Filtrar imperdibles por tipo"
-              className="mb-8 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap"
+              className="mb-8 flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
             >
               <FilterChip
                 active={typeFilter === "todos"}

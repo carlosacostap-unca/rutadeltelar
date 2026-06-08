@@ -434,17 +434,19 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
             />
           </div>
 
-          <DetailMediaGallery
-            title={artisan.name}
-            fallbackLabel="Actor"
-            coverUrl={artisan.imageUrl}
-            galleryUrls={artisan.galleryUrls}
-            coverFocus={artisan.imageFocus}
-            galleryImages={galleryImages}
-            coverClassName="aspect-[1.12] rounded-[1.85rem] border-[#efd4b0]/25"
-            coverSizes="(max-width: 1024px) 100vw, 56vw"
-            thumbnailClassName="aspect-[4/3] w-[180px] rounded-[1.1rem] border-[#efd4b0]/25"
-          />
+          <div className="order-first lg:order-none">
+            <DetailMediaGallery
+              title={artisan.name}
+              fallbackLabel="Actor"
+              coverUrl={artisan.imageUrl}
+              galleryUrls={artisan.galleryUrls}
+              coverFocus={artisan.imageFocus}
+              galleryImages={galleryImages}
+              coverClassName="aspect-[1.12] rounded-[1.85rem] border-[#efd4b0]/25"
+              coverSizes="(max-width: 1024px) 100vw, 56vw"
+              thumbnailClassName="aspect-[4/3] w-[180px] rounded-[1.1rem] border-[#efd4b0]/25"
+            />
+          </div>
         </section>
 
         {hasContact ? (
