@@ -29,6 +29,7 @@ export default function StationDetailMapLeaflet({ lat, lng, label }: Props) {
       center={[lat, lng]}
       zoom={16}
       maxZoom={SATELLITE_REFERENCE_MAX_ZOOM}
+      className="relative z-0"
       style={{ height: "280px", width: "100%" }}
       scrollWheelZoom={false}
     >

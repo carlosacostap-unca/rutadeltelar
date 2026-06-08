@@ -88,7 +88,7 @@ export function ImageLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 px-4 py-6"
+      className="fixed inset-0 z-[5000] flex items-center justify-center bg-black/85 px-4 py-6"
       role="dialog"
       aria-modal="true"
       aria-label="Imagen ampliada"
