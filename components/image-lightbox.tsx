@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export type LightboxImage = {
   url: string;
@@ -82,11 +83,11 @@ export function ImageLightbox({
     };
   }, [activeIndex, goToOffset, hasMany, onClose]);
 
-  if (!activeImage) {
+  if (!activeImage || typeof document === "undefined") {
     return null;
   }
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[5000] flex items-center justify-center bg-black/85 px-4 py-6"
       role="dialog"
@@ -149,6 +150,7 @@ export function ImageLightbox({
           </>
         ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
