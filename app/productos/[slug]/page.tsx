@@ -95,9 +95,11 @@ function RelatedStationCard({ station }: { station: Station }) {
 function ProductHeroInfo({
   product,
   relatedStation,
+  productMakers,
 }: {
   product: Product;
   relatedStation?: Station | null;
+  productMakers: Artisan[];
 }) {
   return (
     <article className="h-full rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#0d314a] sm:p-8">
@@ -111,6 +113,53 @@ function ProductHeroInfo({
       <h1 className="brand-font mt-5 text-[2.45rem] font-normal uppercase leading-none tracking-normal text-[#082d49] sm:text-[3.15rem]">
         {formatBrandFontText(product.name)}
       </h1>
+
+      {productMakers.length > 0 ? (
+        <div className="mt-5 border-y border-[#123a55]/15 py-4">
+          <p className="text-[0.7rem] font-black uppercase leading-none tracking-normal text-[#18364d]/75">
+            Hecho por
+          </p>
+          <div className="mt-3 flex flex-col gap-3">
+            {productMakers.map((actor) => (
+              <Link
+                key={actor.slug}
+                href={`/artesanas/${actor.slug}`}
+                className="group flex items-center gap-4"
+              >
+                {actor.imageUrl ? (
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[1rem] border border-[#123a55]/15">
+                    <Image
+                      src={withPocketBaseImageThumb(actor.imageUrl, "thumbnail")}
+                      alt={actor.name}
+                      fill
+                      className="object-cover"
+                      sizes="64px"
+                      style={getImageFocusStyle(actor.imageFocus)}
+                    />
+                  </div>
+                ) : (
+                  <div className="brand-font flex h-16 w-16 shrink-0 items-center justify-center rounded-[1rem] bg-[#123a55]/10 text-3xl font-normal uppercase leading-none text-[#082d49]">
+                    {actor.name[0]}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  {actor.actorType ? (
+                    <p className="text-[0.7rem] font-black uppercase leading-none tracking-normal text-[#18364d]/70">
+                      {actor.actorType}
+                    </p>
+                  ) : null}
+                  <p className="mt-1 text-xl font-black leading-none text-[#082d49] transition group-hover:text-[#123a55]/75">
+                    {actor.name}
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-[#18364d]/75">
+                    {actor.place}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <p className="mt-5 text-base font-medium leading-tight text-[#18364d]/85">
         {product.description}
@@ -200,7 +249,7 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  const { product, relatedStation, relatedActors } = context;
+  const { product, relatedStation, productMakers, localActors } = context;
 
   return (
     <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
@@ -251,24 +300,25 @@ export default async function ProductDetailPage({
             <ProductHeroInfo
               product={product}
               relatedStation={relatedStation}
+              productMakers={productMakers}
             />
           </div>
         </section>
 
-        {relatedActors.length > 0 ? (
+        {localActors.length > 0 ? (
           <section className="mt-14">
             <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
-              Hecho por
+              Comunidad local
             </p>
             <h2 className="brand-font mt-1 max-w-4xl text-[2.25rem] font-normal uppercase leading-none tracking-normal text-[#f3d7b4] sm:text-[3rem]">
               {formatBrandFontText(
-                relatedActors.length === 1
-                  ? "El actor detras de esta pieza"
-                  : "Quienes hacen esta pieza",
+                productMakers.length > 0
+                  ? "Otros actores de la localidad"
+                  : "Actores de la localidad",
               )}
             </h2>
             <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {relatedActors.map((actor) => (
+              {localActors.map((actor) => (
                 <RelatedActorCard key={actor.slug} actor={actor} />
               ))}
             </div>

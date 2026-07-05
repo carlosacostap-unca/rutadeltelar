@@ -1388,12 +1388,16 @@ export async function getProductContextBySlug(slug: string) {
         (product.stationSlug ? s.slug === product.stationSlug : false),
     ) ?? null;
 
-  const relatedActors = artisans.filter((a) =>
-    (a.recordId && product.relatedActorRecordIds?.includes(a.recordId)) ||
-    (relatedStation
-      ? sameRecordId(a.stationRecordId, relatedStation.recordId)
-      : false),
+  const productMakers = artisans.filter((a) =>
+    a.recordId ? product.relatedActorRecordIds?.includes(a.recordId) : false,
   );
+  const localActors = relatedStation
+    ? artisans.filter(
+        (a) =>
+          sameRecordId(a.stationRecordId, relatedStation.recordId) &&
+          !productMakers.some((maker) => maker.slug === a.slug),
+      )
+    : [];
 
-  return { product, relatedStation, relatedActors };
+  return { product, relatedStation, productMakers, localActors };
 }
