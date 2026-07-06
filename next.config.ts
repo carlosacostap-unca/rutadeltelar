@@ -20,6 +20,16 @@ if (pocketBaseUrl) {
 
 const nextConfig: NextConfig = {
   images: {
+    localPatterns: [
+      {
+        pathname: "/images/**",
+        search: "",
+      },
+      {
+        pathname: "/images/home/sponsor-1-ministerio.png",
+        search: "?v=20260706",
+      },
+    ],
     remotePatterns,
     qualities: [75, 90],
   },

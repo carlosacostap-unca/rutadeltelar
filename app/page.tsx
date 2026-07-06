@@ -35,10 +35,10 @@ type FeaturedDepartment = {
 
 const sponsorLogos = [
   {
-    src: "/images/home/sponsor-1-ministerio.png",
+    src: "/images/home/sponsor-1-ministerio.png?v=20260706",
     alt: "Catamarca Gobierno - Ministerio de Educacion y Trabajo",
-    width: 942,
-    height: 166,
+    width: 1718,
+    height: 282,
     className: "w-[min(33rem,82vw)] lg:w-[28rem]",
     alignClassName: "-translate-y-px",
   },
