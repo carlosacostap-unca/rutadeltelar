@@ -46,6 +46,11 @@ type StationsTerritoryMapLeafletProps = {
   stations: Station[];
   activeSlug?: string;
   selectedSlug?: string;
+  selectedFocusPoint?: {
+    key: string;
+    latitude: number;
+    longitude: number;
+  };
   onSelectStation?: (slug: string) => void;
   artisans?: Artisan[];
   highlightSpots?: HighlightSpot[];
@@ -379,6 +384,35 @@ function SelectedStationFlyTo({
   return null;
 }
 
+function SelectedFocusPointFlyTo({
+  point,
+}: {
+  point?: {
+    key: string;
+    latitude: number;
+    longitude: number;
+  };
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!point) {
+      return;
+    }
+
+    map.flyTo(
+      [point.latitude, point.longitude],
+      Math.max(map.getZoom(), TERRITORY_MAP_SINGLE_POINT_ZOOM),
+      {
+        animate: true,
+        duration: 1.1,
+      },
+    );
+  }, [map, point]);
+
+  return null;
+}
+
 function PopupAction({
   label,
   onClick,
@@ -439,6 +473,7 @@ export function StationsTerritoryMapLeaflet({
   stations,
   activeSlug,
   selectedSlug,
+  selectedFocusPoint,
   onSelectStation,
   artisans = [],
   highlightSpots = [],
@@ -545,6 +580,7 @@ export function StationsTerritoryMapLeaflet({
           selectedSlug={selectedSlug}
           stations={geolocatedStations}
         />
+        <SelectedFocusPointFlyTo point={selectedFocusPoint} />
         <DetailScaleObserver onDetailScaleChange={setIsDetailScale} />
         <SatelliteReferenceTileLayers mood={warmTiles ? "warm" : "neutral"} />
         <ScaleControl position="bottomleft" imperial={false} />

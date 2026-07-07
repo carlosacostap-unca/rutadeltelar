@@ -2,7 +2,6 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import {
   type Artisan,
   type HighlightSpot,
@@ -29,6 +28,11 @@ type StationsTerritoryMapProps = {
 
 type ExplorerView = "stations" | "choices" | "artisans" | "highlightSpots";
 type LayerKey = "stations" | "artisans" | "highlightSpots";
+type MapFocusPoint = {
+  key: string;
+  latitude: number;
+  longitude: number;
+};
 
 const StationsTerritoryMapLeaflet = dynamic(
   () =>
@@ -50,43 +54,6 @@ function normalizeMapText(value: string) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
-}
-
-function normalizeExplorerText(value?: string) {
-  return normalizeMapText(value ?? "")
-    .replace(/^estacion\s+/i, "")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-
-function repeatsExplorerText(value?: string, comparedWith?: string) {
-  const normalizedValue = normalizeExplorerText(value);
-  const normalizedComparison = normalizeExplorerText(comparedWith);
-
-  if (!normalizedValue || !normalizedComparison) {
-    return false;
-  }
-
-  return (
-    normalizedValue === normalizedComparison ||
-    normalizedValue.includes(normalizedComparison) ||
-    normalizedComparison.includes(normalizedValue)
-  );
-}
-
-function getArtisanExplorerDescription(artisan: Artisan) {
-  const craft = artisan.craft?.trim();
-  const genericCraft =
-    repeatsExplorerText(craft, artisan.actorType) ||
-    ["artesano", "artesana", "actor artesanal"].includes(
-      normalizeExplorerText(craft),
-    );
-
-  if (craft && !genericCraft) {
-    return craft;
-  }
-
-  return artisan.place || artisan.stationName || "Perfil vinculado";
 }
 
 function belongsToStation(
@@ -188,6 +155,7 @@ export function StationsTerritoryMap({
   const [focusMode, setFocusMode] = useState<"all" | "active">("all");
   const [localSelectedSlug, setLocalSelectedSlug] = useState<string>();
   const [explorerView, setExplorerView] = useState<ExplorerView>("stations");
+  const [selectedFocusPoint, setSelectedFocusPoint] = useState<MapFocusPoint>();
   const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
     stations: true,
     artisans: true,
@@ -212,10 +180,32 @@ export function StationsTerritoryMap({
     );
   }, [activeSlug, artisans, effectiveSelectedSlug, highlightSpots, stations]);
 
-  function handleSelectStation(slug: string) {
-    setLocalSelectedSlug(slug);
+  function handleSelectStation(station: Station) {
+    setLocalSelectedSlug(station.slug);
     setExplorerView("choices");
-    onSelectStation?.(slug);
+    if (hasValidCoordinates(station)) {
+      setSelectedFocusPoint({
+        key: `station-${station.slug}`,
+        latitude: station.latitude,
+        longitude: station.longitude,
+      });
+    }
+    onSelectStation?.(station.slug);
+  }
+
+  function handleFocusEntity(
+    kind: "artisan" | "highlight",
+    entity: Artisan | HighlightSpot,
+  ) {
+    if (!hasValidCoordinates(entity)) {
+      return;
+    }
+
+    setSelectedFocusPoint({
+      key: `${kind}-${entity.slug}`,
+      latitude: entity.latitude,
+      longitude: entity.longitude,
+    });
   }
 
   function handleExplorerBack() {
@@ -404,7 +394,13 @@ export function StationsTerritoryMap({
               stations={filteredStations}
               activeSlug={activeSlug}
               selectedSlug={effectiveSelectedSlug}
-              onSelectStation={handleSelectStation}
+              selectedFocusPoint={selectedFocusPoint}
+              onSelectStation={(slug) => {
+                const station = stations.find((item) => item.slug === slug);
+                if (station) {
+                  handleSelectStation(station);
+                }
+              }}
               artisans={filteredArtisans}
               highlightSpots={filteredHighlightSpots}
               showStations={visibleLayers.stations}
@@ -488,13 +484,15 @@ export function StationsTerritoryMap({
                         station.slug === effectiveSelectedSlug;
 
                       return (
-                        <article
+                        <button
                           key={station.slug}
+                          type="button"
+                          onClick={() => handleSelectStation(station)}
                           className={`rounded-[1.15rem] border p-4 text-sm transition ${
                             isActive
                               ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
                               : "border-[#123a55]/15 bg-[#123a55]/90 text-[#efd4b0]"
-                          }`}
+                          } text-left hover:-translate-y-0.5`}
                         >
                           {station.department ? (
                             <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
@@ -504,27 +502,7 @@ export function StationsTerritoryMap({
                           <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
                             <StationName station={station} />
                           </p>
-                          {station.slogan ? (
-                            <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
-                              {station.slogan}
-                            </p>
-                          ) : null}
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleSelectStation(station.slug)}
-                              className="rounded-full border border-[#efd4b0]/35 px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
-                            >
-                              Elegir
-                            </button>
-                            <Link
-                              href={`/estaciones/${station.slug}`}
-                              className="rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55] hover:bg-white"
-                            >
-                              Abrir
-                            </Link>
-                          </div>
-                        </article>
+                        </button>
                       );
                     })
                   ) : (
@@ -568,10 +546,11 @@ export function StationsTerritoryMap({
                 <div className="space-y-3">
                   {selectedArtisans.length > 0 ? (
                     selectedArtisans.map((artisan) => (
-                      <Link
+                      <button
                         key={artisan.slug}
-                        href={`/artesanas/${artisan.slug}`}
-                        className="block rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55]/90 p-4 text-sm text-[#efd4b0] transition hover:-translate-y-0.5 hover:bg-[#123a55]"
+                        type="button"
+                        onClick={() => handleFocusEntity("artisan", artisan)}
+                        className="block w-full rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55]/90 p-4 text-left text-sm text-[#efd4b0] transition hover:-translate-y-0.5 hover:bg-[#123a55]"
                       >
                         <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
                           {artisan.actorType ?? "Actor"}
@@ -579,13 +558,7 @@ export function StationsTerritoryMap({
                         <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
                           {artisan.name}
                         </p>
-                        <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
-                          {getArtisanExplorerDescription(artisan)}
-                        </p>
-                        <span className="mt-4 inline-flex rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
-                          Ver perfil
-                        </span>
-                      </Link>
+                      </button>
                     ))
                   ) : (
                     <EmptyPanel>
@@ -599,10 +572,11 @@ export function StationsTerritoryMap({
                 <div className="space-y-3">
                   {selectedHighlightSpots.length > 0 ? (
                     selectedHighlightSpots.map((spot) => (
-                      <Link
+                      <button
                         key={spot.slug}
-                        href={`/imperdibles/${spot.slug}`}
-                        className="block rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55]/90 p-4 text-sm text-[#efd4b0] transition hover:-translate-y-0.5 hover:bg-[#123a55]"
+                        type="button"
+                        onClick={() => handleFocusEntity("highlight", spot)}
+                        className="block w-full rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55]/90 p-4 text-left text-sm text-[#efd4b0] transition hover:-translate-y-0.5 hover:bg-[#123a55]"
                       >
                         <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
                           {spot.type}
@@ -610,13 +584,7 @@ export function StationsTerritoryMap({
                         <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
                           {spot.title}
                         </p>
-                        <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
-                          {spot.subtitle || spot.location}
-                        </p>
-                        <span className="mt-4 inline-flex rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
-                          Ver imperdible
-                        </span>
-                      </Link>
+                      </button>
                     ))
                   ) : (
                     <EmptyPanel>
