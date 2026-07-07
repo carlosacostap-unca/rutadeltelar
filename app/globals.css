@@ -229,3 +229,53 @@ textarea:focus-visible {
 .leaflet-container .territory-map-imagery {
   filter: saturate(0.78) sepia(0.18) contrast(0.92) brightness(1.04);
 }
+
+.leaflet-container .territory-marker {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f8e6c8;
+  border-radius: 999px;
+  background: #123a55;
+  box-shadow:
+    0 2px 10px rgba(18, 58, 85, 0.32),
+    0 0 0 2px rgba(18, 58, 85, 0.18);
+}
+
+.leaflet-container .territory-marker svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: #f8e6c8;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.leaflet-container .territory-marker-station {
+  background: #9d4d2e;
+}
+
+.leaflet-container .territory-marker-artisan {
+  background: #61644a;
+}
+
+.leaflet-container .territory-marker-highlight {
+  background: #3d2414;
+}
+
+.leaflet-container .territory-marker-active {
+  width: 36px;
+  height: 36px;
+  border-width: 4px;
+  background: #7c3419;
+  box-shadow:
+    0 3px 16px rgba(18, 58, 85, 0.38),
+    0 0 0 4px rgba(248, 230, 200, 0.28);
+}
+
+.leaflet-container .territory-marker-active svg {
+  width: 20px;
+  height: 20px;
+}

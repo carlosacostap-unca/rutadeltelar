@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { divIcon } from "leaflet";
 import type { LatLngBoundsExpression, LatLngExpression } from "leaflet";
 import {
-  CircleMarker,
   MapContainer,
+  Marker,
   Popup,
   Polyline,
   ScaleControl,
@@ -28,6 +29,7 @@ import { SatelliteMapButton } from "@/components/satellite-map-button";
 const TERRITORY_MAP_SINGLE_POINT_ZOOM = 13;
 const TERRITORY_MAP_MULTI_POINT_ZOOM = 10;
 const TERRITORY_MAP_MAX_BOUNDS_ZOOM = 13;
+const OSRM_ROUTE_ENDPOINT = "https://router.project-osrm.org/route/v1/driving";
 
 type StationsTerritoryMapLeafletProps = {
   stations: Station[];
@@ -62,6 +64,144 @@ function formatStationMapLabel(station: Station) {
 
 function formatStationMapLocation(value: string) {
   return value.replace(/,\s*Catamarca\.?$/i, "");
+}
+
+function getMapEntityIcon({
+  kind,
+  active = false,
+}: {
+  kind: "station" | "artisan" | "highlight";
+  active?: boolean;
+}) {
+  const config = {
+    station: {
+      className: "station",
+      title: "Estacion",
+      icon:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg>',
+    },
+    artisan: {
+      className: "artisan",
+      title: "Actor",
+      icon:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="6.5" r="3"/><path d="M5.5 20c1.1-5 3.2-7.5 6.5-7.5s5.4 2.5 6.5 7.5"/><path d="M4.5 14.5h15"/><path d="M6.5 17h11"/></svg>',
+    },
+    highlight: {
+      className: "highlight",
+      title: "Imperdible",
+      icon:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.6 5.4 6 .8-4.3 4.2 1 6-5.3-2.8-5.3 2.8 1-6-4.3-4.2 6-.8L12 3Z"/></svg>',
+    },
+  }[kind];
+
+  return divIcon({
+    className: "",
+    html: `<span class="territory-marker territory-marker-${config.className}${
+      active ? " territory-marker-active" : ""
+    }" title="${config.title}" aria-hidden="true">${config.icon}</span>`,
+    iconAnchor: active ? [18, 18] : [15, 15],
+    popupAnchor: [0, active ? -18 : -15],
+    tooltipAnchor: [0, active ? -18 : -15],
+    iconSize: active ? [36, 36] : [30, 30],
+  });
+}
+
+function RoadRouteLayer({
+  stations,
+}: {
+  stations: Array<{ latitude: number; longitude: number }>;
+}) {
+  const [routePositions, setRoutePositions] = useState<
+    Array<[number, number]> | null
+  >(null);
+  const fallbackPositions = useMemo(
+    () =>
+      stations.map(
+        (station) => [station.latitude, station.longitude] as [number, number],
+      ),
+    [stations],
+  );
+  const coordinates = useMemo(
+    () =>
+      stations
+        .map((station) => `${station.longitude},${station.latitude}`)
+        .join(";"),
+    [stations],
+  );
+
+  useEffect(() => {
+    if (stations.length < 2) {
+      setRoutePositions(null);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function loadRoute() {
+      try {
+        const response = await fetch(
+          `${OSRM_ROUTE_ENDPOINT}/${coordinates}?overview=full&geometries=geojson`,
+          { signal: controller.signal },
+        );
+
+        if (!response.ok) {
+          setRoutePositions(null);
+          return;
+        }
+
+        const payload = (await response.json()) as {
+          routes?: Array<{
+            geometry?: {
+              coordinates?: Array<[number, number]>;
+            };
+          }>;
+        };
+        const route = payload.routes?.[0]?.geometry?.coordinates;
+
+        if (!route || route.length < 2) {
+          setRoutePositions(null);
+          return;
+        }
+
+        setRoutePositions(route.map(([longitude, latitude]) => [latitude, longitude]));
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setRoutePositions(null);
+        }
+      }
+    }
+
+    loadRoute();
+
+    return () => controller.abort();
+  }, [coordinates, stations.length]);
+
+  const positions = routePositions ?? fallbackPositions;
+
+  if (positions.length < 2) {
+    return null;
+  }
+
+  return (
+    <>
+      <Polyline
+        positions={positions}
+        pathOptions={{
+          color: "#123a55",
+          opacity: 0.72,
+          weight: 7,
+        }}
+      />
+      <Polyline
+        positions={positions}
+        pathOptions={{
+          color: "#f3d7b4",
+          opacity: 0.96,
+          weight: 4,
+        }}
+      />
+    </>
+  );
 }
 
 function MapResizer() {
@@ -207,13 +347,6 @@ export function StationsTerritoryMapLeaflet({
     geolocatedStations.length +
     geolocatedArtisans.length +
     geolocatedHighlightSpots.length;
-  const stationRoute = useMemo(
-    () =>
-      geolocatedStations.map(
-        (station) => [station.latitude, station.longitude] as [number, number],
-      ),
-    [geolocatedStations],
-  );
 
   const center = useMemo<LatLngExpression>(() => {
     const allPoints = [
@@ -293,32 +426,16 @@ export function StationsTerritoryMapLeaflet({
         <SatelliteReferenceTileLayers mood={warmTiles ? "warm" : "neutral"} />
         <ScaleControl position="bottomleft" imperial={false} />
 
-        {stationRoute.length > 1 ? (
-          <Polyline
-            positions={stationRoute}
-            pathOptions={{
-              color: "#f3d7b4",
-              opacity: 0.92,
-              weight: 4,
-              dashArray: "10 10",
-            }}
-          />
-        ) : null}
+        <RoadRouteLayer stations={geolocatedStations} />
 
         {geolocatedStations.map((station) => {
           const isActive = station.slug === activeSlug || station.slug === selectedSlug;
 
           return (
-            <CircleMarker
+            <Marker
               key={station.slug}
-              center={[station.latitude, station.longitude]}
-              radius={isActive ? 12 : 9}
-              pathOptions={{
-                color: "#f8e6c8",
-                fillColor: isActive ? "#7c3419" : "#9d4d2e",
-                fillOpacity: isActive ? 0.9 : 0.7,
-                weight: isActive ? 4 : 3,
-              }}
+              position={[station.latitude, station.longitude]}
+              icon={getMapEntityIcon({ kind: "station", active: isActive })}
               eventHandlers={{
                 click: () => onSelectStation?.(station.slug),
               }}
@@ -353,21 +470,15 @@ export function StationsTerritoryMapLeaflet({
                   <SatelliteMapButton point={station} compact className="w-full" />
                 </div>
               </Popup>
-            </CircleMarker>
+            </Marker>
           );
         })}
 
         {geolocatedArtisans.map((artisan) => (
-          <CircleMarker
+          <Marker
             key={`artisan-${artisan.slug}`}
-            center={[artisan.latitude, artisan.longitude]}
-            radius={6}
-            pathOptions={{
-              color: "#f8e6c8",
-              fillColor: "#61644a",
-              fillOpacity: 0.8,
-              weight: 3,
-            }}
+            position={[artisan.latitude, artisan.longitude]}
+            icon={getMapEntityIcon({ kind: "artisan" })}
             eventHandlers={{
               click: () => router.push(`/artesanas/${artisan.slug}`),
             }}
@@ -403,20 +514,14 @@ export function StationsTerritoryMapLeaflet({
                 <SatelliteMapButton point={artisan} compact className="w-full" />
               </div>
             </Popup>
-          </CircleMarker>
+          </Marker>
         ))}
 
         {geolocatedHighlightSpots.map((spot) => (
-          <CircleMarker
+          <Marker
             key={`spot-${spot.slug}`}
-            center={[spot.latitude, spot.longitude]}
-            radius={5}
-            pathOptions={{
-              color: "#f8e6c8",
-              fillColor: "#3d2414",
-              fillOpacity: 0.75,
-              weight: 3,
-            }}
+            position={[spot.latitude, spot.longitude]}
+            icon={getMapEntityIcon({ kind: "highlight" })}
             eventHandlers={{
               click: () => router.push(`/imperdibles/${spot.slug}`),
             }}
@@ -452,7 +557,7 @@ export function StationsTerritoryMapLeaflet({
                 <SatelliteMapButton point={spot} compact className="w-full" />
               </div>
             </Popup>
-          </CircleMarker>
+          </Marker>
         ))}
       </MapContainer>
     </div>
