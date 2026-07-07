@@ -507,9 +507,6 @@ export function StationsTerritoryMapLeaflet({
             key={`artisan-${artisan.slug}`}
             position={[artisan.latitude, artisan.longitude]}
             icon={getMapEntityIcon({ kind: "artisan" })}
-            eventHandlers={{
-              click: () => router.push(`/artesanas/${artisan.slug}`),
-            }}
           >
             <Tooltip direction="top" offset={[0, -8]} opacity={1}>
               {artisan.name}
@@ -550,9 +547,6 @@ export function StationsTerritoryMapLeaflet({
             key={`spot-${spot.slug}`}
             position={[spot.latitude, spot.longitude]}
             icon={getMapEntityIcon({ kind: "highlight" })}
-            eventHandlers={{
-              click: () => router.push(`/imperdibles/${spot.slug}`),
-            }}
           >
             <Tooltip direction="top" offset={[0, -8]} opacity={1}>
               {spot.title}
