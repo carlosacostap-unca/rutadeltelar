@@ -225,3 +225,7 @@ textarea:focus-visible {
   background: var(--card);
   color: var(--foreground);
 }
+
+.leaflet-container .territory-map-imagery {
+  filter: saturate(0.78) sepia(0.18) contrast(0.92) brightness(1.04);
+}

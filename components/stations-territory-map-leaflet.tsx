@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { LatLngBoundsExpression, LatLngExpression } from "leaflet";
@@ -8,6 +8,7 @@ import {
   CircleMarker,
   MapContainer,
   Popup,
+  Polyline,
   ScaleControl,
   Tooltip,
   useMap,
@@ -38,6 +39,9 @@ type StationsTerritoryMapLeafletProps = {
   showStations?: boolean;
   showArtisans?: boolean;
   showHighlightSpots?: boolean;
+  className?: string;
+  mapClassName?: string;
+  warmTiles?: boolean;
 };
 
 function getGeolocatedStations(stations: Station[]) {
@@ -129,7 +133,7 @@ function PopupAction({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-1.5 text-xs font-semibold text-[color:var(--foreground)]"
+      className="inline-flex justify-center rounded-full border border-[#123a55]/20 bg-[#123a55] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] hover:bg-[#7c3419]"
     >
       {label}
     </button>
@@ -150,17 +154,25 @@ function PopupImage({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[rgba(74,51,35,0.14)]">
+    <div className="overflow-hidden rounded-xl border border-[rgba(74,51,35,0.14)] bg-[#efd4b0]">
       <Image
         src={withPocketBaseImageThumb(src, "thumbnail")}
         alt={alt}
         width={320}
         height={176}
         unoptimized
-        className="h-28 w-full object-cover"
+        className="h-28 w-full object-cover saturate-[0.92]"
         style={getImageFocusStyle(focus)}
       />
     </div>
+  );
+}
+
+function PopupEyebrow({ children }: { children: ReactNode }) {
+  return (
+    <p className="text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#7c3419]">
+      {children}
+    </p>
   );
 }
 
@@ -174,6 +186,9 @@ export function StationsTerritoryMapLeaflet({
   showStations = true,
   showArtisans = true,
   showHighlightSpots = true,
+  className = "",
+  mapClassName = "h-[380px] w-full sm:h-[520px]",
+  warmTiles = false,
 }: StationsTerritoryMapLeafletProps) {
   const router = useRouter();
   const geolocatedStations = useMemo(() => {
@@ -192,6 +207,13 @@ export function StationsTerritoryMapLeaflet({
     geolocatedStations.length +
     geolocatedArtisans.length +
     geolocatedHighlightSpots.length;
+  const stationRoute = useMemo(
+    () =>
+      geolocatedStations.map(
+        (station) => [station.latitude, station.longitude] as [number, number],
+      ),
+    [geolocatedStations],
+  );
 
   const center = useMemo<LatLngExpression>(() => {
     const allPoints = [
@@ -246,7 +268,9 @@ export function StationsTerritoryMapLeaflet({
   }, [geolocatedArtisans, geolocatedHighlightSpots, geolocatedStations]);
 
   return (
-    <div className="overflow-hidden rounded-[1.35rem] border border-[#123a55]/20 shadow-sm">
+    <div
+      className={`overflow-hidden rounded-[1.35rem] border border-[#123a55]/20 bg-[#123a55]/10 shadow-sm ${className}`}
+    >
       <MapContainer
         center={center}
         zoom={
@@ -259,15 +283,27 @@ export function StationsTerritoryMapLeaflet({
         maxZoom={SATELLITE_REFERENCE_MAX_ZOOM}
         scrollWheelZoom={false}
         zoomControl
-        className="h-[360px] w-full sm:h-[460px]"
+        className={mapClassName}
       >
         <MapResizer />
         <SelectedStationFlyTo
           selectedSlug={selectedSlug}
           stations={geolocatedStations}
         />
-        <SatelliteReferenceTileLayers />
+        <SatelliteReferenceTileLayers mood={warmTiles ? "warm" : "neutral"} />
         <ScaleControl position="bottomleft" imperial={false} />
+
+        {stationRoute.length > 1 ? (
+          <Polyline
+            positions={stationRoute}
+            pathOptions={{
+              color: "#f3d7b4",
+              opacity: 0.92,
+              weight: 4,
+              dashArray: "10 10",
+            }}
+          />
+        ) : null}
 
         {geolocatedStations.map((station) => {
           const isActive = station.slug === activeSlug || station.slug === selectedSlug;
@@ -278,10 +314,10 @@ export function StationsTerritoryMapLeaflet({
               center={[station.latitude, station.longitude]}
               radius={isActive ? 12 : 9}
               pathOptions={{
-                color: isActive ? "#7c3419" : "#9d4d2e",
+                color: "#f8e6c8",
                 fillColor: isActive ? "#7c3419" : "#9d4d2e",
                 fillOpacity: isActive ? 0.9 : 0.7,
-                weight: 2,
+                weight: isActive ? 4 : 3,
               }}
               eventHandlers={{
                 click: () => onSelectStation?.(station.slug),
@@ -291,10 +327,11 @@ export function StationsTerritoryMapLeaflet({
                 {formatStationMapLabel(station)}
               </Tooltip>
               <Popup>
-                <div className="space-y-3 min-w-[180px]">
+                <div className="min-w-[210px] space-y-3">
                   <PopupImage src={station.imageUrl} alt={station.name} focus={station.imageFocus} />
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold">
+                    <PopupEyebrow>Estacion de la ruta</PopupEyebrow>
+                    <p className="text-base font-black leading-tight text-[#082d49]">
                       {formatStationMapLabel(station)}
                     </p>
                     <p className="text-xs text-[#725a49]">
@@ -309,6 +346,10 @@ export function StationsTerritoryMapLeaflet({
                       </p>
                     ) : null}
                   </div>
+                  <PopupAction
+                    label="Ver estacion"
+                    onClick={() => router.push(`/estaciones/${station.slug}`)}
+                  />
                   <SatelliteMapButton point={station} compact className="w-full" />
                 </div>
               </Popup>
@@ -322,10 +363,10 @@ export function StationsTerritoryMapLeaflet({
             center={[artisan.latitude, artisan.longitude]}
             radius={6}
             pathOptions={{
-              color: "#61644a",
+              color: "#f8e6c8",
               fillColor: "#61644a",
               fillOpacity: 0.8,
-              weight: 2,
+              weight: 3,
             }}
             eventHandlers={{
               click: () => router.push(`/artesanas/${artisan.slug}`),
@@ -335,10 +376,11 @@ export function StationsTerritoryMapLeaflet({
               {artisan.name}
             </Tooltip>
             <Popup>
-              <div className="space-y-3 min-w-[180px]">
+              <div className="min-w-[210px] space-y-3">
                 <PopupImage src={artisan.imageUrl} alt={artisan.name} focus={artisan.imageFocus} />
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold">{artisan.name}</p>
+                  <PopupEyebrow>{artisan.actorType ?? "Actor artesanal"}</PopupEyebrow>
+                  <p className="text-base font-black leading-tight text-[#082d49]">{artisan.name}</p>
                   <p className="text-xs text-[#725a49]">{artisan.place}</p>
                   <p className="text-xs text-[#725a49]">
                     {artisan.craft || "Actor artesanal"}
@@ -370,10 +412,10 @@ export function StationsTerritoryMapLeaflet({
             center={[spot.latitude, spot.longitude]}
             radius={5}
             pathOptions={{
-              color: "#3d2414",
+              color: "#f8e6c8",
               fillColor: "#3d2414",
               fillOpacity: 0.75,
-              weight: 2,
+              weight: 3,
             }}
             eventHandlers={{
               click: () => router.push(`/imperdibles/${spot.slug}`),
@@ -383,10 +425,11 @@ export function StationsTerritoryMapLeaflet({
               {spot.title}
             </Tooltip>
             <Popup>
-              <div className="space-y-3 min-w-[180px]">
+              <div className="min-w-[210px] space-y-3">
                 <PopupImage src={spot.imageUrl} alt={spot.title} focus={spot.imageFocus} />
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold">{spot.title}</p>
+                  <PopupEyebrow>{spot.type || "Imperdible"}</PopupEyebrow>
+                  <p className="text-base font-black leading-tight text-[#082d49]">{spot.title}</p>
                   <p className="text-xs text-[#725a49]">{spot.location}</p>
                   <p className="text-xs text-[#725a49]">
                     {spot.subtitle || spot.type}
