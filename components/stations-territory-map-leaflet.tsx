@@ -32,6 +32,16 @@ const TERRITORY_MAP_MAX_BOUNDS_ZOOM = 13;
 const TERRITORY_MAP_DETAIL_MIN_ZOOM = 13;
 const OSRM_ROUTE_ENDPOINT = "https://router.project-osrm.org/route/v1/driving";
 
+type RoadRoutePoint = {
+  latitude: number;
+  longitude: number;
+};
+
+type RoadRouteSegment = {
+  key: string;
+  positions: Array<[number, number]>;
+};
+
 type StationsTerritoryMapLeafletProps = {
   stations: Station[];
   activeSlug?: string;
@@ -107,100 +117,147 @@ function getMapEntityIcon({
   });
 }
 
+async function fetchRoadRouteSegment(
+  start: RoadRoutePoint,
+  end: RoadRoutePoint,
+  signal: AbortSignal,
+) {
+  const coordinates = `${start.longitude},${start.latitude};${end.longitude},${end.latitude}`;
+  const response = await fetch(
+    `${OSRM_ROUTE_ENDPOINT}/${coordinates}?overview=full&geometries=geojson&steps=false`,
+    { signal },
+  );
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const payload = (await response.json()) as {
+    routes?: Array<{
+      geometry?: {
+        coordinates?: Array<[number, number]>;
+      };
+    }>;
+  };
+  const route = payload.routes?.[0]?.geometry?.coordinates;
+
+  if (!route || route.length < 2) {
+    return null;
+  }
+
+  return route.map(
+    ([longitude, latitude]) => [latitude, longitude] as [number, number],
+  );
+}
+
 function RoadRouteLayer({
   stations,
 }: {
   stations: Array<{ latitude: number; longitude: number }>;
 }) {
-  const [routePositions, setRoutePositions] = useState<
-    Array<[number, number]> | null
-  >(null);
-  const fallbackPositions = useMemo(
+  const [routeSegments, setRouteSegments] = useState<RoadRouteSegment[]>([]);
+  const routePoints = useMemo(
     () =>
-      stations.map(
-        (station) => [station.latitude, station.longitude] as [number, number],
-      ),
+      stations.map((station) => ({
+        latitude: station.latitude,
+        longitude: station.longitude,
+      })),
     [stations],
   );
-  const coordinates = useMemo(
+  const routeKey = useMemo(
     () =>
-      stations
-        .map((station) => `${station.longitude},${station.latitude}`)
-        .join(";"),
-    [stations],
+      routePoints
+        .map((station) => `${station.latitude},${station.longitude}`)
+        .join("|"),
+    [routePoints],
   );
 
   useEffect(() => {
-    if (stations.length < 2) {
-      setRoutePositions(null);
+    if (routePoints.length < 2) {
+      setRouteSegments([]);
       return;
     }
 
     const controller = new AbortController();
 
-    async function loadRoute() {
+    async function loadRouteSegments() {
       try {
-        const response = await fetch(
-          `${OSRM_ROUTE_ENDPOINT}/${coordinates}?overview=full&geometries=geojson`,
-          { signal: controller.signal },
+        const segments = await Promise.all(
+          routePoints.slice(0, -1).map(async (start, index) => {
+            const end = routePoints[index + 1];
+
+            let positions: Array<[number, number]> | null = null;
+
+            try {
+              positions = await fetchRoadRouteSegment(
+                start,
+                end,
+                controller.signal,
+              );
+            } catch (error) {
+              if (controller.signal.aborted) {
+                throw error;
+              }
+            }
+
+            if (!positions) {
+              return null;
+            }
+
+            return {
+              key: `${start.latitude},${start.longitude}-${end.latitude},${end.longitude}`,
+              positions,
+            };
+          }),
         );
 
-        if (!response.ok) {
-          setRoutePositions(null);
-          return;
+        if (!controller.signal.aborted) {
+          setRouteSegments(
+            segments.filter(
+              (segment): segment is RoadRouteSegment => segment !== null,
+            ),
+          );
         }
-
-        const payload = (await response.json()) as {
-          routes?: Array<{
-            geometry?: {
-              coordinates?: Array<[number, number]>;
-            };
-          }>;
-        };
-        const route = payload.routes?.[0]?.geometry?.coordinates;
-
-        if (!route || route.length < 2) {
-          setRoutePositions(null);
-          return;
-        }
-
-        setRoutePositions(route.map(([longitude, latitude]) => [latitude, longitude]));
       } catch (error) {
         if (!controller.signal.aborted) {
-          setRoutePositions(null);
+          setRouteSegments([]);
         }
       }
     }
 
-    loadRoute();
+    loadRouteSegments();
 
     return () => controller.abort();
-  }, [coordinates, stations.length]);
+  }, [routeKey, routePoints]);
 
-  const positions = routePositions ?? fallbackPositions;
-
-  if (positions.length < 2) {
+  if (routeSegments.length === 0) {
     return null;
   }
 
   return (
     <>
-      <Polyline
-        positions={positions}
-        pathOptions={{
-          color: "#123a55",
-          opacity: 0.72,
-          weight: 7,
-        }}
-      />
-      <Polyline
-        positions={positions}
-        pathOptions={{
-          color: "#f3d7b4",
-          opacity: 0.96,
-          weight: 4,
-        }}
-      />
+      {routeSegments.map((segment) => (
+        <Polyline
+          key={`${segment.key}-outline`}
+          positions={segment.positions}
+          pathOptions={{
+            color: "#123a55",
+            opacity: 0.72,
+            weight: 7,
+          }}
+        />
+      ))}
+      {routeSegments.map((segment) => (
+        <Polyline
+          key={segment.key}
+          positions={segment.positions}
+          pathOptions={{
+            color: "#f3d7b4",
+            opacity: 0.96,
+            weight: 4,
+          }}
+        />
+      ))}
     </>
   );
 }
@@ -289,15 +346,17 @@ function SelectedStationFlyTo({
 function PopupAction({
   label,
   onClick,
+  className = "",
 }: {
   label: string;
   onClick: () => void;
+  className?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex justify-center rounded-full border border-[#123a55]/20 bg-[#123a55] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] hover:bg-[#7c3419]"
+      className={`inline-flex justify-center rounded-full border border-[#123a55]/20 bg-[#123a55] px-2 py-1 text-[0.65rem] font-black uppercase leading-none tracking-normal text-[#efd4b0] hover:bg-[#7c3419] sm:px-3 sm:py-1.5 sm:text-xs ${className}`}
     >
       {label}
     </button>
@@ -318,14 +377,14 @@ function PopupImage({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[rgba(74,51,35,0.14)] bg-[#efd4b0]">
+    <div className="hidden overflow-hidden rounded-xl border border-[rgba(74,51,35,0.14)] bg-[#efd4b0] sm:block">
       <Image
         src={withPocketBaseImageThumb(src, "thumbnail")}
         alt={alt}
         width={320}
         height={176}
         unoptimized
-        className="h-28 w-full object-cover saturate-[0.92]"
+        className="h-24 w-full object-cover saturate-[0.92] sm:h-28"
         style={getImageFocusStyle(focus)}
       />
     </div>
@@ -334,7 +393,7 @@ function PopupImage({
 
 function PopupEyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#7c3419]">
+    <p className="text-[0.62rem] font-black uppercase leading-none tracking-normal text-[#7c3419] sm:text-[0.68rem]">
       {children}
     </p>
   );
@@ -471,31 +530,39 @@ export function StationsTerritoryMapLeaflet({
               <Tooltip direction="top" offset={[0, -8]} opacity={1}>
                 {formatStationMapLabel(station)}
               </Tooltip>
-              <Popup>
-                <div className="min-w-[210px] space-y-3">
+              <Popup className="territory-entity-popup">
+                <div className="w-[180px] space-y-2 sm:min-w-[210px] sm:w-auto sm:space-y-3">
                   <PopupImage src={station.imageUrl} alt={station.name} focus={station.imageFocus} />
                   <div className="space-y-1">
                     <PopupEyebrow>Estacion de la ruta</PopupEyebrow>
-                    <p className="text-base font-black leading-tight text-[#082d49]">
+                    <p className="text-sm font-black leading-tight text-[#082d49] sm:text-base">
                       {formatStationMapLabel(station)}
                     </p>
-                    <p className="text-xs text-[#725a49]">
+                    <p className="text-[0.7rem] leading-tight text-[#725a49] sm:text-xs">
                       {formatStationMapLocation(station.locality)}
                     </p>
-                    <p className="text-xs text-[#725a49]">
+                    <p className="hidden text-xs text-[#725a49] sm:block">
                       {station.slogan || "Nodo territorial de la ruta"}
                     </p>
                     {station.datoDestacado ? (
-                      <p className="rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419]">
+                      <p className="hidden rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419] sm:block">
                         {station.datoDestacado}
                       </p>
                     ) : null}
                   </div>
-                  <PopupAction
-                    label="Ver estacion"
-                    onClick={() => router.push(`/estaciones/${station.slug}`)}
-                  />
-                  <SatelliteMapButton point={station} compact className="w-full" />
+                  <div className="flex gap-1.5 sm:flex-col sm:gap-2">
+                    <PopupAction
+                      label="Abrir"
+                      onClick={() => router.push(`/estaciones/${station.slug}`)}
+                      className="flex-1"
+                    />
+                    <SatelliteMapButton
+                      point={station}
+                      label="Satelital"
+                      compact
+                      className="flex-1 px-2 py-1 text-[0.65rem] sm:w-full sm:px-3 sm:py-1.5 sm:text-xs"
+                    />
+                  </div>
                 </div>
               </Popup>
             </Marker>
@@ -511,32 +578,40 @@ export function StationsTerritoryMapLeaflet({
             <Tooltip direction="top" offset={[0, -8]} opacity={1}>
               {artisan.name}
             </Tooltip>
-            <Popup>
-              <div className="min-w-[210px] space-y-3">
+            <Popup className="territory-entity-popup">
+              <div className="w-[180px] space-y-2 sm:min-w-[210px] sm:w-auto sm:space-y-3">
                 <PopupImage src={artisan.imageUrl} alt={artisan.name} focus={artisan.imageFocus} />
                 <div className="space-y-1">
                   <PopupEyebrow>{artisan.actorType ?? "Actor artesanal"}</PopupEyebrow>
-                  <p className="text-base font-black leading-tight text-[#082d49]">{artisan.name}</p>
-                  <p className="text-xs text-[#725a49]">{artisan.place}</p>
-                  <p className="text-xs text-[#725a49]">
+                  <p className="text-sm font-black leading-tight text-[#082d49] sm:text-base">{artisan.name}</p>
+                  <p className="text-[0.7rem] leading-tight text-[#725a49] sm:text-xs">{artisan.place}</p>
+                  <p className="hidden text-xs text-[#725a49] sm:block">
                     {artisan.craft || "Actor artesanal"}
                   </p>
                   {artisan.datoDestacado ? (
-                    <p className="rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419]">
+                    <p className="hidden rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419] sm:block">
                       {artisan.datoDestacado}
                     </p>
                   ) : null}
                 </div>
                 {artisan.stationName ? (
-                  <p className="text-xs text-[#725a49]">
+                  <p className="hidden text-xs text-[#725a49] sm:block">
                     Estacion: {artisan.stationName}
                   </p>
                 ) : null}
-                <PopupAction
-                  label="Ver actor"
-                  onClick={() => router.push(`/artesanas/${artisan.slug}`)}
-                />
-                <SatelliteMapButton point={artisan} compact className="w-full" />
+                <div className="flex gap-1.5 sm:flex-col sm:gap-2">
+                  <PopupAction
+                    label="Abrir"
+                    onClick={() => router.push(`/artesanas/${artisan.slug}`)}
+                    className="flex-1"
+                  />
+                  <SatelliteMapButton
+                    point={artisan}
+                    label="Satelital"
+                    compact
+                    className="flex-1 px-2 py-1 text-[0.65rem] sm:w-full sm:px-3 sm:py-1.5 sm:text-xs"
+                  />
+                </div>
               </div>
             </Popup>
           </Marker>
@@ -551,32 +626,40 @@ export function StationsTerritoryMapLeaflet({
             <Tooltip direction="top" offset={[0, -8]} opacity={1}>
               {spot.title}
             </Tooltip>
-            <Popup>
-              <div className="min-w-[210px] space-y-3">
+            <Popup className="territory-entity-popup">
+              <div className="w-[180px] space-y-2 sm:min-w-[210px] sm:w-auto sm:space-y-3">
                 <PopupImage src={spot.imageUrl} alt={spot.title} focus={spot.imageFocus} />
                 <div className="space-y-1">
                   <PopupEyebrow>{spot.type || "Imperdible"}</PopupEyebrow>
-                  <p className="text-base font-black leading-tight text-[#082d49]">{spot.title}</p>
-                  <p className="text-xs text-[#725a49]">{spot.location}</p>
-                  <p className="text-xs text-[#725a49]">
+                  <p className="text-sm font-black leading-tight text-[#082d49] sm:text-base">{spot.title}</p>
+                  <p className="text-[0.7rem] leading-tight text-[#725a49] sm:text-xs">{spot.location}</p>
+                  <p className="hidden text-xs text-[#725a49] sm:block">
                     {spot.subtitle || spot.type}
                   </p>
                   {spot.datoDestacado ? (
-                    <p className="rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419]">
+                    <p className="hidden rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419] sm:block">
                       {spot.datoDestacado}
                     </p>
                   ) : null}
                 </div>
                 {spot.stationName ? (
-                  <p className="text-xs text-[#725a49]">
+                  <p className="hidden text-xs text-[#725a49] sm:block">
                     Estacion: {spot.stationName}
                   </p>
                 ) : null}
-                <PopupAction
-                  label="Ver imperdible"
-                  onClick={() => router.push(`/imperdibles/${spot.slug}`)}
-                />
-                <SatelliteMapButton point={spot} compact className="w-full" />
+                <div className="flex gap-1.5 sm:flex-col sm:gap-2">
+                  <PopupAction
+                    label="Abrir"
+                    onClick={() => router.push(`/imperdibles/${spot.slug}`)}
+                    className="flex-1"
+                  />
+                  <SatelliteMapButton
+                    point={spot}
+                    label="Satelital"
+                    compact
+                    className="flex-1 px-2 py-1 text-[0.65rem] sm:w-full sm:px-3 sm:py-1.5 sm:text-xs"
+                  />
+                </div>
               </div>
             </Popup>
           </Marker>

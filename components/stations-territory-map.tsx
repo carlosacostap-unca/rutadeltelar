@@ -103,12 +103,12 @@ function MapReferenceIcon({ kind }: { kind: LayerKey }) {
     highlightSpots: "bg-[#ffd400]",
   }[kind];
   const iconClassName =
-    "h-4 w-4 fill-none stroke-[#10283b] stroke-[2.1] [stroke-linecap:round] [stroke-linejoin:round]";
+    "h-3 w-3 fill-none stroke-[#10283b] stroke-[2.1] [stroke-linecap:round] [stroke-linejoin:round] sm:h-4 sm:w-4";
 
   return (
     <span
       aria-hidden="true"
-      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border-[3px] border-[#10283b] shadow-[0_0_0_2px_rgba(255,255,255,0.78)] ${className}`}
+      className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-[#10283b] shadow-[0_0_0_2px_rgba(255,255,255,0.78)] sm:h-8 sm:w-8 sm:border-[3px] ${className}`}
     >
       {kind === "stations" ? (
         <svg viewBox="0 0 24 24" className={iconClassName}>
@@ -374,14 +374,14 @@ export function StationsTerritoryMap({
           </DeferredRender>
 
           {showIconReferences ? (
-            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-[1.15rem] border border-[#123a55]/20 bg-[#123a55]/5 p-3 text-[#082d49]">
-              <p className="mr-1 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/75">
+            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-[1.15rem] border border-[#123a55]/20 bg-[#123a55]/5 p-2 text-[#082d49] sm:mt-4 sm:gap-3 sm:p-3">
+              <p className="mr-0 text-[0.62rem] font-black uppercase leading-none tracking-normal text-[#123a55]/75 sm:mr-1 sm:text-xs">
                 Referencias
               </p>
               {layerItems.map((item) => (
-                <div key={`icon-reference-${item.key}`} className="flex items-center gap-2">
+                <div key={`icon-reference-${item.key}`} className="flex items-center gap-1.5 sm:gap-2">
                   <MapReferenceIcon kind={item.key} />
-                  <span className="text-sm font-black uppercase leading-none tracking-normal">
+                  <span className="text-[0.68rem] font-black uppercase leading-none tracking-normal sm:text-sm">
                     {item.label}
                   </span>
                 </div>

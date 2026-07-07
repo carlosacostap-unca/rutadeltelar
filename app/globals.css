@@ -226,6 +226,12 @@ textarea:focus-visible {
   color: var(--foreground);
 }
 
+@media (max-width: 640px) {
+  .leaflet-container .territory-entity-popup .leaflet-popup-content {
+    margin: 8px 10px;
+  }
+}
+
 .leaflet-container .territory-map-imagery {
   filter: saturate(0.78) sepia(0.18) contrast(0.92) brightness(1.04);
 }
