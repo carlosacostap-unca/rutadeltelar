@@ -293,12 +293,9 @@ export function StationsTerritoryMap({
       : selectedStation
         ? formatMapStationName(selectedStation.name)
         : "Ruta del Telar";
-  const explorerDescription =
-    explorerView === "stations"
-      ? "Elegí una estación para ver sus actores e imperdibles."
-      : selectedStation?.slogan ||
-        selectedStation?.summary ||
-        "Elegí qué contenido vinculado querés navegar.";
+  const explorerHeightClass = showIconReferences
+    ? "h-[446px] sm:h-[596px]"
+    : "h-[380px] sm:h-[520px]";
 
   return (
     <section className="rounded-[1.85rem] bg-[#efd4b0] p-4 text-[#123a55] shadow-sm sm:p-6">
@@ -448,14 +445,13 @@ export function StationsTerritoryMap({
         </div>
 
         {showExplorer ? (
-          <aside className="flex h-[380px] min-w-0 flex-col overflow-hidden rounded-[1.35rem] border border-[#123a55]/15 bg-[#f5dfbd] sm:h-[520px]">
+          <aside
+            className={`flex ${explorerHeightClass} min-w-0 flex-col overflow-hidden rounded-[1.35rem] border border-[#123a55]/15 bg-[#f5dfbd]`}
+          >
             <div className="shrink-0 border-b border-[#123a55]/15 p-3 sm:p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/70">
-                    Explorador
-                  </p>
-                  <p className="mt-1 truncate text-xl font-black leading-tight tracking-normal text-[#082d49]">
+                  <p className="truncate text-xl font-black leading-tight tracking-normal text-[#082d49]">
                     {explorerTitle}
                   </p>
                 </div>
@@ -469,9 +465,6 @@ export function StationsTerritoryMap({
                   </button>
                 ) : null}
               </div>
-              <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#123a55]/75">
-                {explorerDescription}
-              </p>
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto p-3 pr-2 sm:p-4 sm:pr-3">
