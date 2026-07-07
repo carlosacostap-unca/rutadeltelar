@@ -77,6 +77,42 @@ function formatStationMapLocation(value: string) {
   return value.replace(/,\s*Catamarca\.?$/i, "");
 }
 
+function normalizePopupInfoText(value?: string) {
+  return (value ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/^estacion\s+/i, "")
+    .replace(/,\s*catamarca\.?$/i, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function repeatsPopupInfo(value?: string, comparedWith?: string) {
+  const normalizedValue = normalizePopupInfoText(value);
+  const normalizedComparison = normalizePopupInfoText(comparedWith);
+
+  if (!normalizedValue || !normalizedComparison) {
+    return false;
+  }
+
+  return (
+    normalizedValue === normalizedComparison ||
+    normalizedValue.includes(normalizedComparison) ||
+    normalizedComparison.includes(normalizedValue)
+  );
+}
+
+function isGenericArtisanCraft(value?: string) {
+  const normalizedValue = normalizePopupInfoText(value);
+
+  return (
+    normalizedValue === "artesano" ||
+    normalizedValue === "artesana" ||
+    normalizedValue === "actor artesanal"
+  );
+}
+
 function getMapEntityIcon({
   kind,
   active = false,
@@ -569,53 +605,66 @@ export function StationsTerritoryMapLeaflet({
           );
         })}
 
-        {visibleArtisans.map((artisan) => (
-          <Marker
-            key={`artisan-${artisan.slug}`}
-            position={[artisan.latitude, artisan.longitude]}
-            icon={getMapEntityIcon({ kind: "artisan" })}
-          >
-            <Tooltip direction="top" offset={[0, -8]} opacity={1}>
-              {artisan.name}
-            </Tooltip>
-            <Popup className="territory-entity-popup">
-              <div className="w-[180px] space-y-2 sm:min-w-[210px] sm:w-auto sm:space-y-3">
-                <PopupImage src={artisan.imageUrl} alt={artisan.name} focus={artisan.imageFocus} />
-                <div className="space-y-1">
-                  <PopupEyebrow>{artisan.actorType ?? "Actor artesanal"}</PopupEyebrow>
-                  <p className="text-sm font-black leading-tight text-[#082d49] sm:text-base">{artisan.name}</p>
-                  <p className="text-[0.7rem] leading-tight text-[#725a49] sm:text-xs">{artisan.place}</p>
-                  <p className="hidden text-xs text-[#725a49] sm:block">
-                    {artisan.craft || "Actor artesanal"}
-                  </p>
-                  {artisan.datoDestacado ? (
-                    <p className="hidden rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419] sm:block">
-                      {artisan.datoDestacado}
+        {visibleArtisans.map((artisan) => {
+          const artisanCraft = artisan.craft?.trim();
+          const shouldShowCraft =
+            artisanCraft &&
+            !isGenericArtisanCraft(artisanCraft) &&
+            !repeatsPopupInfo(artisanCraft, artisan.actorType);
+          const shouldShowStation =
+            artisan.stationName &&
+            !repeatsPopupInfo(artisan.stationName, artisan.place);
+
+          return (
+            <Marker
+              key={`artisan-${artisan.slug}`}
+              position={[artisan.latitude, artisan.longitude]}
+              icon={getMapEntityIcon({ kind: "artisan" })}
+            >
+              <Tooltip direction="top" offset={[0, -8]} opacity={1}>
+                {artisan.name}
+              </Tooltip>
+              <Popup className="territory-entity-popup">
+                <div className="w-[180px] space-y-2 sm:min-w-[210px] sm:w-auto sm:space-y-3">
+                  <PopupImage src={artisan.imageUrl} alt={artisan.name} focus={artisan.imageFocus} />
+                  <div className="space-y-1">
+                    <PopupEyebrow>{artisan.actorType ?? "Actor artesanal"}</PopupEyebrow>
+                    <p className="text-sm font-black leading-tight text-[#082d49] sm:text-base">{artisan.name}</p>
+                    <p className="text-[0.7rem] leading-tight text-[#725a49] sm:text-xs">{artisan.place}</p>
+                    {shouldShowCraft ? (
+                      <p className="hidden text-xs text-[#725a49] sm:block">
+                        {artisanCraft}
+                      </p>
+                    ) : null}
+                    {artisan.datoDestacado ? (
+                      <p className="hidden rounded-lg bg-[#8a452b12] px-2 py-1 text-xs font-semibold text-[#7c3419] sm:block">
+                        {artisan.datoDestacado}
+                      </p>
+                    ) : null}
+                  </div>
+                  {shouldShowStation ? (
+                    <p className="hidden text-xs text-[#725a49] sm:block">
+                      Estacion: {artisan.stationName}
                     </p>
                   ) : null}
+                  <div className="flex gap-1.5 sm:flex-col sm:gap-2">
+                    <PopupAction
+                      label="Abrir"
+                      onClick={() => router.push(`/artesanas/${artisan.slug}`)}
+                      className="flex-1"
+                    />
+                    <SatelliteMapButton
+                      point={artisan}
+                      label="Satelital"
+                      compact
+                      className="flex-1 px-2 py-1 text-[0.65rem] sm:w-full sm:px-3 sm:py-1.5 sm:text-xs"
+                    />
+                  </div>
                 </div>
-                {artisan.stationName ? (
-                  <p className="hidden text-xs text-[#725a49] sm:block">
-                    Estacion: {artisan.stationName}
-                  </p>
-                ) : null}
-                <div className="flex gap-1.5 sm:flex-col sm:gap-2">
-                  <PopupAction
-                    label="Abrir"
-                    onClick={() => router.push(`/artesanas/${artisan.slug}`)}
-                    className="flex-1"
-                  />
-                  <SatelliteMapButton
-                    point={artisan}
-                    label="Satelital"
-                    compact
-                    className="flex-1 px-2 py-1 text-[0.65rem] sm:w-full sm:px-3 sm:py-1.5 sm:text-xs"
-                  />
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+              </Popup>
+            </Marker>
+          );
+        })}
 
         {visibleHighlightSpots.map((spot) => (
           <Marker
