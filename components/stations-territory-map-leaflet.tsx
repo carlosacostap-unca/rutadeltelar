@@ -29,6 +29,7 @@ import { SatelliteMapButton } from "@/components/satellite-map-button";
 const TERRITORY_MAP_SINGLE_POINT_ZOOM = 13;
 const TERRITORY_MAP_MULTI_POINT_ZOOM = 10;
 const TERRITORY_MAP_MAX_BOUNDS_ZOOM = 13;
+const TERRITORY_MAP_DETAIL_MIN_ZOOM = 13;
 const OSRM_ROUTE_ENDPOINT = "https://router.project-osrm.org/route/v1/driving";
 
 type StationsTerritoryMapLeafletProps = {
@@ -223,6 +224,29 @@ function MapResizer() {
   return null;
 }
 
+function DetailScaleObserver({
+  onDetailScaleChange,
+}: {
+  onDetailScaleChange: (visible: boolean) => void;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    const updateDetailScale = () => {
+      onDetailScaleChange(map.getZoom() >= TERRITORY_MAP_DETAIL_MIN_ZOOM);
+    };
+
+    updateDetailScale();
+    map.on("zoomend", updateDetailScale);
+
+    return () => {
+      map.off("zoomend", updateDetailScale);
+    };
+  }, [map, onDetailScaleChange]);
+
+  return null;
+}
+
 function SelectedStationFlyTo({
   selectedSlug,
   stations,
@@ -331,6 +355,7 @@ export function StationsTerritoryMapLeaflet({
   warmTiles = false,
 }: StationsTerritoryMapLeafletProps) {
   const router = useRouter();
+  const [isDetailScale, setIsDetailScale] = useState(false);
   const geolocatedStations = useMemo(() => {
     if (!showStations) return [];
     return getGeolocatedStations(stations);
@@ -347,6 +372,8 @@ export function StationsTerritoryMapLeaflet({
     geolocatedStations.length +
     geolocatedArtisans.length +
     geolocatedHighlightSpots.length;
+  const visibleArtisans = isDetailScale ? geolocatedArtisans : [];
+  const visibleHighlightSpots = isDetailScale ? geolocatedHighlightSpots : [];
 
   const center = useMemo<LatLngExpression>(() => {
     const allPoints = [
@@ -423,6 +450,7 @@ export function StationsTerritoryMapLeaflet({
           selectedSlug={selectedSlug}
           stations={geolocatedStations}
         />
+        <DetailScaleObserver onDetailScaleChange={setIsDetailScale} />
         <SatelliteReferenceTileLayers mood={warmTiles ? "warm" : "neutral"} />
         <ScaleControl position="bottomleft" imperial={false} />
 
@@ -474,7 +502,7 @@ export function StationsTerritoryMapLeaflet({
           );
         })}
 
-        {geolocatedArtisans.map((artisan) => (
+        {visibleArtisans.map((artisan) => (
           <Marker
             key={`artisan-${artisan.slug}`}
             position={[artisan.latitude, artisan.longitude]}
@@ -517,7 +545,7 @@ export function StationsTerritoryMapLeaflet({
           </Marker>
         ))}
 
-        {geolocatedHighlightSpots.map((spot) => (
+        {visibleHighlightSpots.map((spot) => (
           <Marker
             key={`spot-${spot.slug}`}
             position={[spot.latitude, spot.longitude]}

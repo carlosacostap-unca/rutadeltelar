@@ -35,19 +35,19 @@ const LAYERS = [
     id: "stations",
     label: "Estaciones",
     helper: "Nodos de entrada",
-    colorClass: "bg-[#9d4d2e]",
+    colorClass: "bg-[#00d4ff]",
   },
   {
     id: "artisans",
     label: "Actores",
     helper: "Oficios y perfiles",
-    colorClass: "bg-[#61644a]",
+    colorClass: "bg-[#ff4fd8]",
   },
   {
     id: "highlightSpots",
     label: "Imperdibles",
     helper: "Paradas destacadas",
-    colorClass: "bg-[#3d2414]",
+    colorClass: "bg-[#ffd400]",
   },
 ] as const;
 
