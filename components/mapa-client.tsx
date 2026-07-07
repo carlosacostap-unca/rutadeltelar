@@ -49,6 +49,7 @@ export function MapaClient({ stations, artisans, highlightSpots }: Props) {
         compactHeader
         showExplorer={false}
         showLegend={false}
+        showIconReferences
         warmTiles
       />
 

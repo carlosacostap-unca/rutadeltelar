@@ -23,6 +23,7 @@ type StationsTerritoryMapProps = {
   compactHeader?: boolean;
   showExplorer?: boolean;
   showLegend?: boolean;
+  showIconReferences?: boolean;
   warmTiles?: boolean;
 };
 
@@ -95,6 +96,44 @@ function EmptyPanel({ children }: { children: ReactNode }) {
   );
 }
 
+function MapReferenceIcon({ kind }: { kind: LayerKey }) {
+  const className = {
+    stations: "bg-[#00d4ff]",
+    artisans: "bg-[#ff4fd8]",
+    highlightSpots: "bg-[#ffd400]",
+  }[kind];
+  const iconClassName =
+    "h-4 w-4 fill-none stroke-[#10283b] stroke-[2.1] [stroke-linecap:round] [stroke-linejoin:round]";
+
+  return (
+    <span
+      aria-hidden="true"
+      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border-[3px] border-[#10283b] shadow-[0_0_0_2px_rgba(255,255,255,0.78)] ${className}`}
+    >
+      {kind === "stations" ? (
+        <svg viewBox="0 0 24 24" className={iconClassName}>
+          <path d="M3.5 11.5 12 4l8.5 7.5" />
+          <path d="M5.5 10.5V20h13v-9.5" />
+          <path d="M9.5 20v-5h5v5" />
+        </svg>
+      ) : null}
+      {kind === "artisans" ? (
+        <svg viewBox="0 0 24 24" className={iconClassName}>
+          <circle cx="12" cy="6.5" r="3" />
+          <path d="M5.5 20c1.1-5 3.2-7.5 6.5-7.5s5.4 2.5 6.5 7.5" />
+          <path d="M4.5 14.5h15" />
+          <path d="M6.5 17h11" />
+        </svg>
+      ) : null}
+      {kind === "highlightSpots" ? (
+        <svg viewBox="0 0 24 24" className={iconClassName}>
+          <path d="m12 3 2.6 5.4 6 .8-4.3 4.2 1 6-5.3-2.8-5.3 2.8 1-6-4.3-4.2 6-.8L12 3Z" />
+        </svg>
+      ) : null}
+    </span>
+  );
+}
+
 export function StationsTerritoryMap({
   stations,
   activeSlug,
@@ -106,6 +145,7 @@ export function StationsTerritoryMap({
   compactHeader = false,
   showExplorer = true,
   showLegend = true,
+  showIconReferences = false,
   warmTiles = false,
 }: StationsTerritoryMapProps) {
   const [focusMode, setFocusMode] = useState<"all" | "active">("all");
@@ -332,6 +372,22 @@ export function StationsTerritoryMap({
               warmTiles={warmTiles}
             />
           </DeferredRender>
+
+          {showIconReferences ? (
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-[1.15rem] border border-[#123a55]/20 bg-[#123a55]/5 p-3 text-[#082d49]">
+              <p className="mr-1 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/75">
+                Referencias
+              </p>
+              {layerItems.map((item) => (
+                <div key={`icon-reference-${item.key}`} className="flex items-center gap-2">
+                  <MapReferenceIcon kind={item.key} />
+                  <span className="text-sm font-black uppercase leading-none tracking-normal">
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : null}
 
           {showLegend ? (
             <div className="mt-4 grid gap-3 rounded-[1.35rem] border border-[#123a55]/20 bg-[#123a55]/5 p-4 md:grid-cols-3">
