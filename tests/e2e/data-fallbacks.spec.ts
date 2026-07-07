@@ -21,7 +21,7 @@ test.describe("incomplete data fallbacks", () => {
   test("explains when visible map records have no coordinates", async ({ page }) => {
     await page.goto("/mapa");
 
-    await expect(page.getByText("0 puntos en mapa")).toBeVisible();
+    await expect(page.getByText("Sin coordenadas visibles")).toBeVisible();
     await expect(
       page.getByText("Ninguno de los registros visibles tiene coordenadas cargadas."),
     ).toBeVisible();

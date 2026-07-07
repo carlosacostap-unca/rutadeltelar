@@ -21,6 +21,8 @@ type StationsTerritoryMapProps = {
   highlightSpots?: HighlightSpot[];
   showLayerControls?: boolean;
   compactHeader?: boolean;
+  showExplorer?: boolean;
+  showLegend?: boolean;
   warmTiles?: boolean;
 };
 
@@ -102,6 +104,8 @@ export function StationsTerritoryMap({
   highlightSpots,
   showLayerControls = true,
   compactHeader = false,
+  showExplorer = true,
+  showLegend = true,
   warmTiles = false,
 }: StationsTerritoryMapProps) {
   const [focusMode, setFocusMode] = useState<"all" | "active">("all");
@@ -304,7 +308,13 @@ export function StationsTerritoryMap({
         </div>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(20rem,0.85fr)]">
+      <div
+        className={
+          showExplorer
+            ? "grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(20rem,0.85fr)]"
+            : "grid gap-4"
+        }
+      >
         <div className="min-w-0">
           <DeferredRender
             fallback={<MapLoadingPlaceholder label="Mapa listo al acercarte..." />}
@@ -323,25 +333,28 @@ export function StationsTerritoryMap({
             />
           </DeferredRender>
 
-          <div className="mt-4 grid gap-3 rounded-[1.35rem] border border-[#123a55]/20 bg-[#123a55]/5 p-4 md:grid-cols-3">
-            {layerItems.map((item) => (
-              <div key={`legend-${item.key}`} className="flex items-start gap-3">
-                <span
-                  className={`mt-1 inline-flex h-3 w-3 shrink-0 rounded-full ring-2 ring-[#efd4b0] ${item.colorClass}`}
-                />
-                <div>
-                  <p className="text-sm font-black uppercase leading-none tracking-normal text-[#082d49]">
-                    {item.label}
-                  </p>
-                  <p className="mt-1 text-xs font-medium leading-5 text-[#123a55]/75">
-                    {item.helper}. Disponibles en mapa: {item.count}
-                  </p>
+          {showLegend ? (
+            <div className="mt-4 grid gap-3 rounded-[1.35rem] border border-[#123a55]/20 bg-[#123a55]/5 p-4 md:grid-cols-3">
+              {layerItems.map((item) => (
+                <div key={`legend-${item.key}`} className="flex items-start gap-3">
+                  <span
+                    className={`mt-1 inline-flex h-3 w-3 shrink-0 rounded-full ring-2 ring-[#efd4b0] ${item.colorClass}`}
+                  />
+                  <div>
+                    <p className="text-sm font-black uppercase leading-none tracking-normal text-[#082d49]">
+                      {item.label}
+                    </p>
+                    <p className="mt-1 text-xs font-medium leading-5 text-[#123a55]/75">
+                      {item.helper}. Disponibles en mapa: {item.count}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : null}
         </div>
 
+        {showExplorer ? (
         <aside className="min-w-0 rounded-[1.35rem] border border-[#123a55]/15 bg-[#f5dfbd] p-3 sm:p-4">
           <div>
             <p className="text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/75">
@@ -554,6 +567,7 @@ export function StationsTerritoryMap({
             </div>
           ) : null}
         </aside>
+        ) : null}
       </div>
     </section>
   );

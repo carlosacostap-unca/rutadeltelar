@@ -25,7 +25,7 @@ test.describe("basic accessibility", () => {
     await expect(page.getByRole("status")).toContainText("1 producto");
   });
 
-  test("exposes pressed state on filter and map layer toggles", async ({ page }) => {
+  test("exposes pressed state on filters and keeps map controls minimal", async ({ page }) => {
     await page.goto("/explorar");
 
     const duration = page.getByRole("button", { name: "2 h" });
@@ -36,11 +36,10 @@ test.describe("basic accessibility", () => {
 
     await page.goto("/mapa");
 
-    const actorsLayer = page.getByRole("button", { name: "Actores", exact: true });
-    await expect(actorsLayer).toHaveAttribute("aria-pressed", "true");
-
-    await actorsLayer.click();
-    await expect(actorsLayer).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByText("Capas del mapa")).toHaveCount(0);
+    await expect(
+      page.getByRole("tablist", { name: /Tipo de contenido para navegar/i }),
+    ).toHaveCount(0);
   });
 
   test("marks the current mobile navigation item", async ({ page }) => {
