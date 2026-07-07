@@ -12,6 +12,7 @@ import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
+import { MetricsViewTracker } from "@/components/metrics-view-tracker";
 import { ShareButton } from "@/components/share-button";
 
 type ProductDetailPageProps = {
@@ -253,6 +254,12 @@ export default async function ProductDetailPage({
 
   return (
     <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
+      <MetricsViewTracker
+        entityType="productos"
+        entityId={product.recordId}
+        entitySlug={product.slug}
+        entityTitle={product.name}
+      />
       <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
           <Link
