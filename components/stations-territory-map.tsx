@@ -476,7 +476,7 @@ export function StationsTerritoryMap({
 
             <div className="min-h-0 flex-1 overflow-y-auto p-3 pr-2 sm:p-4 sm:pr-3">
               {explorerView === "stations" ? (
-                <div className="space-y-3" aria-label="Estaciones para navegar">
+                <div className="flex flex-col gap-3" aria-label="Estaciones para navegar">
                   {stations.length > 0 ? (
                     stations.map((station) => {
                       const isActive =
@@ -488,7 +488,7 @@ export function StationsTerritoryMap({
                           key={station.slug}
                           type="button"
                           onClick={() => handleSelectStation(station)}
-                          className={`rounded-[1.15rem] border p-4 text-sm transition ${
+                          className={`w-full rounded-[1.15rem] border p-4 text-sm transition ${
                             isActive
                               ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
                               : "border-[#123a55]/15 bg-[#123a55]/90 text-[#efd4b0]"
