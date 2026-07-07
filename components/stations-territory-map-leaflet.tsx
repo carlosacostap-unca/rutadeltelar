@@ -563,7 +563,13 @@ export function StationsTerritoryMapLeaflet({
                 click: () => onSelectStation?.(station.slug),
               }}
             >
-              <Tooltip direction="top" offset={[0, -8]} opacity={1}>
+              <Tooltip
+                direction="right"
+                offset={[18, 0]}
+                opacity={1}
+                permanent
+                className="territory-marker-label"
+              >
                 {formatStationMapLabel(station)}
               </Tooltip>
               <Popup className="territory-entity-popup">
@@ -621,7 +627,13 @@ export function StationsTerritoryMapLeaflet({
               position={[artisan.latitude, artisan.longitude]}
               icon={getMapEntityIcon({ kind: "artisan" })}
             >
-              <Tooltip direction="top" offset={[0, -8]} opacity={1}>
+              <Tooltip
+                direction="right"
+                offset={[18, 0]}
+                opacity={1}
+                permanent
+                className="territory-marker-label"
+              >
                 {artisan.name}
               </Tooltip>
               <Popup className="territory-entity-popup">
@@ -672,7 +684,13 @@ export function StationsTerritoryMapLeaflet({
             position={[spot.latitude, spot.longitude]}
             icon={getMapEntityIcon({ kind: "highlight" })}
           >
-            <Tooltip direction="top" offset={[0, -8]} opacity={1}>
+            <Tooltip
+              direction="right"
+              offset={[18, 0]}
+              opacity={1}
+              permanent
+              className="territory-marker-label"
+            >
               {spot.title}
             </Tooltip>
             <Popup className="territory-entity-popup">

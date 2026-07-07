@@ -27,7 +27,7 @@ type StationsTerritoryMapProps = {
   warmTiles?: boolean;
 };
 
-type NavigationTab = "stations" | "artisans" | "highlightSpots";
+type ExplorerView = "stations" | "choices" | "artisans" | "highlightSpots";
 type LayerKey = "stations" | "artisans" | "highlightSpots";
 
 const StationsTerritoryMapLeaflet = dynamic(
@@ -50,6 +50,43 @@ function normalizeMapText(value: string) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
+}
+
+function normalizeExplorerText(value?: string) {
+  return normalizeMapText(value ?? "")
+    .replace(/^estacion\s+/i, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function repeatsExplorerText(value?: string, comparedWith?: string) {
+  const normalizedValue = normalizeExplorerText(value);
+  const normalizedComparison = normalizeExplorerText(comparedWith);
+
+  if (!normalizedValue || !normalizedComparison) {
+    return false;
+  }
+
+  return (
+    normalizedValue === normalizedComparison ||
+    normalizedValue.includes(normalizedComparison) ||
+    normalizedComparison.includes(normalizedValue)
+  );
+}
+
+function getArtisanExplorerDescription(artisan: Artisan) {
+  const craft = artisan.craft?.trim();
+  const genericCraft =
+    repeatsExplorerText(craft, artisan.actorType) ||
+    ["artesano", "artesana", "actor artesanal"].includes(
+      normalizeExplorerText(craft),
+    );
+
+  if (craft && !genericCraft) {
+    return craft;
+  }
+
+  return artisan.place || artisan.stationName || "Perfil vinculado";
 }
 
 function belongsToStation(
@@ -150,7 +187,7 @@ export function StationsTerritoryMap({
 }: StationsTerritoryMapProps) {
   const [focusMode, setFocusMode] = useState<"all" | "active">("all");
   const [localSelectedSlug, setLocalSelectedSlug] = useState<string>();
-  const [navigationTab, setNavigationTab] = useState<NavigationTab>("stations");
+  const [explorerView, setExplorerView] = useState<ExplorerView>("stations");
   const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
     stations: true,
     artisans: true,
@@ -177,7 +214,16 @@ export function StationsTerritoryMap({
 
   function handleSelectStation(slug: string) {
     setLocalSelectedSlug(slug);
+    setExplorerView("choices");
     onSelectStation?.(slug);
+  }
+
+  function handleExplorerBack() {
+    setExplorerView((current) =>
+      current === "artisans" || current === "highlightSpots"
+        ? "choices"
+        : "stations",
+    );
   }
 
   const filteredStations = useMemo(() => {
@@ -251,23 +297,18 @@ export function StationsTerritoryMap({
       helper: "Puntos destacados",
     },
   ];
-  const navigationItems = [
-    {
-      key: "stations" as const,
-      label: "Estaciones",
-      count: stations.length,
-    },
-    {
-      key: "artisans" as const,
-      label: "Actores",
-      count: selectedArtisans.length,
-    },
-    {
-      key: "highlightSpots" as const,
-      label: "Imperdibles",
-      count: selectedHighlightSpots.length,
-    },
-  ];
+  const explorerTitle =
+    explorerView === "stations"
+      ? "Estaciones"
+      : selectedStation
+        ? formatMapStationName(selectedStation.name)
+        : "Ruta del Telar";
+  const explorerDescription =
+    explorerView === "stations"
+      ? "Elegí una estación para ver sus actores e imperdibles."
+      : selectedStation?.slogan ||
+        selectedStation?.summary ||
+        "Elegí qué contenido vinculado querés navegar.";
 
   return (
     <section className="rounded-[1.85rem] bg-[#efd4b0] p-4 text-[#123a55] shadow-sm sm:p-6">
@@ -411,218 +452,181 @@ export function StationsTerritoryMap({
         </div>
 
         {showExplorer ? (
-        <aside className="min-w-0 rounded-[1.35rem] border border-[#123a55]/15 bg-[#f5dfbd] p-3 sm:p-4">
-          <div>
-            <p className="text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/75">
-              Explorador
-            </p>
-            <p className="mt-1 text-xl font-black leading-tight tracking-normal text-[#082d49]">
-              {selectedStation ? (
-                <>
-                  <StationName station={selectedStation} />
-                </>
-              ) : (
-                "Ruta del Telar"
-              )}
-            </p>
-            {selectedStation ? (
-              <p className="mt-2 text-sm font-medium leading-6 text-[#123a55]/75">
-                {selectedStation.slogan ||
-                  selectedStation.summary ||
-                  "Selecciona una estacion para ver actores e imperdibles vinculados."}
-              </p>
-            ) : (
-              <p className="mt-2 text-sm font-medium leading-6 text-[#123a55]/75">
-                Selecciona una estacion para sincronizar el mapa con su ficha territorial.
-              </p>
-            )}
-          </div>
-
-          <div
-            aria-label="Estaciones para enfocar en el mapa"
-            className="mt-4 flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:pr-0 lg:flex-col lg:overflow-visible lg:pr-0"
-          >
-            {stations.length > 0 ? (
-              stations.map((station) => {
-                const isActive =
-                  station.slug === activeSlug ||
-                  station.slug === effectiveSelectedSlug;
-
-                return (
+          <aside className="flex h-[380px] min-w-0 flex-col overflow-hidden rounded-[1.35rem] border border-[#123a55]/15 bg-[#f5dfbd] sm:h-[520px]">
+            <div className="shrink-0 border-b border-[#123a55]/15 p-3 sm:p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/70">
+                    Explorador
+                  </p>
+                  <p className="mt-1 truncate text-xl font-black leading-tight tracking-normal text-[#082d49]">
+                    {explorerTitle}
+                  </p>
+                </div>
+                {explorerView !== "stations" ? (
                   <button
-                    key={`station-chip-${station.slug}`}
                     type="button"
-                    aria-pressed={isActive}
-                    onClick={() => handleSelectStation(station.slug)}
-                    className={`flex min-w-[11rem] shrink-0 items-center justify-between gap-3 rounded-[1rem] border px-3 py-2 text-left text-xs font-black leading-tight tracking-normal transition lg:min-w-0 ${
-                      isActive
-                        ? "border-[#7c3419] bg-[#7c3419] text-[#efd4b0]"
-                        : "border-[#123a55]/25 bg-[#efd4b0] text-[#123a55] hover:border-[#123a55]"
-                    }`}
+                    onClick={handleExplorerBack}
+                    className="shrink-0 rounded-full border border-[#123a55]/25 px-3 py-1.5 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55] hover:border-[#123a55] hover:bg-[#123a55] hover:text-[#efd4b0]"
                   >
-                    <span className="min-w-0">
-                      <StationName station={station} />
-                    </span>
-                    {hasValidCoordinates(station) ? (
-                      <span
-                        aria-hidden="true"
-                        className={`h-2.5 w-2.5 shrink-0 rounded-full ${
-                          isActive ? "bg-[#efd4b0]" : "bg-[#7c3419]"
-                        }`}
-                      />
-                    ) : null}
+                    Volver
                   </button>
-                );
-              })
-            ) : (
-              <EmptyPanel>No hay estaciones visibles con la capa actual.</EmptyPanel>
-            )}
-          </div>
+                ) : null}
+              </div>
+              <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#123a55]/75">
+                {explorerDescription}
+              </p>
+            </div>
 
-          <div
-            role="tablist"
-            aria-label="Tipo de contenido para navegar"
-            className="mt-4 grid grid-cols-3 gap-2"
-          >
-            {navigationItems.map((item) => {
-              const active = navigationTab === item.key;
+            <div className="min-h-0 flex-1 overflow-y-auto p-3 pr-2 sm:p-4 sm:pr-3">
+              {explorerView === "stations" ? (
+                <div className="space-y-3" aria-label="Estaciones para navegar">
+                  {stations.length > 0 ? (
+                    stations.map((station) => {
+                      const isActive =
+                        station.slug === activeSlug ||
+                        station.slug === effectiveSelectedSlug;
 
-              return (
-                <button
-                  key={item.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setNavigationTab(item.key)}
-                  className={`min-w-0 rounded-[0.85rem] border px-2 py-2 text-center text-[0.68rem] font-black uppercase leading-none tracking-normal transition ${
-                    active
-                      ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
-                      : "border-[#123a55]/25 bg-[#efd4b0] text-[#123a55] hover:border-[#123a55]"
-                  }`}
-                >
-                  <span className="block truncate">{item.label}</span>
-                  <span className="mt-1 block text-sm">{item.count}</span>
-                </button>
-              );
-            })}
-          </div>
+                      return (
+                        <article
+                          key={station.slug}
+                          className={`rounded-[1.15rem] border p-4 text-sm transition ${
+                            isActive
+                              ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
+                              : "border-[#123a55]/15 bg-[#123a55]/90 text-[#efd4b0]"
+                          }`}
+                        >
+                          {station.department ? (
+                            <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
+                              {station.department}
+                            </p>
+                          ) : null}
+                          <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
+                            <StationName station={station} />
+                          </p>
+                          {station.slogan ? (
+                            <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
+                              {station.slogan}
+                            </p>
+                          ) : null}
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleSelectStation(station.slug)}
+                              className="rounded-full border border-[#efd4b0]/35 px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+                            >
+                              Elegir
+                            </button>
+                            <Link
+                              href={`/estaciones/${station.slug}`}
+                              className="rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55] hover:bg-white"
+                            >
+                              Abrir
+                            </Link>
+                          </div>
+                        </article>
+                      );
+                    })
+                  ) : (
+                    <EmptyPanel>No hay estaciones para listar con la capa actual.</EmptyPanel>
+                  )}
+                </div>
+              ) : null}
 
-          {navigationTab === "stations" ? (
-            <div className="mt-4 space-y-3">
-              {stations.length > 0 ? (
-                stations.map((station) => {
-                  const isActive =
-                    station.slug === activeSlug ||
-                    station.slug === effectiveSelectedSlug;
+              {explorerView === "choices" ? (
+                <div className="grid gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setExplorerView("artisans")}
+                    className="rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55] p-4 text-left text-[#efd4b0] transition hover:-translate-y-0.5"
+                  >
+                    <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
+                      Contenido vinculado
+                    </p>
+                    <p className="mt-1 text-lg font-black leading-tight">Actores</p>
+                    <p className="mt-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
+                      {selectedArtisans.length} perfil{selectedArtisans.length !== 1 ? "es" : ""} en esta estación.
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExplorerView("highlightSpots")}
+                    className="rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55] p-4 text-left text-[#efd4b0] transition hover:-translate-y-0.5"
+                  >
+                    <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
+                      Contenido vinculado
+                    </p>
+                    <p className="mt-1 text-lg font-black leading-tight">Imperdibles</p>
+                    <p className="mt-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
+                      {selectedHighlightSpots.length} punto{selectedHighlightSpots.length !== 1 ? "s" : ""} destacado{selectedHighlightSpots.length !== 1 ? "s" : ""}.
+                    </p>
+                  </button>
+                </div>
+              ) : null}
 
-                  return (
-                    <article
-                      key={station.slug}
-                      className={`rounded-[1.15rem] border p-4 text-sm transition ${
-                        isActive
-                          ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
-                          : "border-[#123a55]/15 bg-[#123a55]/90 text-[#efd4b0]"
-                      }`}
-                    >
-                      {station.department ? (
+              {explorerView === "artisans" ? (
+                <div className="space-y-3">
+                  {selectedArtisans.length > 0 ? (
+                    selectedArtisans.map((artisan) => (
+                      <Link
+                        key={artisan.slug}
+                        href={`/artesanas/${artisan.slug}`}
+                        className="block rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55]/90 p-4 text-sm text-[#efd4b0] transition hover:-translate-y-0.5 hover:bg-[#123a55]"
+                      >
                         <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
-                          {station.department}
+                          {artisan.actorType ?? "Actor"}
                         </p>
-                      ) : null}
-                      <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
-                        <StationName station={station} />
-                      </p>
-                      {station.slogan ? (
+                        <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
+                          {artisan.name}
+                        </p>
                         <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
-                          {station.slogan}
+                          {getArtisanExplorerDescription(artisan)}
                         </p>
-                      ) : null}
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleSelectStation(station.slug)}
-                          className="rounded-full border border-[#efd4b0]/35 px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
-                        >
-                          Enfocar
-                        </button>
-                        <Link
-                          href={`/estaciones/${station.slug}`}
-                          className="rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55] hover:bg-white"
-                        >
-                          Abrir
-                        </Link>
-                      </div>
-                    </article>
-                  );
-                })
-              ) : (
-                <EmptyPanel>No hay estaciones para listar con la capa actual.</EmptyPanel>
-              )}
-            </div>
-          ) : null}
+                        <span className="mt-4 inline-flex rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
+                          Ver perfil
+                        </span>
+                      </Link>
+                    ))
+                  ) : (
+                    <EmptyPanel>
+                      No hay actores vinculados a esta estacion. Volve y proba con otra estacion.
+                    </EmptyPanel>
+                  )}
+                </div>
+              ) : null}
 
-          {navigationTab === "artisans" ? (
-            <div className="mt-4 space-y-3">
-              {selectedArtisans.length > 0 ? (
-                selectedArtisans.map((artisan) => (
-                  <Link
-                    key={artisan.slug}
-                    href={`/artesanas/${artisan.slug}`}
-                    className="block rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55]/90 p-4 text-sm text-[#efd4b0] transition hover:-translate-y-0.5 hover:bg-[#123a55]"
-                  >
-                    <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
-                      {artisan.actorType ?? "Actor"}
-                    </p>
-                    <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
-                      {artisan.name}
-                    </p>
-                    <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
-                      {artisan.craft || artisan.place}
-                    </p>
-                    <span className="mt-4 inline-flex rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
-                      Ver perfil
-                    </span>
-                  </Link>
-                ))
-              ) : (
-                <EmptyPanel>
-                  No hay actores vinculados a esta estacion. Proba con otra estacion.
-                </EmptyPanel>
-              )}
+              {explorerView === "highlightSpots" ? (
+                <div className="space-y-3">
+                  {selectedHighlightSpots.length > 0 ? (
+                    selectedHighlightSpots.map((spot) => (
+                      <Link
+                        key={spot.slug}
+                        href={`/imperdibles/${spot.slug}`}
+                        className="block rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55]/90 p-4 text-sm text-[#efd4b0] transition hover:-translate-y-0.5 hover:bg-[#123a55]"
+                      >
+                        <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
+                          {spot.type}
+                        </p>
+                        <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
+                          {spot.title}
+                        </p>
+                        <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
+                          {spot.subtitle || spot.location}
+                        </p>
+                        <span className="mt-4 inline-flex rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
+                          Ver imperdible
+                        </span>
+                      </Link>
+                    ))
+                  ) : (
+                    <EmptyPanel>
+                      No hay imperdibles vinculados a esta estacion. Volve y proba con otra estacion.
+                    </EmptyPanel>
+                  )}
+                </div>
+              ) : null}
             </div>
-          ) : null}
-
-          {navigationTab === "highlightSpots" ? (
-            <div className="mt-4 space-y-3">
-              {selectedHighlightSpots.length > 0 ? (
-                selectedHighlightSpots.map((spot) => (
-                  <Link
-                    key={spot.slug}
-                    href={`/imperdibles/${spot.slug}`}
-                    className="block rounded-[1.15rem] border border-[#123a55]/15 bg-[#123a55]/90 p-4 text-sm text-[#efd4b0] transition hover:-translate-y-0.5 hover:bg-[#123a55]"
-                  >
-                    <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#efd4b0]/75">
-                      {spot.type}
-                    </p>
-                    <p className="mt-1 font-black leading-tight tracking-normal text-[#efd4b0]">
-                      {spot.title}
-                    </p>
-                    <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-[#efd4b0]/75">
-                      {spot.subtitle || spot.location}
-                    </p>
-                    <span className="mt-4 inline-flex rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
-                      Ver imperdible
-                    </span>
-                  </Link>
-                ))
-              ) : (
-                <EmptyPanel>
-                  No hay imperdibles vinculados a esta estacion. Proba con otra estacion.
-                </EmptyPanel>
-              )}
-            </div>
-          ) : null}
-        </aside>
+          </aside>
         ) : null}
       </div>
     </section>

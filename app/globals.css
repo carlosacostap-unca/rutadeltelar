@@ -287,3 +287,22 @@ textarea:focus-visible {
   width: 20px;
   height: 20px;
 }
+
+.leaflet-container .territory-marker-label {
+  border: 1px solid rgba(16, 40, 59, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 244, 225, 0.92);
+  color: #082d49;
+  box-shadow: 0 2px 10px rgba(8, 20, 30, 0.24);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  padding: 0.34rem 0.52rem;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.leaflet-container .territory-marker-label::before {
+  display: none;
+}
