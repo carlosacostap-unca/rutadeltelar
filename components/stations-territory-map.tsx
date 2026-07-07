@@ -32,7 +32,10 @@ type MapFocusPoint = {
   key: string;
   latitude: number;
   longitude: number;
+  zoom?: number;
 };
+
+const MAP_ENTITY_CARD_FOCUS_ZOOM = 16;
 
 const StationsTerritoryMapLeaflet = dynamic(
   () =>
@@ -205,6 +208,7 @@ export function StationsTerritoryMap({
       key: `${kind}-${entity.slug}`,
       latitude: entity.latitude,
       longitude: entity.longitude,
+      zoom: MAP_ENTITY_CARD_FOCUS_ZOOM,
     });
   }
 

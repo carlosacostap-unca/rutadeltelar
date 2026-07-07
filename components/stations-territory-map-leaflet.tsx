@@ -50,6 +50,7 @@ type StationsTerritoryMapLeafletProps = {
     key: string;
     latitude: number;
     longitude: number;
+    zoom?: number;
   };
   onSelectStation?: (slug: string) => void;
   artisans?: Artisan[];
@@ -391,6 +392,7 @@ function SelectedFocusPointFlyTo({
     key: string;
     latitude: number;
     longitude: number;
+    zoom?: number;
   };
 }) {
   const map = useMap();
@@ -402,7 +404,7 @@ function SelectedFocusPointFlyTo({
 
     map.flyTo(
       [point.latitude, point.longitude],
-      Math.max(map.getZoom(), TERRITORY_MAP_SINGLE_POINT_ZOOM),
+      point.zoom ?? Math.max(map.getZoom(), TERRITORY_MAP_SINGLE_POINT_ZOOM),
       {
         animate: true,
         duration: 1.1,
