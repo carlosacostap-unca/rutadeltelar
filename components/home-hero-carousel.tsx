@@ -374,9 +374,9 @@ export function HomeHeroCarousel({
   };
 
   return (
-    <section className="mb-16 md:mb-20" aria-label="Presentacion principal">
+    <section className="mb-12 md:mb-16" aria-label="Presentacion principal">
       <div
-        className="relative min-h-[660px] select-none overflow-hidden rounded-[2rem] [touch-action:pan-y] sm:min-h-[610px] md:min-h-[560px]"
+        className="relative min-h-[610px] select-none overflow-hidden rounded-[2rem] [touch-action:pan-y] sm:min-h-[580px] md:min-h-[520px]"
         onClickCapture={handleClickCapture}
         onDragStart={(event) => event.preventDefault()}
         onPointerCancel={resetSwipeGesture}
@@ -386,7 +386,7 @@ export function HomeHeroCarousel({
       >
         <div
           data-testid="home-hero-track"
-          className={`flex min-h-[660px] sm:min-h-[610px] md:min-h-[560px] ${
+          className={`flex min-h-[610px] sm:min-h-[580px] md:min-h-[520px] ${
             isDragging
               ? "transition-none"
               : "transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
@@ -405,7 +405,7 @@ export function HomeHeroCarousel({
               <div
                 key={slide.image}
                 aria-hidden={!active}
-                className={`relative min-h-[660px] w-full shrink-0 sm:min-h-[610px] md:min-h-[560px] ${
+                className={`relative min-h-[610px] w-full shrink-0 sm:min-h-[580px] md:min-h-[520px] ${
                   active ? "" : "pointer-events-none"
                 }`}
                 style={{ width: `${100 / heroTrackSlideCount}%` }}
@@ -420,7 +420,7 @@ export function HomeHeroCarousel({
                   sizes="(max-width: 768px) 100vw, 1100px"
                 />
                 <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.76)_0%,rgba(0,0,0,0.52)_48%,rgba(0,0,0,0.26)_100%)]" />
-                <div className="relative z-10 flex min-h-[660px] max-w-4xl flex-col justify-center px-7 py-16 sm:min-h-[610px] md:min-h-[560px] md:px-16">
+                <div className="relative z-10 flex min-h-[610px] max-w-4xl flex-col justify-center px-7 py-14 sm:min-h-[580px] md:min-h-[520px] md:px-16 md:py-12">
                   {slide.content}
                   {index === 1 ? (
                     <StationHeroDepartmentLinks

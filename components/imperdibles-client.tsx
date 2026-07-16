@@ -12,6 +12,7 @@ type Props = {
   spots: HighlightSpot[];
   types: string[];
   hasUpcoming: boolean;
+  initialView?: "agenda" | "destacados";
 };
 
 function formatEventDate(iso: string) {
@@ -40,9 +41,14 @@ function groupByDate(events: HighlightSpot[]) {
 
 const PRIORITY_ORDER: Record<string, number> = { alta: 0, media: 1, baja: 2 };
 
-export function ImperdiblesClient({ spots, types, hasUpcoming }: Props) {
+export function ImperdiblesClient({
+  spots,
+  types,
+  hasUpcoming,
+  initialView,
+}: Props) {
   const [view, setView] = useState<"agenda" | "destacados">(
-    hasUpcoming ? "agenda" : "destacados",
+    initialView ?? (hasUpcoming ? "agenda" : "destacados"),
   );
   const [typeFilter, setTypeFilter] = useState("todos");
 

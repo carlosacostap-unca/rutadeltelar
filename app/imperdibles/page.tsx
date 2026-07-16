@@ -3,7 +3,19 @@ import { formatBrandFontText } from "@/app/lib/brand-font-text";
 import { DataSourceBadge } from "@/components/data-source-badge";
 import { ImperdiblesClient } from "@/components/imperdibles-client";
 
-export default async function ImperdiblesPage() {
+type ImperdiblesPageProps = {
+  searchParams?: Promise<{ view?: string | string[] }>;
+};
+
+export default async function ImperdiblesPage({ searchParams }: ImperdiblesPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const requestedView = Array.isArray(resolvedSearchParams?.view)
+    ? resolvedSearchParams.view[0]
+    : resolvedSearchParams?.view;
+  const initialView =
+    requestedView === "agenda" || requestedView === "destacados"
+      ? requestedView
+      : undefined;
   const highlightSpotsResult = await getHighlightSpotsResult();
   const spots = highlightSpotsResult.items;
 
@@ -53,6 +65,7 @@ export default async function ImperdiblesPage() {
           spots={spots}
           types={types}
           hasUpcoming={hasUpcoming}
+          initialView={initialView}
         />
       </div>
     </main>

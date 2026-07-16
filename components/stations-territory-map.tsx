@@ -24,6 +24,7 @@ type StationsTerritoryMapProps = {
   showLegend?: boolean;
   showIconReferences?: boolean;
   warmTiles?: boolean;
+  routeGeometry?: Array<[number, number]>;
 };
 
 type ExplorerView = "stations" | "choices" | "artisans" | "highlightSpots";
@@ -154,6 +155,7 @@ export function StationsTerritoryMap({
   showLegend = true,
   showIconReferences = false,
   warmTiles = false,
+  routeGeometry,
 }: StationsTerritoryMapProps) {
   const [focusMode, setFocusMode] = useState<"all" | "active">("all");
   const [localSelectedSlug, setLocalSelectedSlug] = useState<string>();
@@ -408,6 +410,7 @@ export function StationsTerritoryMap({
               showArtisans={visibleLayers.artisans}
               showHighlightSpots={visibleLayers.highlightSpots}
               warmTiles={warmTiles}
+              routeGeometry={routeGeometry}
             />
           </DeferredRender>
 

@@ -19,6 +19,7 @@ if (pocketBaseUrl) {
 }
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     localPatterns: [
       {
@@ -28,6 +29,10 @@ const nextConfig: NextConfig = {
       {
         pathname: "/images/home/sponsor-1-ministerio.png",
         search: "?v=20260706",
+      },
+      {
+        pathname: "/expo/media/**",
+        search: "",
       },
     ],
     remotePatterns,

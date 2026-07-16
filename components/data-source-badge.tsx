@@ -1,5 +1,5 @@
 type DataSourceBadgeProps = {
-  source: "pocketbase" | "mock";
+  source: "pocketbase" | "mock" | "expo";
   error?: string;
 };
 
@@ -11,6 +11,7 @@ export function DataSourceBadge({
     process.env.NODE_ENV === "development" ||
     process.env.NEXT_PUBLIC_SHOW_DATA_SOURCE_BADGE === "true";
   const isPocketBase = source === "pocketbase";
+  const isExpo = source === "expo";
 
   if (!shouldShow) {
     return null;
@@ -29,7 +30,7 @@ export function DataSourceBadge({
       }`}
     >
       <span className="font-semibold uppercase tracking-wider">
-        {isPocketBase ? "Datos conectados" : "Fallback local"}
+        {isPocketBase ? "Datos conectados" : isExpo ? "Expo offline" : "Fallback local"}
       </span>
       {error ? <span className="truncate">({error})</span> : null}
     </div>

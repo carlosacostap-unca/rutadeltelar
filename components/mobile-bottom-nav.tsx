@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 
 type NavItem = {
   href: string;
@@ -80,7 +80,7 @@ const navItems: NavItem[] = [
   {
     href: "/imperdibles",
     label: "Imperdibles",
-    shortLabel: "Imperd.",
+    shortLabel: "Imperdibles",
     icon: (
       <path
         d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.4 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"
@@ -265,15 +265,15 @@ function isActive(pathname: string, href: string) {
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [moreMenu, setMoreMenu] = useState({
+    pathname,
+    open: false,
+  });
+  const moreOpen = moreMenu.pathname === pathname && moreMenu.open;
   const moreActive = useMemo(
     () => moreItems.some((item) => isActive(pathname, item.href)),
     [pathname],
   );
-
-  useEffect(() => {
-    setMoreOpen(false);
-  }, [pathname]);
 
   return (
     <>
@@ -334,7 +334,12 @@ export function MobileBottomNav() {
                   type="button"
                   aria-label={item.label}
                   aria-expanded={moreOpen}
-                  onClick={() => setMoreOpen((current) => !current)}
+                  onClick={() =>
+                    setMoreMenu({
+                      pathname,
+                      open: !moreOpen,
+                    })
+                  }
                   className={className}
                 >
                   <svg

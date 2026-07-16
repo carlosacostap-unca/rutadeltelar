@@ -39,8 +39,10 @@ import {
   withPocketBaseImageThumb,
   type PocketBaseImageUsage,
 } from "@/app/lib/pocketbase-images";
+import { isExpoOffline } from "@/app/lib/expo-config";
+import { loadExpoSnapshot } from "@/app/lib/expo-snapshot";
 
-export type DataSource = "pocketbase" | "mock";
+export type DataSource = "pocketbase" | "mock" | "expo";
 
 export type DataResult<TItem> = {
   items: TItem[];
@@ -68,6 +70,7 @@ export type SuggestedJourney = {
   leadArtisan?: Artisan;
   leadHighlightSpot?: HighlightSpot;
   steps: SuggestedJourneyStep[];
+  routeGeometry?: Array<[number, number]>;
 };
 
 function getPathValue(source: unknown, path: string) {
@@ -718,6 +721,11 @@ function createMockResult<TItem>(
 }
 
 export async function getExperiencesResult(): Promise<DataResult<Experience>> {
+  if (isExpoOffline()) {
+    const snapshot = await loadExpoSnapshot();
+    return { items: snapshot.data.experiences, source: "expo" };
+  }
+
   try {
     const response = await getPocketBaseList("experiences", {
       filter: 'estado = "aprobado"',
@@ -769,6 +777,11 @@ export async function getExperienceBySlug(slug: string) {
 }
 
 export async function getArtisansResult(): Promise<DataResult<Artisan>> {
+  if (isExpoOffline()) {
+    const snapshot = await loadExpoSnapshot();
+    return { items: snapshot.data.artisans, source: "expo" };
+  }
+
   try {
     const response = await getPocketBaseList("artisans", {
       filter: 'estado = "aprobado"',
@@ -807,6 +820,11 @@ export async function getArtisansResult(): Promise<DataResult<Artisan>> {
 }
 
 export async function getStationsResult(): Promise<DataResult<Station>> {
+  if (isExpoOffline()) {
+    const snapshot = await loadExpoSnapshot();
+    return { items: snapshot.data.stations, source: "expo" };
+  }
+
   try {
     const response = await getPocketBaseFullList("stations", {
       filter: 'estado = "aprobado"',
@@ -855,6 +873,11 @@ export async function getStationBySlug(slug: string) {
 }
 
 export async function getHighlightSpotsResult(): Promise<DataResult<HighlightSpot>> {
+  if (isExpoOffline()) {
+    const snapshot = await loadExpoSnapshot();
+    return { items: snapshot.data.highlightSpots, source: "expo" };
+  }
+
   try {
     const response = await getPocketBaseList("highlightSpots", {
       filter: 'estado = "aprobado"',
@@ -1224,9 +1247,16 @@ export async function getSuggestedJourneys(): Promise<SuggestedJourney[]> {
       return accumulator;
     }, []);
 
-  return journeys.length > 0
-    ? journeys
-    : [
+  if (journeys.length > 0) {
+    if (!isExpoOffline()) return journeys;
+    const snapshot = await loadExpoSnapshot();
+    return journeys.map((journey) => ({
+      ...journey,
+      routeGeometry: snapshot.routes[journey.slug]?.positions,
+    }));
+  }
+
+  return [
         {
           slug: "recorrido-ruta-del-telar",
           title: "Recorrido sugerido por la Ruta del Telar",
@@ -1333,6 +1363,13 @@ type ProductResultOptions = {
 export async function getProductsResult({
   sort = "nombre",
 }: ProductResultOptions = {}): Promise<DataResult<Product>> {
+  if (isExpoOffline()) {
+    const snapshot = await loadExpoSnapshot();
+    const items = [...snapshot.data.products];
+    if (sort.startsWith("-")) items.reverse();
+    return { items, source: "expo" };
+  }
+
   try {
     const response = await getPocketBaseList("products", {
       // Accept only approved records

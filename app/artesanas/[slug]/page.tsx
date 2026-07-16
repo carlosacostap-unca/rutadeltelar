@@ -22,6 +22,7 @@ import { StationDetailMap } from "@/components/station-detail-map";
 
 type ArtisanDetailPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ promoCapture?: string | string[] }>;
 };
 
 export async function generateStaticParams() {
@@ -336,8 +337,9 @@ function RelatedCard({
   );
 }
 
-export default async function ArtisanDetailPage({ params }: ArtisanDetailPageProps) {
+export default async function ArtisanDetailPage({ params, searchParams }: ArtisanDetailPageProps) {
   const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
   const context = await getArtisanContextBySlug(slug);
 
   if (!context) {
@@ -362,6 +364,9 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
     !!artisan.pagina_web_url;
   const locationLabel =
     relatedStation?.name ?? artisan.stationName ?? artisan.place;
+  const promoCapture = Array.isArray(resolvedSearchParams?.promoCapture)
+    ? resolvedSearchParams.promoCapture.includes("1")
+    : resolvedSearchParams?.promoCapture === "1";
 
   return (
     <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
@@ -496,6 +501,8 @@ export default async function ArtisanDetailPage({ params }: ArtisanDetailPagePro
                 lat={artisan.latitude}
                 lng={artisan.longitude}
                 label={artisan.name}
+                eager={promoCapture}
+                staticMapSrc="/video/actor-map.png"
               />
             </div>
             {artisan.address ? (

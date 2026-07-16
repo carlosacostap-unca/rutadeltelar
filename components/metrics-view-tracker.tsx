@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from "react";
+import { useExpoMode } from "@/components/expo-mode-provider";
 
 export type MetricsEntityType =
   | "estaciones"
@@ -24,8 +25,10 @@ export function MetricsViewTracker({
   entitySlug,
   entityTitle,
 }: MetricsViewTrackerProps) {
+  const { expoOffline } = useExpoMode();
+
   useEffect(() => {
-    if (!entityId) return;
+    if (!entityId || expoOffline) return;
 
     const key = `${entityType}:${entityId}:${window.location.pathname}`;
     if (sentViews.has(key)) return;
@@ -51,7 +54,7 @@ export function MetricsViewTracker({
       .finally(() => {
         window.setTimeout(() => sentViews.delete(key), 5000);
       });
-  }, [entityId, entitySlug, entityTitle, entityType]);
+  }, [entityId, entitySlug, entityTitle, entityType, expoOffline]);
 
   return null;
 }

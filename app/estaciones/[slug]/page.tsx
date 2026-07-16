@@ -20,6 +20,7 @@ import { StationDetailMap } from "@/components/station-detail-map";
 
 type StationDetailPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ promoCapture?: string | string[] }>;
 };
 
 export async function generateStaticParams() {
@@ -140,8 +141,13 @@ function RelatedCard({
 
 export default async function StationDetailPage({
   params,
+  searchParams,
 }: StationDetailPageProps) {
   const { slug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const promoCapture = Array.isArray(resolvedSearchParams.promoCapture)
+    ? resolvedSearchParams.promoCapture.includes("1")
+    : resolvedSearchParams.promoCapture === "1";
   const context = await getStationContextBySlug(slug);
 
   if (!context) {
@@ -252,6 +258,7 @@ export default async function StationDetailPage({
                 lat={station.latitude}
                 lng={station.longitude}
                 label={station.name}
+                eager={promoCapture}
               />
             </div>
           </section>

@@ -1,5 +1,8 @@
+"use client";
+
 import { getActorSocialLinks } from "@/app/lib/contact-links";
 import { getSatelliteMapUrl, type MapPoint } from "@/app/lib/map-links";
+import { useExpoMode } from "@/components/expo-mode-provider";
 
 type ContactButtonsProps = {
   phone?: string;
@@ -121,18 +124,19 @@ export function ContactButtons({
   instagram_url,
   pagina_web_url,
 }: ContactButtonsProps) {
-  const socialLinks = getActorSocialLinks({
+  const { expoOffline } = useExpoMode();
+  const socialLinks = expoOffline ? [] : getActorSocialLinks({
     facebook_url,
     instagram_url,
     pagina_web_url,
   });
-  const addressMapUrl = mapPoint ? getSatelliteMapUrl(mapPoint) : null;
+  const addressMapUrl = !expoOffline && mapPoint ? getSatelliteMapUrl(mapPoint) : null;
 
   if (!phone && !email && !address && socialLinks.length === 0) return null;
 
   return (
     <div className="mt-4 flex flex-wrap gap-3">
-      {phone ? (
+      {phone && !expoOffline ? (
         <a
           href={`https://wa.me/${cleanPhone(phone)}`}
           target="_blank"

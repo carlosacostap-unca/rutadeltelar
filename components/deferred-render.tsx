@@ -2,6 +2,12 @@
 
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
+declare global {
+  interface Window {
+    __PROMO_CAPTURE_EAGER_RENDER__?: boolean;
+  }
+}
+
 type DeferredRenderProps = {
   children: ReactNode;
   fallback: ReactNode;
@@ -13,7 +19,9 @@ export function DeferredRender({
   fallback,
   rootMargin = "360px",
 }: DeferredRenderProps) {
-  const [shouldRender, setShouldRender] = useState(false);
+  const [shouldRender, setShouldRender] = useState(
+    () => typeof window !== "undefined" && window.__PROMO_CAPTURE_EAGER_RENDER__ === true,
+  );
   const markerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {

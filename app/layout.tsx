@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { getPublicRuntimeMode } from "@/app/lib/expo-config";
 import { getSiteUrl } from "@/app/lib/metadata";
 import { AppShell } from "@/components/app-shell";
+import { ExpoModeProvider } from "@/components/expo-mode-provider";
 import "./globals.css";
 
 const neueHaasDisplay = localFont({
@@ -99,6 +101,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const runtimeMode = getPublicRuntimeMode();
+
   return (
     <html
       lang="es"
@@ -106,7 +110,9 @@ export default function RootLayout({
       className={`${neueHaasDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AppShell>{children}</AppShell>
+        <ExpoModeProvider value={runtimeMode}>
+          <AppShell>{children}</AppShell>
+        </ExpoModeProvider>
       </body>
     </html>
   );

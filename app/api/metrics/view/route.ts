@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { cookies, headers } from "next/headers";
+import { isExpoOffline } from "@/app/lib/expo-config";
 
 const pbUrl = (process.env.POCKETBASE_URL || process.env.NEXT_PUBLIC_POCKETBASE_URL || "").replace(/\/$/, "");
 const adminEmail = process.env.POCKETBASE_ADMIN_EMAIL;
@@ -25,6 +26,10 @@ type ViewPayload = {
 };
 
 export async function POST(request: Request) {
+  if (isExpoOffline()) {
+    return Response.json({ ok: true, skipped: "expo_offline" });
+  }
+
   if (!pbUrl || !adminEmail || !adminPassword) {
     return Response.json({ ok: false, skipped: "missing_pocketbase_credentials" }, { status: 202 });
   }

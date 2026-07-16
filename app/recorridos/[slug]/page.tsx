@@ -182,6 +182,7 @@ export default async function SuggestedJourneyPage({
             highlightSpots={journey.highlightSpots}
             activeSlug={journey.station.slug}
             selectedSlug={journey.station.slug}
+            routeGeometry={journey.routeGeometry}
           />
         </div>
       </section>

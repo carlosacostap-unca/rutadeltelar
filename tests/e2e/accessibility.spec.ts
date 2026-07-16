@@ -47,11 +47,22 @@ test.describe("basic accessibility", () => {
     await page.goto("/estaciones");
 
     await expect(
-      page.getByRole("navigation", { name: /Navegacion principal/i }),
+      page.getByRole("banner").getByRole("link", { name: "Ir al inicio" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("banner").getByRole("link", { name: "Buscar en la ruta" }),
+    ).toBeVisible();
+    const mobileNavigation = page.getByRole("navigation", {
+      name: /Navegacion principal/i,
+    });
+
+    await expect(mobileNavigation).toBeVisible();
     await expect(page.getByRole("link", { name: "Estaciones" })).toHaveAttribute(
       "aria-current",
       "page",
     );
+    await expect(
+      mobileNavigation.getByText("Imperdibles", { exact: true }),
+    ).toBeVisible();
   });
 });

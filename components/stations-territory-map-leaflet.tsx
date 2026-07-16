@@ -23,8 +23,10 @@ import { hasValidCoordinates } from "@/app/lib/geo";
 import { getImageFocusStyle, type ImageFocus } from "@/app/lib/image-focus";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { SATELLITE_REFERENCE_MAX_ZOOM } from "@/app/lib/map-tile-layers";
+import { resolveOfflineRoutePositions } from "@/app/lib/expo-map";
 import { SatelliteReferenceTileLayers } from "@/components/satellite-reference-tile-layers";
 import { SatelliteMapButton } from "@/components/satellite-map-button";
+import { useExpoMode } from "@/components/expo-mode-provider";
 
 const TERRITORY_MAP_SINGLE_POINT_ZOOM = 13;
 const TERRITORY_MAP_MULTI_POINT_ZOOM = 10;
@@ -61,6 +63,7 @@ type StationsTerritoryMapLeafletProps = {
   className?: string;
   mapClassName?: string;
   warmTiles?: boolean;
+  routeGeometry?: Array<[number, number]>;
 };
 
 function getGeolocatedStations(stations: Station[]) {
@@ -194,9 +197,12 @@ async function fetchRoadRouteSegment(
 
 function RoadRouteLayer({
   stations,
+  routeGeometry,
 }: {
   stations: Array<{ latitude: number; longitude: number }>;
+  routeGeometry?: Array<[number, number]>;
 }) {
+  const { expoOffline } = useExpoMode();
   const [routeSegments, setRouteSegments] = useState<RoadRouteSegment[]>([]);
   const routePoints = useMemo(
     () =>
@@ -213,12 +219,17 @@ function RoadRouteLayer({
         .join("|"),
     [routePoints],
   );
+  const offlineSegments = useMemo<RoadRouteSegment[]>(() => {
+    if (!expoOffline || routePoints.length < 2) return [];
+    const positions = resolveOfflineRoutePositions(
+      routeGeometry,
+      routePoints.map((point) => [point.latitude, point.longitude] as [number, number]),
+    );
+    return [{ key: "expo-offline-route", positions }];
+  }, [expoOffline, routeGeometry, routePoints]);
 
   useEffect(() => {
-    if (routePoints.length < 2) {
-      setRouteSegments([]);
-      return;
-    }
+    if (routePoints.length < 2 || expoOffline) return;
 
     const controller = new AbortController();
 
@@ -270,15 +281,21 @@ function RoadRouteLayer({
     loadRouteSegments();
 
     return () => controller.abort();
-  }, [routeKey, routePoints]);
+  }, [expoOffline, routeKey, routePoints]);
 
-  if (routeSegments.length === 0) {
+  const visibleSegments = expoOffline
+    ? offlineSegments
+    : routePoints.length < 2
+      ? []
+      : routeSegments;
+
+  if (visibleSegments.length === 0) {
     return null;
   }
 
   return (
     <>
-      {routeSegments.map((segment) => (
+      {visibleSegments.map((segment) => (
         <Polyline
           key={`${segment.key}-outline`}
           positions={segment.positions}
@@ -289,7 +306,7 @@ function RoadRouteLayer({
           }}
         />
       ))}
-      {routeSegments.map((segment) => (
+      {visibleSegments.map((segment) => (
         <Polyline
           key={segment.key}
           positions={segment.positions}
@@ -485,6 +502,7 @@ export function StationsTerritoryMapLeaflet({
   className = "",
   mapClassName = "h-[380px] w-full sm:h-[520px]",
   warmTiles = false,
+  routeGeometry,
 }: StationsTerritoryMapLeafletProps) {
   const router = useRouter();
   const [isDetailScale, setIsDetailScale] = useState(false);
@@ -587,7 +605,7 @@ export function StationsTerritoryMapLeaflet({
         <SatelliteReferenceTileLayers mood={warmTiles ? "warm" : "neutral"} />
         <ScaleControl position="bottomleft" imperial={false} />
 
-        <RoadRouteLayer stations={geolocatedStations} />
+        <RoadRouteLayer stations={geolocatedStations} routeGeometry={routeGeometry} />
 
         {geolocatedStations.map((station) => {
           const isActive = station.slug === activeSlug || station.slug === selectedSlug;

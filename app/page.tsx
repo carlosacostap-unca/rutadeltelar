@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { isExpoOffline } from "@/app/lib/expo-config";
 import Link from "next/link";
 import {
   getArtisansResult,
@@ -376,7 +377,7 @@ function SocialIcon({
   return content;
 }
 
-function HomeFooterSection() {
+function HomeFooterSection({ expoOffline }: { expoOffline: boolean }) {
   return (
     <footer
       aria-label="Informacion institucional"
@@ -427,11 +428,15 @@ function HomeFooterSection() {
           <p className="text-2xl font-light leading-none tracking-normal sm:text-3xl">
             Ruta del Telar
           </p>
-          <div className="mt-7 flex justify-center gap-8">
-            {socialIcons.map((icon) => (
-              <SocialIcon key={icon.label} icon={icon} />
-            ))}
-          </div>
+          {expoOffline ? (
+            <p className="mt-5 text-sm text-white/75">Enlaces externos disponibles con conexion</p>
+          ) : (
+            <div className="mt-7 flex justify-center gap-8">
+              {socialIcons.map((icon) => (
+                <SocialIcon key={icon.label} icon={icon} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </footer>
@@ -439,6 +444,7 @@ function HomeFooterSection() {
 }
 
 export default async function Home() {
+  const expoOffline = isExpoOffline();
   const [stationsResult, artisansResult, productsResult] = await Promise.all([
     getStationsResult(),
     getArtisansResult(),
@@ -464,7 +470,7 @@ export default async function Home() {
   );
   return (
     <main className="relative left-1/2 flex w-screen -translate-x-1/2 -mb-28 -mt-6 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
-      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-20 lg:px-10">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-6 sm:px-8 sm:pt-8 md:pb-28 md:pt-12 lg:px-10">
         <HomeHeroCarousel stationDepartmentLinks={stationDepartmentLinks} />
 
         <section className="mb-20">
@@ -543,7 +549,7 @@ export default async function Home() {
         </section>
       </div>
       <HomeSponsorsSection />
-      <HomeFooterSection />
+      <HomeFooterSection expoOffline={expoOffline} />
     </main>
   );
 }
