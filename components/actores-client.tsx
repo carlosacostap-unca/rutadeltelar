@@ -364,7 +364,10 @@ function ActorCard({
   return (
     <Link href={`/artesanas/${item.slug}`} className="group block h-full">
       <article className="grid h-full min-h-[13.5rem] grid-cols-[7.75rem_minmax(0,1fr)] overflow-hidden rounded-[1.65rem] bg-[#efd4b0] text-[#0d314a] shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-xl sm:block sm:min-h-0">
-        <div className="relative h-full min-h-[13.5rem] w-full overflow-hidden sm:aspect-[4/3] sm:h-auto sm:min-h-0">
+        <div
+          data-testid="actor-media"
+          className="relative h-full min-h-[13.5rem] w-full overflow-hidden sm:aspect-[4/3] sm:h-auto sm:min-h-0"
+        >
           {item.imageUrl ? (
             <PbImage
               src={item.imageUrl}

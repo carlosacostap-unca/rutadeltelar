@@ -88,13 +88,12 @@ test.describe("visual layout smoke", () => {
     await page.goto("/artesanas");
 
     const firstCard = page.locator("article").first();
-    const firstImage = firstCard.getByRole("img");
-    const imageBox = await firstImage.boundingBox();
+    const mediaBox = await firstCard.getByTestId("actor-media").boundingBox();
 
-    expect(imageBox).not.toBeNull();
+    expect(mediaBox).not.toBeNull();
 
-    if (imageBox) {
-      expect(imageBox.width).toBeGreaterThan(imageBox.height * 1.2);
+    if (mediaBox) {
+      expect(mediaBox.width).toBeGreaterThan(mediaBox.height * 1.2);
     }
 
     await expect(firstCard.getByRole("heading")).toBeVisible();
