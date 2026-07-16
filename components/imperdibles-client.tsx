@@ -11,7 +11,6 @@ import { PbImage } from "@/components/pb-image";
 type Props = {
   spots: HighlightSpot[];
   types: string[];
-  hasUpcoming: boolean;
   initialView?: "agenda" | "destacados";
 };
 
@@ -44,11 +43,10 @@ const PRIORITY_ORDER: Record<string, number> = { alta: 0, media: 1, baja: 2 };
 export function ImperdiblesClient({
   spots,
   types,
-  hasUpcoming,
   initialView,
 }: Props) {
   const [view, setView] = useState<"agenda" | "destacados">(
-    initialView ?? (hasUpcoming ? "agenda" : "destacados"),
+    initialView ?? "destacados",
   );
   const [typeFilter, setTypeFilter] = useState("todos");
 
@@ -89,6 +87,18 @@ export function ImperdiblesClient({
       >
         <button
           type="button"
+          aria-pressed={view === "destacados"}
+          onClick={() => setView("destacados")}
+          className={`flex-1 rounded-full px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
+            view === "destacados"
+              ? "bg-[#efd4b0] text-[#123a55] shadow-sm"
+              : "text-[#efd4b0]"
+          }`}
+        >
+          Destacados
+        </button>
+        <button
+          type="button"
           aria-pressed={view === "agenda"}
           onClick={() => setView("agenda")}
           className={`flex-1 rounded-full px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
@@ -103,18 +113,6 @@ export function ImperdiblesClient({
               {eventos.length}
             </span>
           ) : null}
-        </button>
-        <button
-          type="button"
-          aria-pressed={view === "destacados"}
-          onClick={() => setView("destacados")}
-          className={`flex-1 rounded-full px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
-            view === "destacados"
-              ? "bg-[#efd4b0] text-[#123a55] shadow-sm"
-              : "text-[#efd4b0]"
-          }`}
-        >
-          Destacados
         </button>
       </div>
 

@@ -29,4 +29,37 @@ test.describe("visual layout smoke", () => {
     ).toBeVisible();
     await expectNoDocumentOverflow(page);
   });
+
+  test("shows compact station cards and complete department filters on mobile", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/estaciones");
+
+    const departmentFilters = page.getByRole("group", {
+      name: /Filtrar estaciones por departamento/i,
+    });
+
+    for (const label of [
+      "Todas",
+      "Antofagasta de la Sierra",
+      "Belen",
+    ]) {
+      await expect(
+        departmentFilters.getByRole("button", { name: label }),
+      ).toBeVisible();
+    }
+
+    const firstCard = page.locator("article").first();
+    const cardBox = await firstCard.boundingBox();
+
+    expect(cardBox).not.toBeNull();
+
+    if (cardBox) {
+      expect(cardBox.width).toBeGreaterThan(cardBox.height * 1.8);
+      expect(cardBox.y).toBeLessThan(700);
+    }
+
+    await expectNoDocumentOverflow(page);
+  });
 });

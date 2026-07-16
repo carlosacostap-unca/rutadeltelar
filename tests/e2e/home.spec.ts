@@ -157,7 +157,7 @@ test("navigates from home to a main public section", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/estaciones$/);
   await expect(
-    page.getByRole("heading", { name: /Nodos territoriales/i }),
+    page.getByRole("heading", { name: /Todas las estaciones/i }),
   ).toBeVisible();
 });
 

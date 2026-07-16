@@ -5,13 +5,52 @@ test.describe("public catalogs", () => {
     await page.goto("/estaciones");
 
     await expect(
-      page.getByRole("heading", { name: /Nodos territoriales/i }),
+      page.getByRole("heading", { name: /Todas las estaciones/i }),
     ).toBeVisible();
 
-    await page.getByPlaceholder(/Buscar por nombre/i).fill("Belen");
+    await page
+      .getByRole("searchbox", {
+        name: /Buscar una estación/i,
+      })
+      .fill("Belen");
 
     await expect(page.locator('a[href="/estaciones/belen-catamarca"]')).toBeVisible();
     await expect(page.locator('a[href="/estaciones/laguna-blanca"]')).toHaveCount(0);
+  });
+
+  test("communicates the active station department filter", async ({ page }) => {
+    await page.goto("/estaciones");
+
+    const departmentFilters = page.getByRole("group", {
+      name: /Filtrar estaciones por departamento/i,
+    });
+
+    await departmentFilters.getByRole("button", { name: "Belen" }).click();
+
+    await expect(page).toHaveURL(/departamento=Belen/);
+    await expect(page.getByText("2 estaciones en Belen", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Quitar filtro" })).toBeVisible();
+  });
+
+  test("starts the station map with only the scoped station layer", async ({
+    page,
+  }) => {
+    await page.goto("/estaciones?departamento=Belen");
+
+    await page.getByRole("button", { name: "Mapa" }).click();
+
+    await expect(
+      page.getByText("Estaciones de Belen", { exact: true }),
+    ).toBeVisible();
+
+    const actorsLayer = page.getByRole("button", { name: "Actores", exact: true });
+    const highlightsLayer = page.getByRole("button", {
+      name: "Imperdibles",
+      exact: true,
+    });
+
+    await expect(actorsLayer).toHaveAttribute("aria-pressed", "false");
+    await expect(highlightsLayer).toHaveAttribute("aria-pressed", "false");
   });
 
   test("filters actors by craft or name", async ({ page }) => {

@@ -25,6 +25,10 @@ type StationsTerritoryMapProps = {
   showIconReferences?: boolean;
   warmTiles?: boolean;
   routeGeometry?: Array<[number, number]>;
+  initialVisibleLayers?: Partial<Record<LayerKey, boolean>>;
+  scopeRelatedEntitiesToStations?: boolean;
+  compactLayerControls?: boolean;
+  title?: string;
 };
 
 type ExplorerView = "stations" | "choices" | "artisans" | "highlightSpots";
@@ -156,16 +160,44 @@ export function StationsTerritoryMap({
   showIconReferences = false,
   warmTiles = false,
   routeGeometry,
+  initialVisibleLayers,
+  scopeRelatedEntitiesToStations = false,
+  compactLayerControls = false,
+  title = "Estaciones conectadas por territorio",
 }: StationsTerritoryMapProps) {
   const [focusMode, setFocusMode] = useState<"all" | "active">("all");
   const [localSelectedSlug, setLocalSelectedSlug] = useState<string>();
   const [explorerView, setExplorerView] = useState<ExplorerView>("stations");
   const [selectedFocusPoint, setSelectedFocusPoint] = useState<MapFocusPoint>();
-  const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
-    stations: true,
-    artisans: true,
-    highlightSpots: true,
-  });
+  const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>(
+    () => ({
+      stations: initialVisibleLayers?.stations ?? true,
+      artisans: initialVisibleLayers?.artisans ?? true,
+      highlightSpots: initialVisibleLayers?.highlightSpots ?? true,
+    }),
+  );
+  const scopedArtisans = useMemo(() => {
+    const items = artisans ?? [];
+
+    if (!scopeRelatedEntitiesToStations) {
+      return items;
+    }
+
+    return items.filter((artisan) =>
+      stations.some((station) => belongsToStation(artisan, station)),
+    );
+  }, [artisans, scopeRelatedEntitiesToStations, stations]);
+  const scopedHighlightSpots = useMemo(() => {
+    const items = highlightSpots ?? [];
+
+    if (!scopeRelatedEntitiesToStations) {
+      return items;
+    }
+
+    return items.filter((spot) =>
+      stations.some((station) => belongsToStation(spot, station)),
+    );
+  }, [highlightSpots, scopeRelatedEntitiesToStations, stations]);
   const effectiveSelectedSlug = selectedSlug ?? localSelectedSlug;
   const selectedStation = useMemo(() => {
     const explicitStation =
@@ -176,14 +208,20 @@ export function StationsTerritoryMap({
 
     return (
       stations.find((station) =>
-        (artisans ?? []).some((artisan) => belongsToStation(artisan, station)),
+        scopedArtisans.some((artisan) => belongsToStation(artisan, station)),
       ) ??
       stations.find((station) =>
-        (highlightSpots ?? []).some((spot) => belongsToStation(spot, station)),
+        scopedHighlightSpots.some((spot) => belongsToStation(spot, station)),
       ) ??
       stations[0]
     );
-  }, [activeSlug, artisans, effectiveSelectedSlug, highlightSpots, stations]);
+  }, [
+    activeSlug,
+    effectiveSelectedSlug,
+    scopedArtisans,
+    scopedHighlightSpots,
+    stations,
+  ]);
 
   function handleSelectStation(station: Station) {
     setLocalSelectedSlug(station.slug);
@@ -232,19 +270,23 @@ export function StationsTerritoryMap({
 
   const filteredArtisans = useMemo(() => {
     if (focusMode !== "active" || !activeSlug) {
-      return artisans ?? [];
+      return scopedArtisans;
     }
 
-    return (artisans ?? []).filter((artisan) => artisan.stationSlug === activeSlug);
-  }, [activeSlug, artisans, focusMode]);
+    return scopedArtisans.filter(
+      (artisan) => artisan.stationSlug === activeSlug,
+    );
+  }, [activeSlug, focusMode, scopedArtisans]);
 
   const filteredHighlightSpots = useMemo(() => {
     if (focusMode !== "active" || !activeSlug) {
-      return highlightSpots ?? [];
+      return scopedHighlightSpots;
     }
 
-    return (highlightSpots ?? []).filter((spot) => spot.stationSlug === activeSlug);
-  }, [activeSlug, focusMode, highlightSpots]);
+    return scopedHighlightSpots.filter(
+      (spot) => spot.stationSlug === activeSlug,
+    );
+  }, [activeSlug, focusMode, scopedHighlightSpots]);
 
   const counts = useMemo(
     () => ({
@@ -255,20 +297,22 @@ export function StationsTerritoryMap({
     [filteredArtisans, filteredHighlightSpots, filteredStations],
   );
   const totalVisiblePoints =
-    counts.stations + counts.artisans + counts.highlightSpots;
+    (visibleLayers.stations ? counts.stations : 0) +
+    (visibleLayers.artisans ? counts.artisans : 0) +
+    (visibleLayers.highlightSpots ? counts.highlightSpots : 0);
   const selectedArtisans = useMemo(
     () =>
-      (artisans ?? []).filter((artisan) =>
+      scopedArtisans.filter((artisan) =>
         belongsToStation(artisan, selectedStation),
       ),
-    [artisans, selectedStation],
+    [scopedArtisans, selectedStation],
   );
   const selectedHighlightSpots = useMemo(
     () =>
-      (highlightSpots ?? []).filter((spot) =>
+      scopedHighlightSpots.filter((spot) =>
         belongsToStation(spot, selectedStation),
       ),
-    [highlightSpots, selectedStation],
+    [scopedHighlightSpots, selectedStation],
   );
   const layerItems = [
     {
@@ -312,11 +356,12 @@ export function StationsTerritoryMap({
               Mapa territorial
             </p>
             <p className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
-              Estaciones conectadas por territorio
+              {title}
             </p>
           </div>
           <span className="rounded-full border border-[#123a55]/20 bg-[#123a55]/10 px-4 py-2 text-xs font-black uppercase leading-none tracking-normal text-[#082d49]">
-            {totalVisiblePoints} puntos visibles
+            {totalVisiblePoints} punto{totalVisiblePoints !== 1 ? "s" : ""} visible
+            {totalVisiblePoints !== 1 ? "s" : ""}
           </span>
         </div>
       ) : null}
@@ -325,7 +370,11 @@ export function StationsTerritoryMap({
         <div
           role="group"
           aria-label="Controles del mapa territorial"
-          className="mb-5 flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
+          className={
+            compactLayerControls && !activeSlug
+              ? "mb-5 grid grid-cols-3 gap-2"
+              : "mb-5 flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
+          }
         >
           {activeSlug ? (
             <>
@@ -369,7 +418,11 @@ export function StationsTerritoryMap({
                     [item.key]: !current[item.key],
                   }))
                 }
-                className={`shrink-0 rounded-full border px-4 py-2 text-sm font-black uppercase leading-none tracking-normal ${
+                className={`rounded-full border font-black uppercase leading-none tracking-normal ${
+                  compactLayerControls && !activeSlug
+                    ? "min-w-0 px-2 py-2.5 text-[0.68rem] sm:px-4 sm:text-sm"
+                    : "shrink-0 px-4 py-2 text-sm"
+                } ${
                   active
                     ? "border-[#123a55] bg-[#123a55] text-[#efd4b0]"
                     : "border-[#123a55]/35 text-[#123a55] hover:border-[#123a55] hover:bg-[#123a55] hover:text-[#efd4b0]"

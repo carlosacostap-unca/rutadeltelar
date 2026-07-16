@@ -8,13 +8,26 @@ test.describe("planning flows", () => {
       page.getByRole("heading", { name: /Atractivos, actividades y eventos/i }),
     ).toBeVisible();
 
-    await expect(page.getByRole("button", { name: /Agenda/i })).toBeVisible();
-    await expect(page.locator('a[href="/imperdibles/demostracion-de-tintes"]')).toBeVisible();
+    const viewSwitcher = page.getByRole("group", {
+      name: "Vista de imperdibles",
+    });
+    const viewButtons = viewSwitcher.getByRole("button");
+    const destacadosButton = viewSwitcher.getByRole("button", {
+      name: "Destacados",
+    });
+    const agendaButton = viewSwitcher.getByRole("button", { name: /Agenda/i });
 
-    await page.getByRole("button", { name: /Destacados/i }).click();
+    await expect(viewButtons.nth(0)).toHaveText("Destacados");
+    await expect(viewButtons.nth(1)).toContainText("Agenda");
+    await expect(destacadosButton).toHaveAttribute("aria-pressed", "true");
 
     await expect(page.locator('a[href="/imperdibles/feria-textil-central"]')).toBeVisible();
     await expect(page.locator('a[href="/imperdibles/mirador-del-telar"]')).toBeVisible();
+
+    await agendaButton.click();
+
+    await expect(agendaButton).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator('a[href="/imperdibles/demostracion-de-tintes"]')).toBeVisible();
   });
 
   test("opens a suggested journey from the journeys catalog", async ({ page }) => {

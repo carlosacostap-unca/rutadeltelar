@@ -19,15 +19,6 @@ export default async function ImperdiblesPage({ searchParams }: ImperdiblesPageP
   const highlightSpotsResult = await getHighlightSpotsResult();
   const spots = highlightSpotsResult.items;
 
-  const now = new Date();
-  const in30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-
-  const hasUpcoming = spots.some((s) => {
-    if (s.type.toLowerCase() !== "evento" || !s.eventDate) return false;
-    const d = new Date(s.eventDate);
-    return d >= now && d <= in30;
-  });
-
   const types = [
     ...new Set(
       spots
@@ -64,7 +55,6 @@ export default async function ImperdiblesPage({ searchParams }: ImperdiblesPageP
         <ImperdiblesClient
           spots={spots}
           types={types}
-          hasUpcoming={hasUpcoming}
           initialView={initialView}
         />
       </div>

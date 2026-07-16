@@ -13,7 +13,6 @@ import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { HighlightedData } from "@/components/highlighted-data";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
-import { SurfaceCard } from "@/components/surface-card";
 
 const StationsTerritoryMap = dynamic(
   () =>
@@ -41,23 +40,49 @@ function formatStationLocation(value: string) {
   return value.replace(/,\s*Catamarca\.?$/i, "");
 }
 
-function DepartmentStationCard({ station }: { station: Station }) {
+function normalizeLabel(value?: string) {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function getStationEyebrow(station: Station) {
+  const stationName = normalizeLabel(station.name.replace(/^Estaci[oó]n\s+/i, ""));
+  const candidates = [station.department, formatStationLocation(station.locality)];
+  const distinctLabel = candidates.find(
+    (candidate) => candidate && normalizeLabel(candidate) !== stationName,
+  );
+
+  if (distinctLabel) {
+    return distinctLabel;
+  }
+
+  return "Estación de la ruta";
+}
+
+function DepartmentStationCard({
+  station,
+  eager = false,
+}: {
+  station: Station;
+  eager?: boolean;
+}) {
   return (
-    <Link
-      href={`/estaciones/${station.slug}`}
-      className="group block"
-    >
-      <article className="h-full overflow-hidden rounded-[1.85rem] bg-[#efd4b0] text-[#0d314a] transition duration-200 group-hover:-translate-y-1">
-        <div className="relative aspect-[0.95] w-full overflow-hidden">
+    <Link href={`/estaciones/${station.slug}`} className="group block">
+      <article className="grid min-h-36 grid-cols-[7.5rem_minmax(0,1fr)] overflow-hidden rounded-[1.5rem] bg-[#efd4b0] text-[#0d314a] transition duration-200 group-hover:-translate-y-1 sm:block sm:h-full sm:rounded-[1.85rem]">
+        <div className="relative min-h-full w-full overflow-hidden sm:aspect-[0.95]">
           {station.imageUrl ? (
             <PbImage
               src={station.imageUrl}
               alt={station.name}
               fill
               className="object-cover transition duration-500 group-hover:scale-[1.04]"
-              sizes="(max-width: 768px) 100vw, 33vw"
+              sizes="(max-width: 639px) 120px, (max-width: 1023px) 50vw, 33vw"
               usage="small"
               quality={90}
+              loading={eager ? "eager" : undefined}
               style={getImageFocusStyle(station.imageFocus)}
               fallback={<MediaFallback label="Estacion" />}
             />
@@ -70,81 +95,25 @@ function DepartmentStationCard({ station }: { station: Station }) {
             </span>
           ) : null}
         </div>
-        <div className="p-6">
-          {station.locality ? (
-            <p className="text-[0.7rem] font-medium uppercase leading-none tracking-normal text-[#18364d]/80">
-              {formatStationLocation(station.locality)}
-            </p>
-          ) : null}
-          <h3 className="mt-1 text-[1.75rem] font-black leading-[0.92] tracking-normal text-[#082d49]">
+        <div className="flex min-w-0 flex-col justify-center p-4 sm:block sm:p-6">
+          <p className="text-[0.65rem] font-black uppercase leading-tight tracking-normal text-[#18364d]/75 sm:text-[0.7rem] sm:font-medium sm:leading-none">
+            {getStationEyebrow(station)}
+          </p>
+          <h3 className="mt-1 text-[1.3rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[1.75rem] sm:leading-[0.92]">
             {station.name}
           </h3>
           {station.slogan ? (
-            <p className="mt-3 text-[0.72rem] font-medium uppercase tracking-normal text-[#18364d]/75">
+            <p className="mt-2 line-clamp-2 text-[0.68rem] font-medium uppercase leading-snug tracking-normal text-[#18364d]/75 sm:mt-3 sm:text-[0.72rem]">
               {station.slogan}
             </p>
           ) : null}
           <HighlightedData
             value={station.datoDestacado}
             compact
-            className="mt-4 border-[#123a55]/20 bg-[#123a55]/5"
+            className="mt-4 hidden border-[#123a55]/20 bg-[#123a55]/5 sm:block"
           />
         </div>
       </article>
-    </Link>
-  );
-}
-
-function DefaultStationCard({ station }: { station: Station }) {
-  return (
-    <Link
-      href={`/estaciones/${station.slug}`}
-      className="group"
-    >
-      <SurfaceCard className="soft-shadow h-full overflow-hidden !p-0 transition group-hover:border-[color:var(--accent)]">
-        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-t-2xl">
-          {station.imageUrl ? (
-            <PbImage
-              src={station.imageUrl}
-              alt={station.name}
-              fill
-              className="object-cover transition group-hover:scale-[1.03]"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              usage="small"
-              style={getImageFocusStyle(station.imageFocus)}
-              fallback={<MediaFallback label="Estacion" />}
-            />
-          ) : (
-            <MediaFallback label="Estacion" />
-          )}
-          {station.hasInauguratedStation ? (
-            <span className="absolute left-3 top-3 rounded-full bg-[color:var(--accent)] px-3 py-0.5 text-xs font-semibold text-white shadow">
-              Estacion inaugurada
-            </span>
-          ) : null}
-        </div>
-        <div className="p-4">
-          {station.department ? (
-            <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent-mid)]">
-              {station.department}
-            </p>
-          ) : null}
-          <h3 className="mt-1 text-base font-semibold text-[color:var(--foreground)] group-hover:text-[color:var(--accent)]">
-            {station.name}
-          </h3>
-          <p className="mt-0.5 text-sm text-[color:var(--text-muted)]">
-            {formatStationLocation(station.locality)}
-          </p>
-          <p className="mt-2 text-xs italic leading-relaxed text-[color:var(--text-muted)]">
-            &quot;{station.slogan}&quot;
-          </p>
-          <HighlightedData
-            value={station.datoDestacado}
-            compact
-            className="mt-3"
-          />
-        </div>
-      </SurfaceCard>
     </Link>
   );
 }
@@ -161,7 +130,6 @@ export function EstacionesClient({
   const urlDepartment = searchParams.get("departamento");
   const dept =
     urlDepartment && departments.includes(urlDepartment) ? urlDepartment : "todas";
-  const useHomeStyle = true;
   const [view, setView] = useState<"lista" | "mapa">("lista");
   const [search, setSearch] = useState("");
   const hasFilters = search.trim() !== "" || dept !== "todas";
@@ -200,114 +168,139 @@ export function EstacionesClient({
       return matchDept && matchSearch;
     });
   }, [stations, dept, search]);
+  const resultLabel = `${filtered.length} ${
+    filtered.length === 1 ? "estación" : "estaciones"
+  }${dept !== "todas" ? ` en ${dept}` : ""}${
+    search.trim() ? ` para “${search.trim()}”` : ""
+  }`;
+  const clearLabel =
+    search.trim() !== "" ? "Limpiar filtros" : "Quitar filtro";
+  const mapTitle =
+    dept === "todas"
+      ? "Estaciones de la Ruta del Telar"
+      : `Estaciones de ${dept}`;
 
   return (
     <>
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <label htmlFor="stations-search" className="sr-only">
-          Buscar estaciones por nombre o localidad
-        </label>
-        <input
-          id="stations-search"
-          type="search"
-          placeholder={
-            dept !== "todas"
-              ? `Buscar en ${dept}...`
-              : "Buscar en todas las estaciones..."
-          }
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className={
-            useHomeStyle
-              ? "flex-1 rounded-full border border-[#efd4b0]/30 bg-[#efd4b0] px-5 py-3 text-sm font-medium text-[#123a55] placeholder:text-[#123a55]/65 focus:border-white focus:outline-none"
-              : ""
-          }
-        />
-        <div
-          role="group"
-          aria-label="Vista de estaciones"
-          className={
-            useHomeStyle
-              ? "flex rounded-full border border-[#efd4b0]/30 bg-[#efd4b0]/15 p-1"
-              : ""
-          }
-        >
-          <button
-            type="button"
-            aria-pressed={view === "lista"}
-            onClick={() => setView("lista")}
-            className={`flex-1 rounded-full px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
-              view === "lista"
-                ? useHomeStyle
-                  ? "bg-[#efd4b0] text-[#123a55] shadow-sm"
-                  : "bg-[color:var(--accent)] text-white shadow-sm"
-                : useHomeStyle
-                  ? "text-[#efd4b0]"
-                  : "text-[color:var(--text-muted)]"
-            }`}
+      <div className="mb-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+        <div>
+          <label
+            htmlFor="stations-search"
+            className="mb-2 block text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]"
           >
-            Lista
-          </button>
-          <button
-            type="button"
-            aria-pressed={view === "mapa"}
-            onClick={() => setView("mapa")}
-            className={`flex-1 rounded-full px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
-              view === "mapa"
-                ? useHomeStyle
-                  ? "bg-[#efd4b0] text-[#123a55] shadow-sm"
-                  : "bg-[color:var(--accent)] text-white shadow-sm"
-                : useHomeStyle
-                  ? "text-[#efd4b0]"
-                  : "text-[color:var(--text-muted)]"
-            }`}
+            Buscar una estación
+          </label>
+          <div className="relative">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#123a55]/65"
+            >
+              <circle
+                cx="11"
+                cy="11"
+                r="6.5"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+              <path
+                d="m16 16 4 4"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="1.8"
+              />
+            </svg>
+            <input
+              id="stations-search"
+              type="search"
+              placeholder={
+                dept !== "todas"
+                  ? `Buscar en ${dept}...`
+                  : "Nombre, localidad o dato destacado..."
+              }
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="min-h-12 w-full rounded-full border border-[#efd4b0]/30 bg-[#efd4b0] py-3 pl-12 pr-5 text-sm font-medium text-[#123a55] placeholder:text-[#123a55]/60 focus:border-white focus:outline-none"
+            />
+          </div>
+        </div>
+        <div>
+          <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+            Vista
+          </p>
+          <div
+            role="group"
+            aria-label="Vista de estaciones"
+            className="flex rounded-full border border-[#efd4b0]/30 bg-[#efd4b0]/15 p-1 sm:w-48"
           >
-            Mapa
-          </button>
+            <button
+              type="button"
+              aria-pressed={view === "lista"}
+              onClick={() => setView("lista")}
+              className={`min-h-10 flex-1 rounded-full px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
+                view === "lista"
+                  ? "bg-[#efd4b0] text-[#123a55] shadow-sm"
+                  : "text-[#efd4b0]"
+              }`}
+            >
+              Lista
+            </button>
+            <button
+              type="button"
+              aria-pressed={view === "mapa"}
+              onClick={() => setView("mapa")}
+              className={`min-h-10 flex-1 rounded-full px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
+                view === "mapa"
+                  ? "bg-[#efd4b0] text-[#123a55] shadow-sm"
+                  : "text-[#efd4b0]"
+              }`}
+            >
+              Mapa
+            </button>
+          </div>
         </div>
       </div>
 
       {departments.length > 0 ? (
-        <div
-          role="group"
-          aria-label="Filtrar estaciones por departamento"
-          className="mb-8 flex gap-2 overflow-x-auto pb-1 pr-8 scrollbar-none scroll-fade-x sm:flex-wrap sm:pr-0"
-        >
-          <button
-            type="button"
-            aria-pressed={dept === "todas"}
-            onClick={() => handleDepartmentChange("todas")}
-            className={`shrink-0 rounded-full border px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
-              dept === "todas"
-                ? useHomeStyle
-                  ? "border-[#efd4b0] bg-[#efd4b0] text-[#123a55]"
-                  : "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
-                : useHomeStyle
-                  ? "border-[#efd4b0]/35 text-[#efd4b0] hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
-                  : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
-            }`}
+        <div className="mb-5">
+          <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+            Departamento
+          </p>
+          <div
+            role="group"
+            aria-label="Filtrar estaciones por departamento"
+            className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap"
           >
-            Todas
-          </button>
-          {departments.map((department) => (
             <button
-              key={department}
               type="button"
-              aria-pressed={dept === department}
-              onClick={() => handleDepartmentChange(department)}
-              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-black uppercase leading-none tracking-normal transition ${
-                dept === department
-                  ? useHomeStyle
-                    ? "border-[#efd4b0] bg-[#efd4b0] text-[#123a55]"
-                    : "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
-                  : useHomeStyle
-                    ? "border-[#efd4b0]/35 text-[#efd4b0] hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
-                    : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--text-muted)]"
+              aria-pressed={dept === "todas"}
+              onClick={() => handleDepartmentChange("todas")}
+              className={`min-h-11 rounded-full border px-3 py-2 text-xs font-black uppercase leading-tight tracking-normal transition sm:min-h-0 sm:shrink-0 sm:px-4 sm:text-sm ${
+                dept === "todas"
+                  ? "border-[#efd4b0] bg-[#efd4b0] text-[#123a55]"
+                  : "border-[#efd4b0]/35 text-[#efd4b0] hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
               }`}
             >
-              {department}
+              Todas
             </button>
-          ))}
+            {departments.map((department) => (
+              <button
+                key={department}
+                type="button"
+                aria-pressed={dept === department}
+                onClick={() => handleDepartmentChange(department)}
+                className={`min-h-11 rounded-full border px-3 py-2 text-xs font-black uppercase leading-tight tracking-normal transition sm:min-h-0 sm:shrink-0 sm:px-4 sm:text-sm ${
+                  dept === department
+                    ? "border-[#efd4b0] bg-[#efd4b0] text-[#123a55]"
+                    : "border-[#efd4b0]/35 text-[#efd4b0] hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+                }`}
+              >
+                {department}{" "}
+                {dept === department ? <span aria-hidden="true">×</span> : null}
+              </button>
+            ))}
+          </div>
         </div>
       ) : null}
 
@@ -316,49 +309,51 @@ export function EstacionesClient({
           stations={filtered}
           artisans={artisans}
           highlightSpots={highlightSpots}
+          initialVisibleLayers={{
+            stations: true,
+            artisans: false,
+            highlightSpots: false,
+          }}
+          scopeRelatedEntitiesToStations
+          showExplorer={false}
+          showLegend={false}
+          compactLayerControls
+          title={mapTitle}
         />
       ) : (
         <>
           <p className="sr-only" aria-live="polite">
             {filtered.length} estaciones disponibles.
           </p>
-          <div className="mb-5 flex flex-wrap items-center gap-2">
-            <p className="text-sm font-medium text-[#efd4b0]/85">
-              {filtered.length} estacion{filtered.length !== 1 ? "es" : ""}
+          <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <p className="text-sm font-black text-[#efd4b0]">
+              {resultLabel}
             </p>
             {hasFilters ? (
               <button
                 type="button"
-                onClick={clearFilters}
-                className="rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+                onClick={
+                  search.trim() !== ""
+                    ? clearFilters
+                    : () => handleDepartmentChange("todas")
+                }
+                className="text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] underline decoration-[#efd4b0]/55 underline-offset-4 transition hover:text-white"
               >
-                Limpiar filtros
+                {clearLabel}
               </button>
             ) : null}
           </div>
-          <div
-            className={
-              useHomeStyle
-                ? "grid gap-10 sm:grid-cols-2 md:gap-14 lg:grid-cols-3"
-                : "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-            }
-          >
-            {filtered.map((station) =>
-              useHomeStyle ? (
-                <DepartmentStationCard key={station.slug} station={station} />
-              ) : (
-                <DefaultStationCard key={station.slug} station={station} />
-              ),
-            )}
+          <div className="grid gap-4 sm:grid-cols-2 sm:gap-10 md:gap-14 lg:grid-cols-3">
+            {filtered.map((station, index) => (
+              <DepartmentStationCard
+                key={station.slug}
+                station={station}
+                eager={index === 0}
+              />
+            ))}
 
             {filtered.length === 0 ? (
-              <div
-                className={`col-span-full py-16 text-center text-sm ${
-                  useHomeStyle
-                    ? "text-[#efd4b0]"
-                    : "text-[color:var(--text-muted)]"
-                }`}
-              >
+              <div className="col-span-full py-16 text-center text-sm text-[#efd4b0]">
                 No hay estaciones que coincidan con tu busqueda.
               </div>
             ) : null}
