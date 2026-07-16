@@ -72,7 +72,7 @@ function DepartmentStationCard({
   return (
     <Link href={`/estaciones/${station.slug}`} className="group block">
       <article className="grid min-h-36 grid-cols-[7.5rem_minmax(0,1fr)] overflow-hidden rounded-[1.5rem] bg-[#efd4b0] text-[#0d314a] transition duration-200 group-hover:-translate-y-1 sm:block sm:h-full sm:rounded-[1.85rem]">
-        <div className="relative min-h-full w-full overflow-hidden sm:aspect-[0.95]">
+        <div className="relative min-h-full w-full overflow-hidden sm:aspect-[0.95] sm:min-h-0">
           {station.imageUrl ? (
             <PbImage
               src={station.imageUrl}
