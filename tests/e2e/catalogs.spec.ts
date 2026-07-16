@@ -64,6 +64,41 @@ test.describe("public catalogs", () => {
     await expect(page.locator('a[href="/artesanas/rosa-chaile"]')).toHaveCount(0);
   });
 
+  test("groups actor filters in a progressive mobile sheet", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/artesanas");
+
+    await page.getByRole("button", { name: "Filtros" }).click();
+
+    const dialog = page.getByRole("dialog", { name: "Filtros" });
+    const departmentSelect = dialog.getByLabel("Departamento", { exact: true });
+    const stationSelect = dialog.getByLabel("Estación", { exact: true });
+
+    await expect(dialog).toBeVisible();
+    await expect(stationSelect).toBeDisabled();
+
+    const departments = await departmentSelect.locator("option").allTextContents();
+    const firstDepartment = departments.find(
+      (label) => label !== "Todos los departamentos",
+    );
+
+    if (!firstDepartment) {
+      throw new Error("Expected at least one actor department");
+    }
+
+    await departmentSelect.selectOption({ label: firstDepartment });
+    await expect(stationSelect).toBeEnabled();
+
+    await dialog.getByRole("button", { name: /Ver \d+ resultados?/ }).click();
+
+    await expect(dialog).toBeHidden();
+    await expect(
+      page.getByRole("button", {
+        name: new RegExp(`Quitar filtro: ${firstDepartment}`),
+      }),
+    ).toBeVisible();
+  });
+
   test("filters products by text and keeps detail links reachable", async ({ page }) => {
     await page.goto("/productos");
 

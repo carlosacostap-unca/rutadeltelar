@@ -9,7 +9,7 @@ async function expectNoDocumentOverflow(page: Page) {
 }
 
 test.describe("visual layout smoke", () => {
-  for (const path of ["/", "/estaciones", "/mapa", "/productos", "/favoritos"]) {
+  for (const path of ["/", "/estaciones", "/artesanas", "/mapa", "/productos", "/favoritos"]) {
     test(`keeps ${path} within the viewport width`, async ({ page }) => {
       await page.goto(path);
 
@@ -61,5 +61,43 @@ test.describe("visual layout smoke", () => {
     }
 
     await expectNoDocumentOverflow(page);
+  });
+
+  test("shows compact actor cards and the first results above the mobile fold", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/artesanas");
+
+    const firstCard = page.locator("article").first();
+    const cardBox = await firstCard.boundingBox();
+
+    expect(cardBox).not.toBeNull();
+
+    if (cardBox) {
+      expect(cardBox.width).toBeGreaterThan(cardBox.height * 1.35);
+      expect(cardBox.y).toBeLessThan(760);
+    }
+
+    await expect(page.getByText("Ver perfil").first()).toBeVisible();
+    await expectNoDocumentOverflow(page);
+  });
+
+  test("keeps actor catalog images compact on desktop", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto("/artesanas");
+
+    const firstCard = page.locator("article").first();
+    const firstImage = firstCard.getByRole("img");
+    const imageBox = await firstImage.boundingBox();
+
+    expect(imageBox).not.toBeNull();
+
+    if (imageBox) {
+      expect(imageBox.width).toBeGreaterThan(imageBox.height * 1.2);
+    }
+
+    await expect(firstCard.getByRole("heading")).toBeVisible();
+    await expect(firstCard.getByText("Ver perfil")).toBeVisible();
   });
 });
