@@ -186,7 +186,7 @@ export function EstacionesClient({
         <div>
           <label
             htmlFor="stations-search"
-            className="mb-2 block text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]"
+            className="sr-only"
           >
             Buscar una estación
           </label>
@@ -317,15 +317,16 @@ export function EstacionesClient({
           scopeRelatedEntitiesToStations
           showExplorer={false}
           showLegend={false}
-          compactLayerControls
+          showLayerControls={false}
           title={mapTitle}
+          initialZoom={8}
         />
       ) : (
         <>
           <p className="sr-only" aria-live="polite">
             {filtered.length} estaciones disponibles.
           </p>
-          <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <div className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-[#efd4b0]/15 pb-3">
             <p className="text-sm font-black text-[#efd4b0]">
               {resultLabel}
             </p>
