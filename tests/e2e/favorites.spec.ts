@@ -15,7 +15,7 @@ test.describe("local favorites", () => {
 
     await page.goto("/favoritos");
 
-    await expect(page.getByRole("heading", { name: "Favoritos", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Tus favoritos", exact: true })).toBeVisible();
     await expect(page.getByText("1 favorito")).toBeVisible();
     await expect(page.locator('a[href="/estaciones/belen-catamarca"]')).toContainText(
       "Estacion Belen",

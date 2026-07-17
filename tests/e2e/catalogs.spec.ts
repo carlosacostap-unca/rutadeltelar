@@ -32,7 +32,7 @@ test.describe("public catalogs", () => {
     await expect(page.getByRole("button", { name: "Quitar filtro" })).toBeVisible();
   });
 
-  test("starts the station map with only the scoped station layer", async ({
+  test("shows the filtered station map without layer controls", async ({
     page,
   }) => {
     await page.goto("/estaciones?departamento=Belen");
@@ -43,14 +43,9 @@ test.describe("public catalogs", () => {
       page.getByText("Estaciones de Belen", { exact: true }),
     ).toBeVisible();
 
-    const actorsLayer = page.getByRole("button", { name: "Actores", exact: true });
-    const highlightsLayer = page.getByRole("button", {
-      name: "Imperdibles",
-      exact: true,
-    });
-
-    await expect(actorsLayer).toHaveAttribute("aria-pressed", "false");
-    await expect(highlightsLayer).toHaveAttribute("aria-pressed", "false");
+    await expect(
+      page.getByRole("group", { name: "Controles del mapa territorial" }),
+    ).toHaveCount(0);
   });
 
   test("filters actors by craft or name", async ({ page }) => {

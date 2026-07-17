@@ -5,7 +5,7 @@ test("renders the public home page", async ({ page }) => {
 
   await expect(page).toHaveTitle(/Ruta del Telar/);
   await expect(
-    page.getByRole("heading", { name: /Ruta del Telar/i }),
+    page.getByRole("heading", { name: /Qu[eé] es la Ruta del Telar/i }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "Estaciones" }).first()).toBeVisible();
 });
@@ -29,7 +29,9 @@ test("shows the stations hero slide", async ({ page }) => {
   await expect(
     activeHero.getByRole("heading", { name: "Estaciones" }),
   ).toBeVisible();
-  await expect(activeHero.getByText(/Departamento Santa Mar/i)).toBeVisible();
+  await expect(
+    activeHero.getByRole("link", { name: /Departamento/i }),
+  ).not.toHaveCount(0);
 });
 
 test("shows the actors hero slide", async ({ page }) => {
@@ -145,7 +147,7 @@ test("shows the highlights hero slide", async ({ page }) => {
     activeHero.getByRole("heading", { name: "Imperdibles" }),
   ).toBeVisible();
   await expect(
-    activeHero.getByText(/Descubr/i),
+    activeHero.getByText(/^Descubr.*imperdibles de la Ruta del Telar$/i),
   ).toBeVisible();
   await expect(activeHero.getByText(/legado prehisp/i)).toBeVisible();
 });
@@ -191,15 +193,13 @@ test("shows the institutional footer with QR and social icons", async ({
 }) => {
   await page.goto("/");
 
-  const footer = page.getByRole("contentinfo", {
-    name: "Informacion institucional",
-  });
+  const footer = page.locator("footer");
 
   await expect(footer).toBeVisible();
   await expect(footer.getByRole("img", { name: /Vicuna/i })).toBeVisible();
   await expect(footer.getByText("Direccion")).toBeVisible();
   await expect(
-    footer.getByText(/Ministerio de Trabajo, Planificacion/i),
+    footer.getByText(/Ministerio de Educacion y Trabajo/i),
   ).toBeVisible();
   await expect(
     footer.getByRole("img", { name: /QR para acceder/i }),

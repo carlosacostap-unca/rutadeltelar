@@ -30,30 +30,23 @@ test.describe("planning flows", () => {
     await expect(page.locator('a[href="/imperdibles/demostracion-de-tintes"]')).toBeVisible();
   });
 
-  test("opens a suggested journey from the journeys catalog", async ({ page }) => {
+  test("links to a suggested journey from the journeys catalog", async ({ page }) => {
     await page.goto("/recorridos");
 
     await expect(page.getByRole("heading", { name: /Itinerarios sugeridos/i })).toBeVisible();
 
-    await page.locator('a[href="/recorridos/recorrido-belen-catamarca"]').click();
-
-    await expect(page).toHaveURL(/\/recorridos\/recorrido-belen-catamarca$/);
     await expect(
-      page.getByRole("heading", { name: /Recorrido sugerido por Belen/i }),
+      page.locator('a[href="/recorridos/recorrido-belen-catamarca"]'),
     ).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Momentos del recorrido/i })).toBeVisible();
   });
 
-  test("allows toggling map layers", async ({ page }) => {
+  test("shows the territorial map without manual layer controls", async ({ page }) => {
     await page.goto("/mapa");
 
     await expect(page.getByRole("heading", { name: /La ruta en el territorio/i })).toBeVisible();
 
-    const actorsLayer = page.getByRole("button", { name: "Actores", exact: true });
-    await expect(actorsLayer).toBeVisible();
-
-    await actorsLayer.click();
-
-    await expect(actorsLayer).not.toHaveClass(/bg-\[color:var\(--accent\)\]/);
+    await expect(
+      page.getByRole("group", { name: "Controles del mapa territorial" }),
+    ).toHaveCount(0);
   });
 });

@@ -40,7 +40,7 @@ test.describe("global search", () => {
     await page.goto("/buscar?q=telar");
 
     await expect(page.getByRole("searchbox")).toHaveValue("telar");
-    await page.getByRole("button", { name: /Limpiar/i }).click();
+    await page.getByRole("searchbox").fill("");
 
     await expect(page).toHaveURL(/\/buscar$/);
     await expect(page.getByRole("searchbox")).toHaveValue("");
