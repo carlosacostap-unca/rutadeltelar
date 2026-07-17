@@ -4,7 +4,6 @@ La aplicación debe poder demostrarse de forma completa y predecible en una expo
 
 ## What Changes
 
-- Distribuir además una edición Electron portable para Windows que incluya su propio navegador, bloquee internamente toda conexión no local y pueda ejecutarse en cualquier equipo compatible sin instalación, reinicio ni cambios en los adaptadores de red.
 - Sustituir la aceptación dependiente de una notebook específica por autodiagnóstico de integridad, bloqueo de red verificable y pruebas portables repetibles, conservando una comprobación manual final en cualquier equipo Windows disponible.
 
 - Incorporar un modo explícito `Expo Offline` que omita toda solicitud remota necesaria para navegar la demostración.

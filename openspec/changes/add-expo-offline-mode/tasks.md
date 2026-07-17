@@ -46,12 +46,6 @@
 - [x] 6.3 Add a Windows launcher that enables exhibition mode, binds to `127.0.0.1`, selects a safe local port, waits for health, and opens Microsoft Edge in app or full-screen mode.
 - [x] 6.4 Add actionable launcher failures and a documented manual startup fallback for unavailable assets, runtime, port, or browser.
 - [x] 6.5 Verify that stopping or relaunching the package does not leave conflicting local server processes.
-- [x] 6.6 Add a sandboxed Electron window that owns the bundled localhost server lifecycle without depending on Microsoft Edge.
-- [x] 6.7 Enforce an Electron-session network policy that cancels every non-local request, popup, and navigation while physical connectivity remains enabled.
-- [x] 6.8 Add startup self-diagnostics for package integrity, required runtime assets, local health, and actionable failures.
-- [x] 6.9 Build a versioned portable Windows x64 distribution and ZIP with complete inventory, size, and SHA-256 checksum.
-- [x] 6.10 Show an immediate branded splash with animated feedback and explicit integrity, server, content, and launch stages.
-- [x] 6.11 Generate Windows PNG/ICO assets from `footer-vicuna.png` and apply them to the splash, BrowserWindow, taskbar, and executable resources.
 
 ## 7. Offline Verification
 
@@ -60,11 +54,11 @@
 - [x] 7.3 Make the exhibition Playwright project block and fail on every non-local request while allowing only localhost and local browser schemes.
 - [x] 7.4 Add a packaged cold-start smoke test that verifies launcher health and a representative page from the assembled distribution.
 - [ ] 7.5 Run OpenSpec validation, lint, unit tests, production build, connected E2E tests, exhibition E2E tests, and the package smoke test.
-- [x] 7.6 Verify that packaged iDrive/PocketBase media is accepted by the Next.js local image policy and assert real image dimensions in both browser and Electron smoke tests.
+- [x] 7.6 Verify that packaged iDrive/PocketBase media is accepted by the Next.js local image policy and assert real image dimensions in browser and package smoke tests.
 
 ## 8. Final Stand Readiness
 
 - [x] 8.1 Generate the final artifact from the live approved source and review the exact entity counts, missing-media report, map coverage, video selection, and package size.
-- [x] 8.2 Execute and record the complete demonstration checklist with the Electron package on any compatible Windows x64 computer while connectivity remains enabled and confirm that no device-specific preparation is required.
+- [x] 8.2 Execute and record the complete demonstration checklist with the portable package on a compatible Windows x64 computer and confirm that no device-specific preparation is required.
 - [x] 8.3 Document the operator startup, shutdown, recovery, content-refresh, and pre-event verification procedures.
 - [ ] 8.4 Copy the validated package and its checksum to primary and backup removable media without changing the connected web deployment.
