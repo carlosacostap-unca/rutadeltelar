@@ -1,4 +1,5 @@
 type HighlightedDataProps = {
+  label?: string;
   value?: string;
   compact?: boolean;
   className?: string;
@@ -6,6 +7,7 @@ type HighlightedDataProps = {
 };
 
 export function HighlightedData({
+  label = "Dato destacado",
   value,
   compact = false,
   className = "",
@@ -53,11 +55,11 @@ export function HighlightedData({
         </span>
         <div>
           <p
-            className={`text-[0.68rem] font-black uppercase leading-none tracking-normal ${
+            className={`text-xs font-black uppercase leading-none tracking-normal ${
               onDark ? "text-[#efd4b0]" : "text-[#8a452b]"
             }`}
           >
-            Dato destacado
+            {label}
           </p>
           <p
             className={`mt-1.5 font-semibold ${

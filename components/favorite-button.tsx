@@ -39,9 +39,11 @@ export function getFavoriteKey(item: Pick<FavoriteItem, "type" | "slug">) {
 export function FavoriteButton({
   item,
   variant = "default",
+  compact = false,
 }: {
   item: FavoriteItem;
   variant?: "default" | "onDark";
+  compact?: boolean;
 }) {
   const [saved, setSaved] = useState(false);
   const onDark = variant === "onDark";
@@ -80,7 +82,9 @@ export function FavoriteButton({
       onClick={toggleFavorite}
       aria-pressed={saved}
       aria-label={`${saved ? "Quitar de favoritos" : "Guardar favorito"}: ${item.title}`}
-      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5 active:scale-95 ${
+      className={`inline-flex items-center rounded-full border text-sm font-semibold transition hover:-translate-y-0.5 active:scale-95 ${
+        compact ? "h-10 w-10 justify-center p-0" : "gap-2 px-4 py-2"
+      } ${
         saved
           ? onDark
             ? "border-[#efd4b0] bg-[#efd4b0] text-[#123a55]"
@@ -99,7 +103,7 @@ export function FavoriteButton({
           strokeWidth="1.7"
         />
       </svg>
-      {saved ? "Guardado" : "Guardar"}
+      {!compact ? (saved ? "Guardado" : "Guardar") : null}
     </button>
   );
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { MobileBottomNav } from "./mobile-bottom-nav";
+import { PwaInstallPrompt } from "./pwa-install-prompt";
 import { SiteHeader } from "./site-header";
 
 type AppShellProps = {
@@ -24,6 +25,7 @@ export function AppShell({ children }: AppShellProps) {
         {children}
       </div>
       <MobileBottomNav />
+      <PwaInstallPrompt />
     </>
   );
 }

@@ -1,12 +1,17 @@
 import { formatBrandFontText } from "@/app/lib/brand-font-text";
-import { getProductsResult, getStationsResult } from "@/app/lib/data";
+import {
+  getArtisansResult,
+  getProductsResult,
+  getStationsResult,
+} from "@/app/lib/data";
 import { DataSourceBadge } from "@/components/data-source-badge";
 import { ProductosClient } from "@/components/productos-client";
 
 export default async function ProductosPage() {
-  const [productsResult, stationsResult] = await Promise.all([
+  const [productsResult, stationsResult, artisansResult] = await Promise.all([
     getProductsResult(),
     getStationsResult(),
+    getArtisansResult(),
   ]);
   const products = productsResult.items;
   const stations = stationsResult.items;
@@ -47,6 +52,7 @@ export default async function ProductosPage() {
           products={products}
           stations={stationsWithProducts}
           categories={categories}
+          artisans={artisansResult.items}
         />
       </div>
     </main>

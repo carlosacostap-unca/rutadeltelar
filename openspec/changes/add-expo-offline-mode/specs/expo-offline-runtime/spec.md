@@ -34,32 +34,13 @@ Features that require an external destination or remote write SHALL degrade with
 - **AND** the action SHALL NOT cause an automatic remote request
 
 ### Requirement: Portable Windows startup
-The exhibition distribution SHALL provide a portable Electron application that starts the bundled local server and opens the application without requiring installation, a separate browser, administrative privileges, restart, or network-adapter changes.
+The exhibition distribution SHALL provide a portable Windows launcher that starts the bundled local server and opens the application without requiring installation, administrative privileges, restart, or network-adapter changes.
 
 #### Scenario: Successful cold start
 - **WHEN** an operator launches the package on any compatible Windows device
 - **THEN** the launcher SHALL start the server bound to localhost
 - **AND** it SHALL wait until local health is confirmed
-- **AND** it SHALL open the application in its bundled app-like or full-screen browser window
-
-#### Scenario: Device remains connected
-- **WHEN** Ethernet, Wi-Fi, or another system network adapter remains active
-- **THEN** the Electron session SHALL cancel every non-local HTTP(S) request and external navigation
-- **AND** the core demonstration SHALL continue using only packaged resources
-
-#### Scenario: Package self-diagnostic
-- **WHEN** the portable application starts
-- **THEN** it SHALL validate the package manifest, required files, local server health, and network-blocking policy before showing the visitor experience
-- **AND** it SHALL report an actionable local error if validation fails
-
-#### Scenario: Visible startup progress
-- **WHEN** integrity validation and local server startup take noticeable time
-- **THEN** the application SHALL immediately show a branded splash window with a loading indicator and current startup stage
-- **AND** it SHALL replace the splash with the visitor experience only after local health and rendering succeed
-
-#### Scenario: Branded Windows identity
-- **WHEN** the portable package is viewed or executed on Windows
-- **THEN** the executable, taskbar window, and splash SHALL use the packaged Ruta del Telar vicuña icon derived from `public/images/home/footer-vicuna.png`
+- **AND** it SHALL open the application in an app-like or full-screen browser window
 
 #### Scenario: Startup fails
 - **WHEN** the runtime, local assets, or a usable port are unavailable
@@ -75,6 +56,6 @@ The exhibition package MUST pass automated and portable acceptance with non-loca
 - **AND** any attempted remote request SHALL fail the suite
 
 #### Scenario: Arbitrary compatible device is validated
-- **WHEN** the final package is cold-started on a compatible Windows device while system connectivity may remain enabled
-- **THEN** the self-diagnostic and documented demonstration checklist SHALL complete successfully
+- **WHEN** the final package is cold-started on a compatible Windows device
+- **THEN** the documented demonstration checklist SHALL complete successfully
 - **AND** no preparation unique to that device SHALL be required

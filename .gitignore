@@ -28,7 +28,11 @@
 # generated exhibition and promotional artifacts
 /public/expo/
 /public/video/
-/electron/assets/
+/electron/
+/scripts/create-expo-electron-icon.mjs
+/scripts/package-expo-electron.mjs
+/scripts/smoke-expo-electron.mjs
+/tests/unit/expo-electron.test.ts
 *.exe
 *.msi
 *.zip

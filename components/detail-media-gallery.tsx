@@ -17,6 +17,7 @@ type DetailMediaGalleryProps = {
   coverClassName?: string;
   coverSizes?: string;
   thumbnailClassName?: string;
+  compactMobile?: boolean;
 };
 
 function ScrollArrow({
@@ -68,6 +69,7 @@ export function DetailMediaGallery({
   coverClassName = "aspect-[16/9]",
   coverSizes = "(max-width: 1024px) 100vw, 70vw",
   thumbnailClassName = "aspect-[4/3] w-[220px]",
+  compactMobile = false,
 }: DetailMediaGalleryProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [thumbnailScrollState, setThumbnailScrollState] = useState({
@@ -99,6 +101,7 @@ export function DetailMediaGallery({
     [coverUrl, images, title],
   );
   const galleryIndexOffset = coverUrl ? 1 : 0;
+  const imageCount = lightboxImages.length;
   const updateThumbnailScrollState = useCallback(() => {
     const scrollContainer = thumbnailScrollRef.current;
 
@@ -176,6 +179,11 @@ export function DetailMediaGallery({
             priority
             fallback={<MediaFallback label={fallbackLabel} />}
           />
+          {compactMobile && imageCount > 1 ? (
+            <span className="absolute bottom-3 right-3 inline-flex min-h-10 items-center rounded-full border border-white/35 bg-[#082d49]/90 px-3.5 py-2 text-xs font-black text-white shadow-lg backdrop-blur-sm sm:hidden">
+              Ver {imageCount} fotos
+            </span>
+          ) : null}
         </button>
       ) : (
         <div className={`w-full overflow-hidden rounded-3xl border border-[color:var(--border)] soft-shadow ${coverClassName}`}>
@@ -184,7 +192,7 @@ export function DetailMediaGallery({
       )}
 
       {thumbnailImages.length > 0 && (
-        <div className="relative">
+        <div className={`relative ${compactMobile && coverUrl ? "hidden sm:block" : ""}`}>
           {thumbnailScrollState.canScrollLeft ? (
             <ScrollArrow direction="left" onClick={() => scrollThumbnails("left")} />
           ) : null}

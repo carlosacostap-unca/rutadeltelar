@@ -56,7 +56,7 @@ Esta solución prioriza confiabilidad y tamaño controlado frente a zoom cartogr
 
 **Alternativa considerada:** precargar teselas visitando las pantallas. Se descarta por cobertura incierta y posibles restricciones de uso de los servidores públicos de teselas.
 
-### 5. Distribución portable de Next.js antes que Electron o Tauri
+### 5. Distribución portable de Next.js
 
 Se generará una salida `standalone` de Next.js y se copiarán `public` y `.next/static` al paquete. El paquete incluirá un runtime Node compatible y un lanzador Windows que:
 
@@ -66,7 +66,7 @@ Se generará una salida `standalone` de Next.js y se copiarán `public` y `.next
 4. abra Microsoft Edge en modo aplicación o pantalla completa;
 5. informe claramente si el servidor no puede iniciar.
 
-Esto reutiliza la aplicación y sus Route Handlers sin forzar una exportación estática incompatible con la búsqueda dinámica, el optimizador de imágenes y endpoints actuales. Electron queda como alternativa posterior si se necesita instalador, ciclo de vida de ventana propio o distribución en equipos sin Edge.
+Esto reutiliza la aplicación y sus Route Handlers sin forzar una exportación estática incompatible con la búsqueda dinámica, el optimizador de imágenes y endpoints actuales.
 
 ### 6. Servicios secundarios con degradación explícita
 
@@ -102,16 +102,6 @@ La suite E2E levantará el paquete con el modo exposición activo y bloqueará t
 - Confirmar si se incluirán videos completos, versiones comprimidas o solo imágenes de portada.
 - Confirmar si la primera entrega se ejecutará en una única notebook conocida o debe ser portable entre varias computadoras Windows.
 - Definir la fecha límite de congelamiento del contenido y quién ejecutará la regeneración final antes del evento.
-
-## Decision Amendment: Electron portable universal
-
-La decisión 5 queda ampliada: el paquete standalone y su lanzador Edge se conservan como contingencia, pero la entrega principal será una distribución Electron portable para Windows x64. Electron incluirá Chromium y abrirá la misma aplicación Next.js standalone en una ventana propia, sin exigir Edge, instalación, privilegios administrativos ni preparación previa de una computadora concreta.
-
-La aplicación Electron iniciará el servidor incluido ligado exclusivamente a `127.0.0.1`, verificará el manifiesto y los archivos antes de mostrar la experiencia, esperará el endpoint de salud y detendrá el servidor al cerrar. Su sesión cancelará en `onBeforeRequest` toda navegación o solicitud HTTP(S) cuyo host no sea `localhost` o `127.0.0.1`; las ventanas nuevas y navegaciones externas también serán denegadas.
-
-La decisión 7 también queda ampliada: mantener la conectividad física desactivada seguirá siendo una prueba opcional de máxima exigencia, no una condición de operación ni una dependencia de un equipo específico. La aceptación obligatoria combinará la suite E2E con red no local bloqueada, el autodiagnóstico integral del paquete Electron y una prueba de arranque/cierre repetible en cualquier Windows x64 compatible mientras la conectividad del sistema puede permanecer activa.
-
-El costo aceptado es un artefacto mayor por incluir Chromium. Una advertencia de SmartScreen puede aparecer mientras el ejecutable no esté firmado; la firma de código permanece fuera del alcance de esta entrega interna para la exposición.
 
 ## Decision Amendment: Detailed vector basemap with schematic fallback
 

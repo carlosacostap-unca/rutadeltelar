@@ -6,7 +6,7 @@ const cwd = process.cwd();
 const output = path.join(cwd, "output");
 const packages = [];
 for (const name of await readdir(output)) {
-  if (!name.startsWith("ruta-del-telar-expo-") || name.includes("-electron-") || name.endsWith(".zip") || name.endsWith(".sha256")) continue;
+  if (!name.startsWith("ruta-del-telar-expo-") || name.endsWith(".zip") || name.endsWith(".sha256")) continue;
   const absolute = path.join(output, name);
   if ((await stat(absolute)).isDirectory()) packages.push(absolute);
 }
