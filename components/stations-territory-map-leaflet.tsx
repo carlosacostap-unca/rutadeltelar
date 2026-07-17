@@ -64,6 +64,7 @@ type StationsTerritoryMapLeafletProps = {
   mapClassName?: string;
   warmTiles?: boolean;
   routeGeometry?: Array<[number, number]>;
+  initialZoom?: number;
 };
 
 function getGeolocatedStations(stations: Station[]) {
@@ -503,6 +504,7 @@ export function StationsTerritoryMapLeaflet({
   mapClassName = "h-[380px] w-full sm:h-[520px]",
   warmTiles = false,
   routeGeometry,
+  initialZoom,
 }: StationsTerritoryMapLeafletProps) {
   const router = useRouter();
   const [isDetailScale, setIsDetailScale] = useState(false);
@@ -584,12 +586,15 @@ export function StationsTerritoryMapLeaflet({
       <MapContainer
         center={center}
         zoom={
-          geolocatedPointCount <= 1
+          initialZoom ?? (geolocatedPointCount <= 1
             ? TERRITORY_MAP_SINGLE_POINT_ZOOM
-            : TERRITORY_MAP_MULTI_POINT_ZOOM
+            : TERRITORY_MAP_MULTI_POINT_ZOOM)
         }
         bounds={bounds}
-        boundsOptions={{ padding: [18, 18], maxZoom: TERRITORY_MAP_MAX_BOUNDS_ZOOM }}
+        boundsOptions={{
+          padding: [18, 18],
+          maxZoom: initialZoom ?? TERRITORY_MAP_MAX_BOUNDS_ZOOM,
+        }}
         maxZoom={SATELLITE_REFERENCE_MAX_ZOOM}
         scrollWheelZoom={false}
         zoomControl
@@ -648,19 +653,10 @@ export function StationsTerritoryMapLeaflet({
                       </p>
                     ) : null}
                   </div>
-                  <div className="flex gap-1.5 sm:flex-col sm:gap-2">
-                    <PopupAction
-                      label="Abrir"
-                      onClick={() => router.push(`/estaciones/${station.slug}`)}
-                      className="flex-1"
-                    />
-                    <SatelliteMapButton
-                      point={station}
-                      label="Satelital"
-                      compact
-                      className="flex-1 px-2 py-1 text-[0.65rem] sm:w-full sm:px-3 sm:py-1.5 sm:text-xs"
-                    />
-                  </div>
+                  <PopupAction
+                    label="Abrir"
+                    onClick={() => router.push(`/estaciones/${station.slug}`)}
+                  />
                 </div>
               </Popup>
             </Marker>

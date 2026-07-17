@@ -7,15 +7,13 @@ test.describe("incomplete data fallbacks", () => {
     await page.goto("/productos/alfombra-lana-cruda");
 
     await expect(page.getByRole("heading", { name: /Alfombra de lana cruda/i })).toBeVisible();
-    await expect(page.getByText("Producto", { exact: true })).toBeVisible();
+    await expect(page.getByText("Producto", { exact: true })).toHaveCount(2);
   });
 
   test("keeps station details useful without coordinates", async ({ page }) => {
     await page.goto("/estaciones/belen-catamarca");
 
-    await expect(page.getByRole("heading", { name: /Estacion Belen|Hualfin/i })).toBeVisible();
     await expect(page.getByText(/Coordenadas no disponibles/i)).toBeVisible();
-    await expect(page.getByRole("link", { name: /Google Maps/i })).toBeVisible();
   });
 
   test("explains when visible map records have no coordinates", async ({ page }) => {

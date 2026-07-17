@@ -375,7 +375,7 @@ function ActorCard({
               fill
               priority={eager}
               className="object-cover transition duration-500 group-hover:scale-[1.04]"
-              sizes="(max-width: 639px) 8rem, (max-width: 1023px) 50vw, 25vw"
+              sizes="(max-width: 639px) 8rem, (max-width: 1023px) 50vw, 33vw"
               usage="small"
               quality={90}
               style={getImageFocusStyle(item.imageFocus)}
@@ -714,7 +714,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
         </button>
       </div>
 
-      <div className="mb-5 hidden grid-cols-3 gap-3 rounded-[1.5rem] border border-[#efd4b0]/20 bg-[#efd4b0]/8 p-4 md:grid">
+      <div className="mb-5 hidden grid-cols-3 gap-3 md:grid">
         <FilterFields
           tipos={tipos}
           stations={stations}
@@ -749,7 +749,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
         </div>
       ) : null}
 
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-[#efd4b0]/15 pb-4">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-[#efd4b0]/15 pb-3">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <p
             className="text-sm font-black text-[#efd4b0]"
@@ -796,7 +796,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
         </label>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 sm:gap-7 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-10 md:gap-14 lg:grid-cols-3">
         {visibleActors.map((item, index) => (
           <ActorCard key={item.slug} item={item} eager={index === 0} />
         ))}

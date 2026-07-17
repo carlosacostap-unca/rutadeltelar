@@ -48,28 +48,24 @@ export default async function EstacionesPage({
   return (
     <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
       <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-6 sm:px-8 sm:pt-8 md:pb-28 md:pt-12 lg:px-10">
-        <header className="mb-6 md:mb-8">
+        <header className="mb-4">
           <p className="text-lg font-black uppercase leading-none tracking-normal text-white sm:text-xl">
             Estaciones
           </p>
-          <h1
-            className={`mt-1 max-w-4xl uppercase leading-none tracking-normal text-[#f3d7b4] ${
-              selectedDepartment
-                ? "text-[2.2rem] font-black sm:text-[2.8rem] md:text-[3.5rem]"
-                : "brand-font text-[2.35rem] font-normal sm:text-[3rem] md:text-[3.75rem]"
-            }`}
-          >
-            {selectedDepartment ? pageTitle : formatBrandFontText(pageTitle)}
+          <h1 className="brand-font mt-1 max-w-4xl uppercase leading-none tracking-normal text-[#f3d7b4] text-[2.35rem] font-normal sm:text-[3rem] md:text-[3.75rem]">
+            {formatBrandFontText(pageTitle)}
           </h1>
-          <p className="mt-3 max-w-4xl text-left text-sm font-medium leading-snug text-white/85 sm:mt-4 sm:text-lg">
+          <p className="mt-3 max-w-5xl text-left text-sm font-medium leading-snug text-white/85 sm:mt-4 sm:text-lg">
             {pageDescription}
           </p>
-          <div className="mt-4">
-            <DataSourceBadge
-              source={stationsResult.source}
-              error={stationsResult.error}
-            />
-          </div>
+          {stationsResult.source !== "pocketbase" || stationsResult.error ? (
+            <div className="mt-4">
+              <DataSourceBadge
+                source={stationsResult.source}
+                error={stationsResult.error}
+              />
+            </div>
+          ) : null}
         </header>
 
         <Suspense

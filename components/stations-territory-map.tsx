@@ -29,6 +29,7 @@ type StationsTerritoryMapProps = {
   scopeRelatedEntitiesToStations?: boolean;
   compactLayerControls?: boolean;
   title?: string;
+  initialZoom?: number;
 };
 
 type ExplorerView = "stations" | "choices" | "artisans" | "highlightSpots";
@@ -164,6 +165,7 @@ export function StationsTerritoryMap({
   scopeRelatedEntitiesToStations = false,
   compactLayerControls = false,
   title = "Estaciones conectadas por territorio",
+  initialZoom,
 }: StationsTerritoryMapProps) {
   const [focusMode, setFocusMode] = useState<"all" | "active">("all");
   const [localSelectedSlug, setLocalSelectedSlug] = useState<string>();
@@ -324,7 +326,7 @@ export function StationsTerritoryMap({
     },
     {
       key: "artisans" as const,
-      label: "Actores",
+      label: "Actores ubicados",
       count: counts.artisans,
       colorClass: "bg-[#ff4fd8]",
       helper: "Perfiles geolocalizados",
@@ -464,6 +466,7 @@ export function StationsTerritoryMap({
               showHighlightSpots={visibleLayers.highlightSpots}
               warmTiles={warmTiles}
               routeGeometry={routeGeometry}
+              initialZoom={initialZoom}
             />
           </DeferredRender>
 
