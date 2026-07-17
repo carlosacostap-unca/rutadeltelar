@@ -17,17 +17,7 @@ La edición principal usa un recorte vectorial Protomaps PMTiles derivado de Ope
 
 El SVG esquemático local permanece detrás de la capa vectorial y actúa como respaldo automático si el archivo PMTiles falta o no puede abrirse. Los marcadores, filtros, popups y recorridos continúan siendo capas locales de Leaflet. Los recorridos se calculan durante la preparación y se guardan como geometría local; si OSRM no responde durante esa preparación conectada, se guarda una línea directa entre puntos.
 
-## Inicio portable recomendado (Electron)
-
-1. Copiar y descomprimir `ruta-del-telar-expo-electron-...-win32-x64.zip` en cualquier computadora Windows x64 compatible.
-2. Comparar el SHA-256 del ZIP con el archivo `.zip.sha256` entregado junto al paquete.
-3. Hacer doble clic en `RutaDelTelarExpo.exe`; no requiere instalación, Edge, reinicio, privilegios administrativos ni desactivar la conectividad.
-4. Esperar mientras la pantalla de inicio con la vicuña informa las etapas de verificación, preparación del servidor, carga de contenidos y apertura. La ventana principal se abrirá a pantalla completa sólo si el paquete es válido.
-5. Cerrar la ventana para detener también el servidor local.
-
-Electron incluye Chromium y aplica una política interna que cancela todas las solicitudes HTTP(S), ventanas nuevas y navegaciones que no apunten al servidor incluido en `127.0.0.1`. Wi-Fi o Ethernet pueden permanecer activos. El ejecutable, la barra de tareas y la pantalla de inicio usan el ícono de la vicuña de Ruta del Telar. Si Windows SmartScreen advierte que el ejecutable no está firmado, comprobar primero el SHA-256 entregado y usar únicamente la copia validada por el equipo del proyecto.
-
-## Inicio de contingencia con Edge
+## Inicio portable con Edge
 
 1. Copiar la carpeta completa del paquete al disco local de la notebook.
 2. Hacer doble clic en `start-expo.cmd`.
@@ -50,13 +40,13 @@ Luego abrir `http://127.0.0.1:3210`. El diagnóstico está en `/api/expo/health`
 
 ## Checklist portable
 
-- Mantener la conectividad de Windows en su estado normal; no es necesario reiniciar ni modificar adaptadores.
-- Iniciar con `RutaDelTelarExpo.exe`.
+- Copiar la carpeta completa del paquete al disco local de la notebook.
+- Iniciar con `start-expo.cmd`.
 - Recorrer inicio, catálogos, búsqueda, favoritos, agenda, mapa y recorrido sugerido.
 - Abrir un detalle representativo de cada tipo y confirmar que no hay imágenes rotas ni esperas de red.
-- Confirmar que WhatsApp, mapas externos, redes sociales y otras salidas no abren ventanas ni realizan solicitudes desde la aplicación.
-- Cerrar Electron y confirmar que la aplicación puede abrirse nuevamente sin conflictos.
-- Como prueba opcional de máxima exigencia, repetir una vez con la conectividad física desactivada; no es un requisito operativo.
+- Confirmar que WhatsApp, mapas externos, redes sociales y otras salidas se degradan correctamente sin conexión.
+- Cerrar la ventana de Edge y confirmar que la aplicación puede abrirse nuevamente sin conflictos.
+- Repetir la prueba con la conectividad física desactivada.
 
 ## Recuperacion y actualización
 

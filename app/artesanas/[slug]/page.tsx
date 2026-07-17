@@ -62,7 +62,7 @@ function normalizeLabel(value?: string) {
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-[#123a55]/20 bg-[#123a55]/5 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
+    <span className="rounded-full border border-[#123a55]/20 bg-[#123a55]/5 px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
       {children}
     </span>
   );
@@ -71,7 +71,7 @@ function Tag({ children }: { children: React.ReactNode }) {
 function FichaRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1 border-b border-[#123a55]/15 py-3 last:border-0">
-      <p className="text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+      <p className="text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/65">
         {label}
       </p>
       <p className="text-sm font-medium leading-6 text-[#123a55]">{value}</p>
@@ -89,7 +89,7 @@ function FichaPanel({
   return (
     <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55] shadow-sm sm:p-7">
       <p className="text-sm font-black uppercase leading-none tracking-normal text-[#123a55]">
-        Ficha
+        {"Informaci\u00f3n pr\u00e1ctica"}
       </p>
       <h2 className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
         {title}
@@ -104,11 +104,11 @@ function ActorFicha({ actor }: { actor: Artisan }) {
 
   if (type.includes("artesan")) {
     return (
-      <FichaPanel title="Artesano/a">
+      <FichaPanel title="Oficio y propuesta">
         {actor.techniques.length > 0 ? (
           <div className="mb-4">
-            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
-              Tecnicas
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+              {"T\u00e9cnicas"}
             </p>
             <div className="flex flex-wrap gap-2">
               {actor.techniques.map((technique) => (
@@ -119,7 +119,7 @@ function ActorFicha({ actor }: { actor: Artisan }) {
         ) : null}
         {actor.materials && actor.materials.length > 0 ? (
           <div className="mb-4">
-            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/65">
               Materiales
             </p>
             <div className="flex flex-wrap gap-2">
@@ -134,7 +134,7 @@ function ActorFicha({ actor }: { actor: Artisan }) {
         ) : null}
         {actor.productosOfrecidos && actor.productosOfrecidos.length > 0 ? (
           <div className="pt-3">
-            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/65">
               Productos ofrecidos
             </p>
             <div className="flex flex-wrap gap-2">
@@ -150,10 +150,10 @@ function ActorFicha({ actor }: { actor: Artisan }) {
 
   if (type.includes("productor")) {
     return (
-      <FichaPanel title="Productor/a">
+      <FichaPanel title={"Producci\u00f3n y venta"}>
         {actor.rubroProductivo ? <FichaRow label="Rubro" value={actor.rubroProductivo} /> : null}
         {actor.escalaProduccion ? (
-          <FichaRow label="Escala de produccion" value={actor.escalaProduccion} />
+          <FichaRow label={"Escala de producci\u00f3n"} value={actor.escalaProduccion} />
         ) : null}
         {actor.modalidadVenta ? (
           <FichaRow label="Modalidad de venta" value={actor.modalidadVenta} />
@@ -163,7 +163,7 @@ function ActorFicha({ actor }: { actor: Artisan }) {
         ) : null}
         {actor.productosOfrecidos && actor.productosOfrecidos.length > 0 ? (
           <div className="pt-3">
-            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/65">
               Productos ofrecidos
             </p>
             <div className="flex flex-wrap gap-2">
@@ -179,7 +179,7 @@ function ActorFicha({ actor }: { actor: Artisan }) {
 
   if (type.includes("hospedaje")) {
     return (
-      <FichaPanel title="Hospedaje">
+      <FichaPanel title={"Informaci\u00f3n del hospedaje"}>
         {actor.tipoHospedaje ? <FichaRow label="Tipo" value={actor.tipoHospedaje} /> : null}
         {actor.capacidad ? <FichaRow label="Capacidad" value={actor.capacidad} /> : null}
         {actor.servicios ? <FichaRow label="Servicios" value={actor.servicios} /> : null}
@@ -190,7 +190,7 @@ function ActorFicha({ actor }: { actor: Artisan }) {
 
   if (type.includes("gastron")) {
     return (
-      <FichaPanel title="Gastronomico">
+      <FichaPanel title={"Propuesta gastron\u00f3mica"}>
         {actor.tipoPropuesta ? <FichaRow label="Propuesta" value={actor.tipoPropuesta} /> : null}
         {actor.especialidades ? (
           <FichaRow label="Especialidades" value={actor.especialidades} />
@@ -208,13 +208,13 @@ function ActorFicha({ actor }: { actor: Artisan }) {
 
   if (type.includes("guia")) {
     return (
-      <FichaPanel title="Guia">
+      <FichaPanel title={"Servicios de gu\u00eda"}>
         {actor.especialidades ? (
           <FichaRow label="Especialidad" value={actor.especialidades} />
         ) : null}
         {actor.idiomas && actor.idiomas.length > 0 ? (
           <div className="border-b border-[#123a55]/15 py-3">
-            <p className="mb-2 text-[0.68rem] font-black uppercase leading-none tracking-normal text-[#123a55]/65">
+            <p className="mb-2 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]/65">
               Idiomas
             </p>
             <div className="flex flex-wrap gap-2">
@@ -240,7 +240,7 @@ function ActorFicha({ actor }: { actor: Artisan }) {
 
   if (actor.techniques.length > 0) {
     return (
-      <FichaPanel title="Datos del actor">
+      <FichaPanel title={"Informaci\u00f3n del actor"}>
         <div className="flex flex-wrap gap-2">
           {actor.techniques.map((technique) => (
             <Tag key={technique}>{technique}</Tag>
@@ -263,10 +263,42 @@ function DetailActionLink({
   return (
     <Link
       href={href}
-      className="inline-flex rounded-full border border-[#efd4b0]/35 px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
+      className="inline-flex min-h-11 items-center rounded-full border border-[#efd4b0]/35 px-4 py-2.5 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#efd4b0]/60"
     >
       {children}
     </Link>
+  );
+}
+
+function PrimaryActionLink({
+  href,
+  newTab = false,
+  children,
+}: {
+  href: string;
+  newTab?: boolean;
+  children: React.ReactNode;
+}) {
+  const className =
+    "inline-flex min-h-11 items-center justify-center rounded-full bg-[#efd4b0] px-5 py-2.5 text-sm font-black uppercase leading-none tracking-normal text-[#123a55] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f3d7b4] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70";
+
+  if (href.startsWith("/") || href.startsWith("#")) {
+    return (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={href}
+      className={className}
+      target={newTab ? "_blank" : undefined}
+      rel={newTab ? "noopener noreferrer" : undefined}
+    >
+      {children}
+    </a>
   );
 }
 
@@ -364,6 +396,37 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
     !!artisan.pagina_web_url;
   const locationLabel =
     relatedStation?.name ?? artisan.stationName ?? artisan.place;
+  const hasCoordinates = hasValidCoordinates(artisan);
+  const showCraft =
+    !!artisan.craft &&
+    normalizeLabel(artisan.craft) !== normalizeLabel(artisan.actorType);
+  const phoneDigits = artisan.contactPhone?.replace(/\D/g, "") ?? "";
+  const primaryAction: {
+    href: string;
+    label: string;
+    newTab?: boolean;
+  } | null = phoneDigits
+    ? {
+        href: `https://wa.me/${phoneDigits}`,
+        label: "Coordinar visita",
+        newTab: true,
+      }
+    : artisan.contactEmail
+      ? {
+          href: `mailto:${artisan.contactEmail}?subject=${encodeURIComponent(`Consulta por ${artisan.name}`)}`,
+          label: "Consultar disponibilidad",
+        }
+      : hasCoordinates
+        ? { href: "#como-llegar", label: "C\u00f3mo llegar" }
+        : relatedStation
+          ? { href: `/estaciones/${relatedStation.slug}`, label: "Ver estaci\u00f3n" }
+          : null;
+  const secondaryAction =
+    (artisan.contactPhone || artisan.contactEmail) && hasCoordinates
+      ? { href: "#como-llegar", label: "C\u00f3mo llegar" }
+      : relatedStation && primaryAction?.href !== `/estaciones/${relatedStation.slug}`
+        ? { href: `/estaciones/${relatedStation.slug}`, label: "Ver estaci\u00f3n" }
+        : null;
   const promoCapture = Array.isArray(resolvedSearchParams?.promoCapture)
     ? resolvedSearchParams.promoCapture.includes("1")
     : resolvedSearchParams?.promoCapture === "1";
@@ -377,31 +440,11 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
         entityTitle={artisan.name}
       />
       <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+        <div className="mb-6">
           <DetailActionLink href="/artesanas">Volver a actores</DetailActionLink>
-          <div className="flex flex-wrap items-center gap-2">
-            <FavoriteButton
-              variant="onDark"
-              item={{
-                type: "actor",
-                slug: artisan.slug,
-                title: artisan.name,
-                subtitle: artisan.craft,
-                href: `/artesanas/${artisan.slug}`,
-                imageUrl: artisan.imageUrl,
-                imageFocus: artisan.imageFocus,
-                datoDestacado: artisan.datoDestacado,
-              }}
-            />
-            <ShareButton
-              title={artisan.name}
-              text={artisan.craft}
-              variant="onDark"
-            />
-          </div>
         </div>
 
-        <section className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:items-start">
+        <section className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:grid-rows-[auto_1fr] lg:items-start">
           <div className="min-w-0 pt-1">
             <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
               Actores
@@ -411,42 +454,66 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
             </h1>
             <div className="mt-5 flex flex-wrap gap-2">
               {artisan.actorType ? (
-                <span className="rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+                <span className="rounded-full border border-[#efd4b0]/35 px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
                   {artisan.actorType}
                 </span>
               ) : null}
               {locationLabel ? (
-                <span className="rounded-full bg-[#efd4b0] px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
+                <span className="rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
                   {locationLabel}
                 </span>
               ) : null}
             </div>
-            {artisan.craft ? (
+            {showCraft ? (
               <p className="mt-5 text-lg font-black leading-tight text-white">
                 {artisan.craft}
               </p>
             ) : null}
-            {relatedStation ? (
-              <Link
-                href={`/estaciones/${relatedStation.slug}`}
-                className="mt-3 inline-flex rounded-full border border-[#efd4b0]/35 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
-              >
-                Ver estacion
-              </Link>
-            ) : null}
-            {artisan.bio ? (
-              <p className="mt-4 w-full text-justify text-base font-medium leading-7 text-white/85">
-                {artisan.bio}
+            {artisan.visitasDisponibles ? (
+              <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-white/85">
+                <span className="font-black text-[#f3d7b4]">
+                  Visitas y demostraciones:
+                </span>{" "}
+                {artisan.visitasDisponibles}
               </p>
             ) : null}
-            <HighlightedData
-              value={artisan.datoDestacado}
-              variant="onDark"
-              className="mt-5 max-w-xl"
-            />
+            {primaryAction || secondaryAction ? (
+              <div className="mt-6 flex flex-wrap gap-2.5">
+                {primaryAction ? (
+                  <PrimaryActionLink href={primaryAction.href} newTab={primaryAction.newTab}>
+                    {primaryAction.label}
+                  </PrimaryActionLink>
+                ) : null}
+                {secondaryAction ? (
+                  <DetailActionLink href={secondaryAction.href}>
+                    {secondaryAction.label}
+                  </DetailActionLink>
+                ) : null}
+              </div>
+            ) : null}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <FavoriteButton
+                variant="onDark"
+                item={{
+                  type: "actor",
+                  slug: artisan.slug,
+                  title: artisan.name,
+                  subtitle: artisan.craft,
+                  href: `/artesanas/${artisan.slug}`,
+                  imageUrl: artisan.imageUrl,
+                  imageFocus: artisan.imageFocus,
+                  datoDestacado: artisan.datoDestacado,
+                }}
+              />
+              <ShareButton
+                title={artisan.name}
+                text={artisan.craft}
+                variant="onDark"
+              />
+            </div>
           </div>
 
-          <div className="order-first lg:order-none">
+          <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <DetailMediaGallery
               title={artisan.name}
               fallbackLabel="Actor"
@@ -454,22 +521,40 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
               galleryUrls={artisan.galleryUrls}
               coverFocus={artisan.imageFocus}
               galleryImages={galleryImages}
-              coverClassName="aspect-[1.12] rounded-[1.85rem] border-[#efd4b0]/25"
+              coverClassName={artisan.imageUrl ? "aspect-[1.12] rounded-[1.85rem] border-[#efd4b0]/25" : "h-48 rounded-[1.85rem] border-[#efd4b0]/25 sm:h-auto sm:aspect-[1.12]"}
               coverSizes="(max-width: 1024px) 100vw, 56vw"
               thumbnailClassName="aspect-[4/3] w-[180px] rounded-[1.1rem] border-[#efd4b0]/25"
+              compactMobile
+            />
+          </div>
+
+          <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+            {artisan.bio ? (
+              <p className="max-w-xl text-left text-base font-medium leading-7 text-white/85">
+                {artisan.bio}
+              </p>
+            ) : null}
+            <HighlightedData
+              label="Para tener en cuenta"
+              value={artisan.datoDestacado}
+              variant="onDark"
+              className="mt-5 max-w-xl"
             />
           </div>
         </section>
 
         {hasContact ? (
-          <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55] shadow-sm sm:p-7">
+          <section id="planifica-tu-visita" className="mb-12 scroll-mt-24 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55] shadow-sm sm:p-7">
             <p className="text-sm font-black uppercase leading-none tracking-normal text-[#123a55]">
-              Contacto
+              {"Planific\u00e1 tu visita"}
             </p>
             <h2 className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
-              Datos para coordinar
+              {"Contacto y coordinaci\u00f3n"}
             </h2>
-            <div className="mt-4 [&>div]:mt-0">
+            <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-[#123a55]/75">
+              {"Consult\u00e1 disponibilidad, horarios y punto de encuentro antes de acercarte."}
+            </p>
+            <div className="mt-5 [&>div]:mt-0">
               <ContactButtons
                 phone={artisan.contactPhone}
                 email={artisan.contactEmail}
@@ -483,15 +568,15 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
           </section>
         ) : null}
 
-        {hasValidCoordinates(artisan) ? (
-          <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-4 text-[#123a55] shadow-sm sm:p-6">
+        {hasCoordinates ? (
+          <section id="como-llegar" className="mb-12 scroll-mt-24 rounded-[1.85rem] bg-[#efd4b0] p-4 text-[#123a55] shadow-sm sm:p-6">
             <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-sm font-black uppercase leading-none tracking-normal text-[#123a55]">
-                  Ubicacion
+                  {"Ubicaci\u00f3n"}
                 </p>
                 <h2 className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
-                  Como llegar
+                  {"C\u00f3mo llegar"}
                 </h2>
               </div>
               <SatelliteMapButton point={artisan} />
@@ -511,30 +596,13 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
               </p>
             ) : null}
           </section>
-        ) : (
-          <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55]">
-            <p className="text-sm font-black uppercase leading-none tracking-normal">
-              Ubicacion
-            </p>
-            <p className="mt-2 text-sm font-medium">
-              Coordenadas no disponibles aun.
-              {artisan.address ? ` Referencia: ${artisan.address}.` : ""}
-            </p>
-            {artisan.address ? (
-              <div className="mt-4 [&>div]:mt-0">
-                <ContactButtons
-                  address={artisan.address}
-                />
-              </div>
-            ) : null}
-          </section>
-        )}
+        ) : null}
 
         <ActorFicha actor={artisan} />
 
         {relatedProducts.length > 0 ? (
           <HomeCarousel
-            eyebrow="Artesania"
+            eyebrow={"Artesan\u00eda"}
             title="Productos de este actor"
             href="/productos"
             verTodosLabel="Ver todos"

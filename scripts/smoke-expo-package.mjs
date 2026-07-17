@@ -6,7 +6,7 @@ const output = path.join(process.cwd(), "output");
 const requested = process.argv[2];
 const basePackages = [];
 for (const name of await readdir(output)) {
-  if (!name.startsWith("ruta-del-telar-expo-") || name.includes("-electron-") || name.endsWith(".zip") || name.endsWith(".sha256")) continue;
+  if (!name.startsWith("ruta-del-telar-expo-") || name.endsWith(".zip") || name.endsWith(".sha256")) continue;
   const absolute = path.join(output, name);
   const { stat } = await import("node:fs/promises");
   if ((await stat(absolute)).isDirectory()) basePackages.push(absolute);

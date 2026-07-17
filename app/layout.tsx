@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { getPublicRuntimeMode } from "@/app/lib/expo-config";
 import { getSiteUrl } from "@/app/lib/metadata";
@@ -86,6 +86,16 @@ export const metadata: Metadata = {
   },
   description:
     "Descubri estaciones, experiencias, talleres y comunidades textiles de Catamarca.",
+  applicationName: "Ruta del Telar",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Ruta del Telar",
+  },
+  icons: {
+    icon: [{ url: "/images/pwa/favicon-64.png", type: "image/png", sizes: "64x64" }],
+    apple: [{ url: "/images/pwa/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
+  },
   openGraph: {
     title: "Ruta del Telar",
     description:
@@ -94,6 +104,10 @@ export const metadata: Metadata = {
     siteName: "Ruta del Telar",
     type: "website",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#efd4b0",
 };
 
 export default function RootLayout({
