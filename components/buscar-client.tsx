@@ -144,7 +144,7 @@ function buildGroups(data: SearchData, query: string): ResultGroup[] {
     )
     .map((a): ResultItem => ({
       slug: a.slug,
-      href: `/artesanas/${a.slug}`,
+      href: `/actores/${a.slug}`,
       title: a.name,
       subtitle: a.craft,
       tag: a.actorType,

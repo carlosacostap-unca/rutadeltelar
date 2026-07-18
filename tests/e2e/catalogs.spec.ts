@@ -49,19 +49,19 @@ test.describe("public catalogs", () => {
   });
 
   test("filters actors by craft or name", async ({ page }) => {
-    await page.goto("/artesanas");
+    await page.goto("/actores");
 
     await expect(page.getByRole("heading", { name: /Actores de la ruta/i })).toBeVisible();
 
     await page.getByPlaceholder(/Buscar por nombre/i).fill("Juana");
 
-    await expect(page.locator('a[href="/artesanas/juana-mamani"]')).toBeVisible();
-    await expect(page.locator('a[href="/artesanas/rosa-chaile"]')).toHaveCount(0);
+    await expect(page.locator('a[href="/actores/juana-mamani"]')).toBeVisible();
+    await expect(page.locator('a[href="/actores/rosa-chaile"]')).toHaveCount(0);
   });
 
   test("groups actor filters in a progressive mobile sheet", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/artesanas");
+    await page.goto("/actores");
 
     await page.getByRole("button", { name: "Filtros" }).click();
 

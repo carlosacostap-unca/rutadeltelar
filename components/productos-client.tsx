@@ -22,7 +22,7 @@ type Props = {
   artisans: Artisan[];
 };
 
-type SortOrder = "recommended" | "name" | "station";
+type SortOrder = "name" | "station";
 
 const PAGE_SIZE = 12;
 
@@ -356,6 +356,13 @@ function ProductCard({
   const makers = getProductMakers(product, artisans);
   const materials = getProductMaterials(product);
   const primaryTechnique = product.techniques[0];
+  const highlighted = product.datoDestacado?.trim();
+  const productType = [product.category, product.subcategory]
+    .filter(Boolean)
+    .join(" · ");
+  const specialty = [materials[0], primaryTechnique]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <article className="group relative h-full overflow-hidden rounded-[1.65rem] bg-[#efd4b0] text-[#0d314a] shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl">
@@ -374,7 +381,7 @@ function ProductCard({
               fill
               priority={eager}
               className="object-cover transition duration-500 group-hover:scale-[1.04]"
-              sizes="(max-width: 639px) 8rem, (max-width: 1023px) 50vw, 25vw"
+              sizes="(max-width: 639px) 8rem, (max-width: 1023px) 50vw, 33vw"
               usage="small"
               quality={90}
               style={getImageFocusStyle(product.imageFocus)}
@@ -386,31 +393,73 @@ function ProductCard({
         </div>
 
         <div className="flex min-w-0 flex-col p-4 sm:p-5">
-          <p className="text-[0.62rem] font-black uppercase leading-none tracking-normal text-[#8a452b]">
-            {[product.category, product.subcategory].filter(Boolean).join(" · ")}
-          </p>
-          <h3 className="mt-2 line-clamp-2 pr-8 text-[1.35rem] font-black leading-[0.94] tracking-normal text-[#082d49] sm:text-[1.55rem]">
+          <h3 className="line-clamp-2 pr-8 text-[1.35rem] font-black leading-[0.94] tracking-normal text-[#082d49] sm:text-[1.55rem]">
             {product.name}
           </h3>
 
-          {(materials[0] || primaryTechnique) && (
-            <p className="mt-2 line-clamp-1 text-[0.72rem] font-bold uppercase leading-tight text-[#18364d]/80">
-              {[materials[0], primaryTechnique].filter(Boolean).join(" · ")}
-            </p>
-          )}
-
-          {stationLabel || makers[0] ? (
-            <p className="mt-2 line-clamp-1 text-[0.7rem] font-medium leading-tight text-[#18364d]/70">
-              {stationLabel ? `En ${stationLabel}` : ""}
-              {stationLabel && makers[0] ? " · " : ""}
-              {makers[0] ? `Por ${makers[0].name}` : ""}
+          {productType ? (
+            <p className="mt-2">
+              <span className="inline-flex rounded-full border border-[#123a55]/15 bg-[#123a55]/8 px-2.5 py-1 text-[0.62rem] font-black uppercase leading-none text-[#123a55]">
+                {productType}
+              </span>
             </p>
           ) : null}
 
-          <p className="mt-2 line-clamp-1 text-[0.73rem] font-medium leading-tight text-[#18364d]/75">
-            {product.description}
-          </p>
+          {specialty ? (
+            <p className="mt-2 line-clamp-2 text-[0.75rem] font-bold leading-tight text-[#18364d]/85">
+              {specialty}
+            </p>
+          ) : null}
 
+          {stationLabel || makers[0] ? (
+            <p className="mt-2 flex items-center gap-1.5 text-[0.68rem] font-medium uppercase leading-tight text-[#18364d]/65">
+              <svg
+                className="h-3.5 w-3.5 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                />
+                <circle
+                  cx="12"
+                  cy="10"
+                  r="2.25"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                />
+              </svg>
+              <span className="line-clamp-1">
+                {stationLabel ? stationLabel : ""}
+                {stationLabel && makers[0] ? " · " : ""}
+                {makers[0] ? `Por ${makers[0].name}` : ""}
+              </span>
+            </p>
+          ) : null}
+
+          {highlighted ? (
+            <div className="mt-3 border-l-2 border-[#8a452b] pl-2.5">
+              <p className="text-[0.58rem] font-black uppercase leading-none text-[#8a452b]">
+                Dato destacado
+              </p>
+              <p className="mt-1 line-clamp-2 text-[0.68rem] font-semibold leading-tight text-[#123a55]/80">
+                {highlighted}
+              </p>
+            </div>
+          ) : null}
+
+          <span className="mt-auto flex items-center gap-1 pt-3 text-xs font-black uppercase text-[#8a452b]">
+            Ver producto
+            <span
+              aria-hidden="true"
+              className="transition-transform group-hover:translate-x-1"
+            >
+              →
+            </span>
+          </span>
         </div>
       </Link>
 
@@ -441,7 +490,7 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
   const [material, setMaterial] = useState("todas");
   const [technique, setTechnique] = useState("todas");
   const [stationSlug, setStationSlug] = useState("todas");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("recommended");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("name");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draftCategory, setDraftCategory] = useState("todas");
@@ -692,7 +741,7 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
         </button>
       </div>
 
-      <div className="mb-5 hidden grid-cols-2 gap-3 xl:grid-cols-5 md:grid">
+      <div className="mb-5 hidden grid-cols-2 gap-3 md:grid lg:grid-cols-3">
         <FilterFields
           categories={categories}
           subcategories={subcategories}
@@ -733,7 +782,6 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
           <span className="text-xs font-black uppercase text-[#efd4b0]/75">Ordenar</span>
           <span className="relative">
             <select value={sortOrder} onChange={(event) => { setSortOrder(event.target.value as SortOrder); setVisibleCount(PAGE_SIZE); }} className="min-h-10 appearance-none rounded-full border border-[#efd4b0]/25 bg-[#efd4b0]/10 py-2 pl-4 pr-9 text-xs font-black text-[#efd4b0] focus:outline-none">
-              <option value="recommended" className="text-[#123a55]">Recomendados</option>
               <option value="name" className="text-[#123a55]">Nombre A–Z</option>
               <option value="station" className="text-[#123a55]">Estación A–Z</option>
             </select>
@@ -742,7 +790,7 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
         </label>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 sm:gap-8 md:gap-10 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-10 md:gap-14 lg:grid-cols-3">
         {visibleProducts.map((product, index) => <ProductCard key={product.slug} product={product} artisans={artisans} stations={stations} eager={index === 0} />)}
         {filtered.length === 0 ? (
           <div className="col-span-full py-16 text-center text-sm text-[#efd4b0]">

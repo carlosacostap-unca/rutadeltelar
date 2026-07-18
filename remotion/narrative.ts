@@ -12,7 +12,7 @@ export const timelineScreenshots: ScreenShot[] = [
   { label: "Ficha de estacion", file: "estacion.png", route: "/estaciones/belen-catamarca" },
   { label: "Productos", file: "productos.png", route: "/productos" },
   { label: "Ficha de producto", file: "producto.png", route: "/productos/manta-guarda-belen" },
-  { label: "Actores y comunidad", file: "artesanas.png", route: "/artesanas" },
+  { label: "Actores y comunidad", file: "artesanas.png", route: "/actores" },
   { label: "Experiencias", file: "experiencias.png", route: "/explorar" },
   { label: "Recorridos", file: "recorridos.png", route: "/recorridos" },
   { label: "Busqueda", file: "buscar.png", route: "/buscar" },

@@ -17,13 +17,13 @@ test("core exhibition paths work without outbound requests", async ({ page, requ
   });
 
   const paths = [
-    "/", "/estaciones", "/artesanas", "/productos", "/explorar", "/imperdibles",
+    "/", "/estaciones", "/actores", "/productos", "/explorar", "/imperdibles",
     "/buscar?q=telar", "/favoritos", "/agenda", "/mapa", "/recorridos",
   ];
   const snapshot = JSON.parse(await readFile(path.join(process.cwd(), "public", "expo", "snapshot.json"), "utf8"));
   paths.push(
     `/estaciones/${snapshot.data.stations[0].slug}`,
-    `/artesanas/${snapshot.data.artisans[0].slug}`,
+    `/actores/${snapshot.data.artisans[0].slug}`,
     `/productos/${snapshot.data.products[0].slug}`,
     `/explorar/${snapshot.data.experiences[0].slug}`,
     `/imperdibles/${snapshot.data.highlightSpots[0].slug}`,

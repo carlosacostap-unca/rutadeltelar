@@ -9,7 +9,7 @@ const pages = [
   { name: "home.png", path: "/" },
   { name: "estaciones.png", path: "/estaciones" },
   { name: "productos.png", path: "/productos" },
-  { name: "artesanas.png", path: "/artesanas" },
+  { name: "artesanas.png", path: "/actores" },
   { name: "experiencias.png", path: "/explorar" },
   { name: "imperdibles.png", path: "/imperdibles" },
   { name: "imperdibles-destacados.png", path: "/imperdibles?view=destacados", fullPage: true },
@@ -239,7 +239,7 @@ for (const item of pages) {
   console.log(`Capturing ${url.href}`);
   await page.goto(url.href, { waitUntil: "networkidle", timeout: 60000 });
   await waitForPage();
-  if (item.fullPage || ["/estaciones", "/artesanas", "/productos", "/explorar", "/imperdibles"].includes(item.path)) {
+  if (item.fullPage || ["/estaciones", "/actores", "/productos", "/explorar", "/imperdibles"].includes(item.path)) {
     await captureFullPage(item.name);
   } else {
     await capture(item.name);
@@ -279,10 +279,10 @@ for (const item of pages) {
     });
   }
 
-  if (item.path === "/artesanas") {
+  if (item.path === "/actores") {
     await captureFirstDetail({
-      linkSelector: 'a[href^="/artesanas/"]',
-      fallbackPath: "/artesanas/tapices-ocampo",
+      linkSelector: 'a[href^="/actores/"]',
+      fallbackPath: "/actores/tapices-ocampo",
       outputName: "actor.png",
       promoCapture: true,
     });
