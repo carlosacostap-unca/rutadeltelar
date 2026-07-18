@@ -1,13 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { type Artisan, type Product, type Station } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
@@ -70,10 +64,10 @@ function getProductMakers(product: Product, artisans: Artisan[]) {
   );
 }
 
-function SelectChevron() {
+function SelectChevron({ className = "" }: { className?: string }) {
   return (
     <svg
-      className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2"
+      className={`pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 ${className}`}
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
@@ -211,7 +205,7 @@ function FilterFields({
                 );
               })}
             </select>
-            <SelectChevron />
+            <SelectChevron className="text-[#123a55]" />
           </span>
         </div>
       ))}
@@ -301,7 +295,10 @@ function FiltersSheet({
             <p className="text-xs font-black uppercase text-[#8a452b]">
               Explorar productos
             </p>
-            <h2 id="products-filter-title" className="mt-1 text-2xl font-black leading-none">
+            <h2
+              id="products-filter-title"
+              className="mt-1 text-2xl font-black leading-none"
+            >
               Filtros
             </h2>
           </div>
@@ -316,7 +313,11 @@ function FiltersSheet({
           </button>
         </div>
         <div className="grid gap-5">
-          <FilterFields {...filterProps} idPrefix="products-mobile-filter" light />
+          <FilterFields
+            {...filterProps}
+            idPrefix="products-mobile-filter"
+            light
+          />
         </div>
         <div className="mt-7 grid grid-cols-[auto_1fr] gap-3">
           <button
@@ -352,7 +353,9 @@ function ProductCard({
   eager?: boolean;
 }) {
   const station = getProductStation(product, stations);
-  const stationLabel = formatStationLabel(station?.locality ?? product.stationName);
+  const stationLabel = formatStationLabel(
+    station?.locality ?? product.stationName,
+  );
   const makers = getProductMakers(product, artisans);
   const materials = getProductMaterials(product);
   const primaryTechnique = product.techniques[0];
@@ -450,16 +453,6 @@ function ProductCard({
               </p>
             </div>
           ) : null}
-
-          <span className="mt-auto flex items-center gap-1 pt-3 text-xs font-black uppercase text-[#8a452b]">
-            Ver producto
-            <span
-              aria-hidden="true"
-              className="transition-transform group-hover:translate-x-1"
-            >
-              →
-            </span>
-          </span>
         </div>
       </Link>
 
@@ -483,7 +476,12 @@ function ProductCard({
   );
 }
 
-export function ProductosClient({ products, stations, categories, artisans }: Props) {
+export function ProductosClient({
+  products,
+  stations,
+  categories,
+  artisans,
+}: Props) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("todas");
   const [subcategory, setSubcategory] = useState("todas");
@@ -508,8 +506,8 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
   );
   const techniques = useMemo(
     () =>
-      [...new Set(products.flatMap((product) => product.techniques))].sort((a, b) =>
-        a.localeCompare(b, "es"),
+      [...new Set(products.flatMap((product) => product.techniques))].sort(
+        (a, b) => a.localeCompare(b, "es"),
       ),
     [products],
   );
@@ -530,7 +528,10 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
       ].sort((a, b) => a.localeCompare(b, "es")),
     [products],
   );
-  const subcategories = useMemo(() => getSubcategories(category), [category, getSubcategories]);
+  const subcategories = useMemo(
+    () => getSubcategories(category),
+    [category, getSubcategories],
+  );
   const draftSubcategories = useMemo(
     () => getSubcategories(draftCategory),
     [draftCategory, getSubcategories],
@@ -597,21 +598,40 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
   );
 
   const filtered = useMemo(() => {
-    const matches = filterProducts(category, subcategory, material, technique, stationSlug);
+    const matches = filterProducts(
+      category,
+      subcategory,
+      material,
+      technique,
+      stationSlug,
+    );
     if (sortOrder === "name") {
       return [...matches].sort((a, b) =>
         a.name.localeCompare(b.name, "es", { sensitivity: "base" }),
       );
     }
     if (sortOrder === "station") {
-      return [...matches].sort((a, b) =>
-        formatStationLabel(a.stationName).localeCompare(formatStationLabel(b.stationName), "es", {
-          sensitivity: "base",
-        }) || a.name.localeCompare(b.name, "es", { sensitivity: "base" }),
+      return [...matches].sort(
+        (a, b) =>
+          formatStationLabel(a.stationName).localeCompare(
+            formatStationLabel(b.stationName),
+            "es",
+            {
+              sensitivity: "base",
+            },
+          ) || a.name.localeCompare(b.name, "es", { sensitivity: "base" }),
       );
     }
     return matches;
-  }, [category, filterProducts, material, sortOrder, stationSlug, subcategory, technique]);
+  }, [
+    category,
+    filterProducts,
+    material,
+    sortOrder,
+    stationSlug,
+    subcategory,
+    technique,
+  ]);
 
   const draftResultCount = useMemo(
     () =>
@@ -622,9 +642,18 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
         draftTechnique,
         draftStationSlug,
       ).length,
-    [draftCategory, draftMaterial, draftStationSlug, draftSubcategory, draftTechnique, filterProducts],
+    [
+      draftCategory,
+      draftMaterial,
+      draftStationSlug,
+      draftSubcategory,
+      draftTechnique,
+      filterProducts,
+    ],
   );
-  const selectedStation = stations.find((station) => station.slug === stationSlug);
+  const selectedStation = stations.find(
+    (station) => station.slug === stationSlug,
+  );
   const visibleProducts = filtered.slice(0, visibleCount);
   const remainingCount = Math.max(filtered.length - visibleProducts.length, 0);
 
@@ -692,11 +721,41 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
   }
 
   const activeFilters = [
-    category !== "todas" ? { key: "category", label: category, clear: () => handleCategoryChange("todas") } : null,
-    subcategory !== "todas" ? { key: "subcategory", label: subcategory, clear: () => handleSubcategoryChange("todas") } : null,
-    material !== "todas" ? { key: "material", label: material, clear: () => handleMaterialChange("todas") } : null,
-    technique !== "todas" ? { key: "technique", label: technique, clear: () => handleTechniqueChange("todas") } : null,
-    stationSlug !== "todas" ? { key: "station", label: formatStationLabel(selectedStation?.locality) || stationSlug, clear: () => handleStationChange("todas") } : null,
+    category !== "todas"
+      ? {
+          key: "category",
+          label: category,
+          clear: () => handleCategoryChange("todas"),
+        }
+      : null,
+    subcategory !== "todas"
+      ? {
+          key: "subcategory",
+          label: subcategory,
+          clear: () => handleSubcategoryChange("todas"),
+        }
+      : null,
+    material !== "todas"
+      ? {
+          key: "material",
+          label: material,
+          clear: () => handleMaterialChange("todas"),
+        }
+      : null,
+    technique !== "todas"
+      ? {
+          key: "technique",
+          label: technique,
+          clear: () => handleTechniqueChange("todas"),
+        }
+      : null,
+    stationSlug !== "todas"
+      ? {
+          key: "station",
+          label: formatStationLabel(selectedStation?.locality) || stationSlug,
+          clear: () => handleStationChange("todas"),
+        }
+      : null,
   ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
   const hasFilters = search.trim() !== "" || activeFilters.length > 0;
   const context =
@@ -716,9 +775,25 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
           <label htmlFor="products-search" className="sr-only">
             Buscar productos por nombre, técnica, material o localidad
           </label>
-          <svg className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#123a55]/55" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2" />
-            <path d="m16 16 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <svg
+            className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#123a55]/55"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle
+              cx="11"
+              cy="11"
+              r="6"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <path
+              d="m16 16 4 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </svg>
           <input
             id="products-search"
@@ -729,15 +804,40 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
             className="min-h-12 w-full rounded-full border border-[#efd4b0]/30 bg-[#efd4b0] py-3 pl-11 pr-11 text-sm font-medium text-[#123a55] placeholder:text-[#123a55]/65 focus:border-white focus:outline-none"
           />
           {search ? (
-            <button type="button" onClick={() => handleSearchChange("")} aria-label="Limpiar búsqueda" className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-lg font-bold text-[#123a55]/65 hover:bg-[#123a55]/10 hover:text-[#123a55]">
+            <button
+              type="button"
+              onClick={() => handleSearchChange("")}
+              aria-label="Limpiar búsqueda"
+              className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-lg font-bold text-[#123a55]/65 hover:bg-[#123a55]/10 hover:text-[#123a55]"
+            >
               <span aria-hidden="true">×</span>
             </button>
           ) : null}
         </div>
-        <button type="button" onClick={openFilterSheet} className="relative inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full border border-[#efd4b0]/40 bg-[#efd4b0]/10 px-4 text-sm font-black uppercase text-[#efd4b0] md:hidden">
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+        <button
+          type="button"
+          onClick={openFilterSheet}
+          className="relative inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full border border-[#efd4b0]/40 bg-[#efd4b0]/10 px-4 text-sm font-black uppercase text-[#efd4b0] md:hidden"
+        >
+          <svg
+            className="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M4 7h16M7 12h10M10 17h4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
           Filtros
-          {activeFilters.length > 0 ? <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#efd4b0] px-1 text-[0.65rem] text-[#123a55]">{activeFilters.length}</span> : null}
+          {activeFilters.length > 0 ? (
+            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#efd4b0] px-1 text-[0.65rem] text-[#123a55]">
+              {activeFilters.length}
+            </span>
+          ) : null}
         </button>
       </div>
 
@@ -765,9 +865,19 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
       {activeFilters.length > 0 ? (
         <div className="mb-4 flex flex-wrap items-center gap-2">
           {activeFilters.map((filter) => (
-            <span key={filter.key} className="flex min-h-8 items-center gap-1.5 rounded-full bg-[#efd4b0]/15 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]">
+            <span
+              key={filter.key}
+              className="flex min-h-8 items-center gap-1.5 rounded-full bg-[#efd4b0]/15 px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0]"
+            >
               {filter.label}
-              <button type="button" onClick={filter.clear} aria-label={`Quitar filtro: ${filter.label}`} className="inline-flex h-5 w-5 items-center justify-center rounded-full hover:bg-white/10 hover:text-white"><span aria-hidden="true">×</span></button>
+              <button
+                type="button"
+                onClick={filter.clear}
+                aria-label={`Quitar filtro: ${filter.label}`}
+                className="inline-flex h-5 w-5 items-center justify-center rounded-full hover:bg-white/10 hover:text-white"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
             </span>
           ))}
         </div>
@@ -775,15 +885,42 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-[#efd4b0]/15 pb-3">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <p className="text-sm font-black text-[#efd4b0]" role="status" aria-live="polite">{resultLabel}</p>
-          {hasFilters ? <button type="button" onClick={clearAll} className="text-xs font-black uppercase text-[#efd4b0] underline decoration-[#efd4b0]/50 underline-offset-4 hover:text-white">Limpiar todo</button> : null}
+          <p
+            className="text-sm font-black text-[#efd4b0]"
+            role="status"
+            aria-live="polite"
+          >
+            {resultLabel}
+          </p>
+          {hasFilters ? (
+            <button
+              type="button"
+              onClick={clearAll}
+              className="text-xs font-black uppercase text-[#efd4b0] underline decoration-[#efd4b0]/50 underline-offset-4 hover:text-white"
+            >
+              Limpiar todo
+            </button>
+          ) : null}
         </div>
         <label className="flex items-center gap-2">
-          <span className="text-xs font-black uppercase text-[#efd4b0]/75">Ordenar</span>
+          <span className="text-xs font-black uppercase text-[#efd4b0]/75">
+            Ordenar
+          </span>
           <span className="relative">
-            <select value={sortOrder} onChange={(event) => { setSortOrder(event.target.value as SortOrder); setVisibleCount(PAGE_SIZE); }} className="min-h-10 appearance-none rounded-full border border-[#efd4b0]/25 bg-[#efd4b0]/10 py-2 pl-4 pr-9 text-xs font-black text-[#efd4b0] focus:outline-none">
-              <option value="name" className="text-[#123a55]">Nombre A–Z</option>
-              <option value="station" className="text-[#123a55]">Estación A–Z</option>
+            <select
+              value={sortOrder}
+              onChange={(event) => {
+                setSortOrder(event.target.value as SortOrder);
+                setVisibleCount(PAGE_SIZE);
+              }}
+              className="min-h-10 appearance-none rounded-full border border-[#efd4b0]/25 bg-[#efd4b0]/10 py-2 pl-4 pr-9 text-xs font-black text-[#efd4b0] focus:outline-none"
+            >
+              <option value="name" className="text-[#123a55]">
+                Nombre A–Z
+              </option>
+              <option value="station" className="text-[#123a55]">
+                Estación A–Z
+              </option>
             </select>
             <SelectChevron />
           </span>
@@ -791,19 +928,41 @@ export function ProductosClient({ products, stations, categories, artisans }: Pr
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-10 md:gap-14 lg:grid-cols-3">
-        {visibleProducts.map((product, index) => <ProductCard key={product.slug} product={product} artisans={artisans} stations={stations} eager={index === 0} />)}
+        {visibleProducts.map((product, index) => (
+          <ProductCard
+            key={product.slug}
+            product={product}
+            artisans={artisans}
+            stations={stations}
+            eager={index === 0}
+          />
+        ))}
         {filtered.length === 0 ? (
           <div className="col-span-full py-16 text-center text-sm text-[#efd4b0]">
             <p>No hay productos que coincidan con tu búsqueda.</p>
-            <button type="button" onClick={clearAll} className="mt-3 font-semibold text-white underline underline-offset-4">Limpiar filtros</button>
+            <button
+              type="button"
+              onClick={clearAll}
+              className="mt-3 font-semibold text-white underline underline-offset-4"
+            >
+              Limpiar filtros
+            </button>
           </div>
         ) : null}
       </div>
 
       {remainingCount > 0 ? (
         <div className="mt-10 flex flex-col items-center gap-2">
-          <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)} className="min-h-12 rounded-full border border-[#efd4b0] bg-[#efd4b0] px-7 text-sm font-black uppercase text-[#123a55] shadow-sm hover:-translate-y-0.5 hover:bg-white">Mostrar más</button>
-          <p className="text-xs font-medium text-[#efd4b0]/65">Quedan {remainingCount} producto{remainingCount !== 1 ? "s" : ""}</p>
+          <button
+            type="button"
+            onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+            className="min-h-12 rounded-full border border-[#efd4b0] bg-[#efd4b0] px-7 text-sm font-black uppercase text-[#123a55] shadow-sm hover:-translate-y-0.5 hover:bg-white"
+          >
+            Mostrar más
+          </button>
+          <p className="text-xs font-medium text-[#efd4b0]/65">
+            Quedan {remainingCount} producto{remainingCount !== 1 ? "s" : ""}
+          </p>
         </div>
       ) : null}
 
