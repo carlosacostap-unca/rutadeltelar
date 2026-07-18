@@ -1,16 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { type Artisan, type Station } from "@/app/lib/content";
 import { getImageFocusStyle } from "@/app/lib/image-focus";
+import { FavoriteButton } from "@/components/favorite-button";
 import { MediaFallback } from "@/components/media-fallback";
 import { PbImage } from "@/components/pb-image";
 
@@ -36,10 +31,10 @@ function getActorStation(item: Artisan, stations: Station[]) {
   );
 }
 
-function SelectChevron() {
+function SelectChevron({ className = "" }: { className?: string }) {
   return (
     <svg
-      className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2"
+      className={`pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 ${className}`}
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
@@ -128,7 +123,7 @@ function FilterFields({
               </option>
             ))}
           </select>
-          <SelectChevron />
+          <SelectChevron className="text-[#123a55]" />
         </span>
       </div>
 
@@ -153,7 +148,7 @@ function FilterFields({
               </option>
             ))}
           </select>
-          <SelectChevron />
+          <SelectChevron className="text-[#123a55]" />
         </span>
       </div>
 
@@ -183,7 +178,7 @@ function FilterFields({
               </option>
             ))}
           </select>
-          <SelectChevron />
+          <SelectChevron className="text-[#123a55]" />
         </span>
       </div>
     </>
@@ -361,8 +356,11 @@ function ActorCard({
       (item.actorType ?? "").trim().toLocaleLowerCase("es");
 
   return (
-    <Link href={`/actores/${item.slug}`} className="group block h-full">
-      <article className="grid h-full min-h-[13.5rem] grid-cols-[7.75rem_minmax(0,1fr)] overflow-hidden rounded-[1.65rem] bg-[#efd4b0] text-[#0d314a] shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-xl sm:block sm:min-h-0">
+    <article className="group relative h-full overflow-hidden rounded-[1.65rem] bg-[#efd4b0] text-[#0d314a] shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl">
+      <Link
+        href={`/actores/${item.slug}`}
+        className="grid h-full min-h-[13.5rem] grid-cols-[7.75rem_minmax(0,1fr)] sm:block sm:min-h-0"
+      >
         <div
           data-testid="actor-media"
           className="relative h-full min-h-[13.5rem] w-full overflow-hidden sm:aspect-[4/3] sm:h-auto sm:min-h-0"
@@ -386,7 +384,7 @@ function ActorCard({
         </div>
 
         <div className="flex min-w-0 flex-col p-4 sm:p-5">
-          <h3 className="line-clamp-2 text-[1.35rem] font-black leading-[0.94] tracking-normal text-[#082d49] sm:text-[1.55rem]">
+          <h3 className="line-clamp-2 pr-8 text-[1.35rem] font-black leading-[0.94] tracking-normal text-[#082d49] sm:text-[1.55rem]">
             {item.name}
           </h3>
 
@@ -428,13 +426,28 @@ function ActorCard({
               <span className="line-clamp-1">{location}</span>
             </p>
           ) : null}
-
         </div>
-      </article>
-    </Link>
+      </Link>
+
+      <div className="absolute right-3 top-3 z-10">
+        <FavoriteButton
+          compact
+          variant="onDark"
+          item={{
+            type: "actor",
+            slug: item.slug,
+            title: item.name,
+            subtitle: location || item.actorType || specialty,
+            href: `/actores/${item.slug}`,
+            imageUrl: item.imageUrl,
+            imageFocus: item.imageFocus,
+            datoDestacado: item.datoDestacado,
+          }}
+        />
+      </div>
+    </article>
   );
 }
-
 export function ActoresClient({ artisans, stations, tipos }: Props) {
   const [search, setSearch] = useState("");
   const [tipo, setTipo] = useState("todos");
@@ -533,8 +546,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
     stationSlug !== "todas"
       ? {
           key: "station",
-          label:
-            formatActorLocation(selectedStation?.locality) || stationSlug,
+          label: formatActorLocation(selectedStation?.locality) || stationSlug,
           clear: () => handleStationChange("todas"),
         }
       : department !== "todas"
@@ -760,7 +772,6 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
               }
               className="min-h-10 appearance-none rounded-full border border-[#efd4b0]/25 bg-[#efd4b0]/10 py-2 pl-4 pr-9 text-xs font-black text-[#efd4b0] focus:outline-none"
             >
-
               <option value="name" className="text-[#123a55]">
                 Nombre A–Z
               </option>
