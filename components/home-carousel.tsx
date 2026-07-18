@@ -6,7 +6,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 type HomeCarouselProps = {
   eyebrow: string;
   title: string;
-  href: string;
+  href?: string;
   verTodosLabel?: string;
   variant?: "default" | "onDark";
   children: ReactNode;
@@ -122,14 +122,16 @@ export function HomeCarousel({
             {title}
           </h2>
         </div>
-        <Link
-          href={href}
-          className={`shrink-0 text-sm font-semibold transition hover:underline ${
-            onDark ? "text-[#efd4b0]" : "text-[color:var(--accent)]"
-          }`}
-        >
-          {verTodosLabel} -&gt;
-        </Link>
+        {href ? (
+          <Link
+            href={href}
+            className={`shrink-0 text-sm font-semibold transition hover:underline ${
+              onDark ? "text-[#efd4b0]" : "text-[color:var(--accent)]"
+            }`}
+          >
+            {verTodosLabel} -&gt;
+          </Link>
+        ) : null}
       </div>
       <div className="relative">
         {canScrollLeft ? (

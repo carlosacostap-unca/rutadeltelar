@@ -10,6 +10,7 @@ import { getImageFocusStyle, type FocusedImage } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
+import { BackButton } from "@/components/back-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
@@ -17,6 +18,7 @@ import { MediaFallback } from "@/components/media-fallback";
 import { MetricsViewTracker } from "@/components/metrics-view-tracker";
 import { PbImage } from "@/components/pb-image";
 import { ShareButton } from "@/components/share-button";
+import { SiteEndSections } from "@/components/site-end-sections";
 
 type ExperienceDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -97,12 +99,12 @@ function DetailActionLink({
   children: React.ReactNode;
 }) {
   return (
-    <Link
-      href={href}
+    <BackButton
+      fallbackHref={href}
       className="inline-flex rounded-full border border-[#efd4b0]/35 px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
     >
       {children}
-    </Link>
+    </BackButton>
   );
 }
 
@@ -209,9 +211,9 @@ export default async function ExperienceDetailPage({
         entitySlug={experience.slug}
         entityTitle={experience.title}
       />
-      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-6 pt-10 sm:px-8 md:pb-8 md:pt-16 lg:px-10">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <DetailActionLink href="/explorar">Volver a experiencias</DetailActionLink>
+          <DetailActionLink href="/explorar">Volver</DetailActionLink>
           <div className="flex flex-wrap items-center gap-2">
             <FavoriteButton
               variant="onDark"
@@ -370,7 +372,7 @@ export default async function ExperienceDetailPage({
               />
               {responsibleArtisan ? (
                 <Link
-                  href={`/artesanas/${responsibleArtisan.slug}`}
+                  href={`/actores/${responsibleArtisan.slug}`}
                   className="mt-5 inline-flex rounded-full border border-[#123a55]/20 px-4 py-2 text-xs font-black uppercase leading-none tracking-normal text-[#123a55] transition hover:bg-[#123a55] hover:text-[#efd4b0]"
                 >
                   Ver perfil
@@ -428,6 +430,7 @@ export default async function ExperienceDetailPage({
           </HomeCarousel>
         ) : null}
       </div>
+      <SiteEndSections />
     </main>
   );
 }

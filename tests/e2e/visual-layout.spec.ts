@@ -9,7 +9,7 @@ async function expectNoDocumentOverflow(page: Page) {
 }
 
 test.describe("visual layout smoke", () => {
-  for (const path of ["/", "/estaciones", "/artesanas", "/mapa", "/productos", "/favoritos"]) {
+  for (const path of ["/", "/estaciones", "/actores", "/mapa", "/productos", "/favoritos"]) {
     test(`keeps ${path} within the viewport width`, async ({ page }) => {
       await page.goto(path);
 
@@ -67,7 +67,7 @@ test.describe("visual layout smoke", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/artesanas");
+    await page.goto("/actores");
 
     const firstCard = page.locator("article").first();
     const cardBox = await firstCard.boundingBox();
@@ -85,7 +85,7 @@ test.describe("visual layout smoke", () => {
 
   test("keeps actor catalog images compact on desktop", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto("/artesanas");
+    await page.goto("/actores");
 
     const firstCard = page.locator("article").first();
     const mediaBox = await firstCard.getByTestId("actor-media").boundingBox();

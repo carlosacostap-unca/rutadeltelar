@@ -107,7 +107,7 @@ const navItems: NavItem[] = [
 
 const moreItems: NavItem[] = [
   {
-    href: "/artesanas",
+    href: "/actores",
     label: "Actores",
     shortLabel: "Actores",
     icon: (

@@ -10,9 +10,11 @@ import { createPageMetadata } from "@/app/lib/metadata";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { ContactButtons } from "@/components/contact-buttons";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
+import { BackButton } from "@/components/back-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
+import { SiteEndSections } from "@/components/site-end-sections";
 import { MediaFallback } from "@/components/media-fallback";
 import { MetricsViewTracker } from "@/components/metrics-view-tracker";
 import { PbImage } from "@/components/pb-image";
@@ -39,7 +41,7 @@ export async function generateMetadata({
   if (!context) {
     return createPageMetadata({
       title: "Actor no encontrado",
-      path: `/artesanas/${slug}`,
+      path: `/actores/${slug}`,
     });
   }
 
@@ -48,7 +50,7 @@ export async function generateMetadata({
   return createPageMetadata({
     title: artisan.name,
     description: artisan.bio || artisan.craft,
-    path: `/artesanas/${artisan.slug}`,
+    path: `/actores/${artisan.slug}`,
     imageUrl: artisan.imageUrl,
   });
 }
@@ -261,44 +263,12 @@ function DetailActionLink({
   children: React.ReactNode;
 }) {
   return (
-    <Link
-      href={href}
+    <BackButton
+      fallbackHref={href}
       className="inline-flex min-h-11 items-center rounded-full border border-[#efd4b0]/35 px-4 py-2.5 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#efd4b0]/60"
     >
       {children}
-    </Link>
-  );
-}
-
-function PrimaryActionLink({
-  href,
-  newTab = false,
-  children,
-}: {
-  href: string;
-  newTab?: boolean;
-  children: React.ReactNode;
-}) {
-  const className =
-    "inline-flex min-h-11 items-center justify-center rounded-full bg-[#efd4b0] px-5 py-2.5 text-sm font-black uppercase leading-none tracking-normal text-[#123a55] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f3d7b4] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70";
-
-  if (href.startsWith("/") || href.startsWith("#")) {
-    return (
-      <Link href={href} className={className}>
-        {children}
-      </Link>
-    );
-  }
-
-  return (
-    <a
-      href={href}
-      className={className}
-      target={newTab ? "_blank" : undefined}
-      rel={newTab ? "noopener noreferrer" : undefined}
-    >
-      {children}
-    </a>
+    </BackButton>
   );
 }
 
@@ -400,33 +370,6 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
   const showCraft =
     !!artisan.craft &&
     normalizeLabel(artisan.craft) !== normalizeLabel(artisan.actorType);
-  const phoneDigits = artisan.contactPhone?.replace(/\D/g, "") ?? "";
-  const primaryAction: {
-    href: string;
-    label: string;
-    newTab?: boolean;
-  } | null = phoneDigits
-    ? {
-        href: `https://wa.me/${phoneDigits}`,
-        label: "Coordinar visita",
-        newTab: true,
-      }
-    : artisan.contactEmail
-      ? {
-          href: `mailto:${artisan.contactEmail}?subject=${encodeURIComponent(`Consulta por ${artisan.name}`)}`,
-          label: "Consultar disponibilidad",
-        }
-      : hasCoordinates
-        ? { href: "#como-llegar", label: "C\u00f3mo llegar" }
-        : relatedStation
-          ? { href: `/estaciones/${relatedStation.slug}`, label: "Ver estaci\u00f3n" }
-          : null;
-  const secondaryAction =
-    (artisan.contactPhone || artisan.contactEmail) && hasCoordinates
-      ? { href: "#como-llegar", label: "C\u00f3mo llegar" }
-      : relatedStation && primaryAction?.href !== `/estaciones/${relatedStation.slug}`
-        ? { href: `/estaciones/${relatedStation.slug}`, label: "Ver estaci\u00f3n" }
-        : null;
   const promoCapture = Array.isArray(resolvedSearchParams?.promoCapture)
     ? resolvedSearchParams.promoCapture.includes("1")
     : resolvedSearchParams?.promoCapture === "1";
@@ -439,12 +382,32 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
         entitySlug={artisan.slug}
         entityTitle={artisan.name}
       />
-      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
-        <div className="mb-6">
-          <DetailActionLink href="/artesanas">Volver a actores</DetailActionLink>
+      <div className="mx-auto w-full max-w-6xl px-5 pb-6 pt-10 sm:px-8 md:pb-8 md:pt-16 lg:px-10">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+          <DetailActionLink href="/actores">Volver</DetailActionLink>
+          <div className="flex flex-wrap items-center gap-2">
+            <FavoriteButton
+              variant="onDark"
+              item={{
+                type: "actor",
+                slug: artisan.slug,
+                title: artisan.name,
+                subtitle: artisan.craft,
+                href: `/actores/${artisan.slug}`,
+                imageUrl: artisan.imageUrl,
+                imageFocus: artisan.imageFocus,
+                datoDestacado: artisan.datoDestacado,
+              }}
+            />
+            <ShareButton
+              title={artisan.name}
+              text={artisan.craft}
+              variant="onDark"
+            />
+          </div>
         </div>
 
-        <section className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:grid-rows-[auto_1fr] lg:items-start">
+        <section className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:items-start">
           <div className="min-w-0 pt-1">
             <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
               Actores
@@ -458,7 +421,15 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
                   {artisan.actorType}
                 </span>
               ) : null}
-              {locationLabel ? (
+              {relatedStation ? (
+                <Link
+                  href={`/estaciones/${relatedStation.slug}`}
+                  className="rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55] transition hover:bg-[#f3d7b4] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                  aria-label={`Ver estaci\u00f3n ${relatedStation.name}`}
+                >
+                  {locationLabel}
+                </Link>
+              ) : locationLabel ? (
                 <span className="rounded-full bg-[#efd4b0] px-3 py-1.5 text-xs font-black uppercase leading-none tracking-normal text-[#123a55]">
                   {locationLabel}
                 </span>
@@ -469,51 +440,20 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
                 {artisan.craft}
               </p>
             ) : null}
-            {artisan.visitasDisponibles ? (
-              <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-white/85">
-                <span className="font-black text-[#f3d7b4]">
-                  Visitas y demostraciones:
-                </span>{" "}
-                {artisan.visitasDisponibles}
+            {artisan.bio ? (
+              <p className="mt-5 max-w-xl text-justify text-base font-medium leading-7 text-white/85">
+                {artisan.bio}
               </p>
             ) : null}
-            {primaryAction || secondaryAction ? (
-              <div className="mt-6 flex flex-wrap gap-2.5">
-                {primaryAction ? (
-                  <PrimaryActionLink href={primaryAction.href} newTab={primaryAction.newTab}>
-                    {primaryAction.label}
-                  </PrimaryActionLink>
-                ) : null}
-                {secondaryAction ? (
-                  <DetailActionLink href={secondaryAction.href}>
-                    {secondaryAction.label}
-                  </DetailActionLink>
-                ) : null}
-              </div>
-            ) : null}
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <FavoriteButton
-                variant="onDark"
-                item={{
-                  type: "actor",
-                  slug: artisan.slug,
-                  title: artisan.name,
-                  subtitle: artisan.craft,
-                  href: `/artesanas/${artisan.slug}`,
-                  imageUrl: artisan.imageUrl,
-                  imageFocus: artisan.imageFocus,
-                  datoDestacado: artisan.datoDestacado,
-                }}
-              />
-              <ShareButton
-                title={artisan.name}
-                text={artisan.craft}
-                variant="onDark"
-              />
-            </div>
+            <HighlightedData
+              label="Para tener en cuenta"
+              value={artisan.datoDestacado}
+              variant="onDark"
+              className="mt-5 max-w-xl"
+            />
           </div>
 
-          <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <div className="order-first min-w-0 lg:order-none">
             <DetailMediaGallery
               title={artisan.name}
               fallbackLabel="Actor"
@@ -524,21 +464,6 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
               coverClassName={artisan.imageUrl ? "aspect-[1.12] rounded-[1.85rem] border-[#efd4b0]/25" : "h-48 rounded-[1.85rem] border-[#efd4b0]/25 sm:h-auto sm:aspect-[1.12]"}
               coverSizes="(max-width: 1024px) 100vw, 56vw"
               thumbnailClassName="aspect-[4/3] w-[180px] rounded-[1.1rem] border-[#efd4b0]/25"
-              compactMobile
-            />
-          </div>
-
-          <div className="min-w-0 lg:col-start-1 lg:row-start-2">
-            {artisan.bio ? (
-              <p className="max-w-xl text-left text-base font-medium leading-7 text-white/85">
-                {artisan.bio}
-              </p>
-            ) : null}
-            <HighlightedData
-              label="Para tener en cuenta"
-              value={artisan.datoDestacado}
-              variant="onDark"
-              className="mt-5 max-w-xl"
             />
           </div>
         </section>
@@ -604,8 +529,6 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
           <HomeCarousel
             eyebrow={"Artesan\u00eda"}
             title="Productos de este actor"
-            href="/productos"
-            verTodosLabel="Ver todos"
             variant="onDark"
           >
             {relatedProducts.map((product) => (
@@ -625,11 +548,32 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
           </HomeCarousel>
         ) : null}
 
+        {relatedExperiences.length > 0 ? (
+          <HomeCarousel
+            eyebrow="Vivencias"
+            title="Experiencias de este actor"
+            variant="onDark"
+          >
+            {relatedExperiences.map((experience) => (
+              <RelatedCard
+                key={experience.slug}
+                href={`/explorar/${experience.slug}`}
+                eyebrow={`${experience.tag} - ${experience.duration}`}
+                title={experience.title}
+                subtitle={experience.description}
+                imageUrl={experience.imageUrl}
+                imageAlt={experience.title}
+                imageFocus={experience.imageFocus}
+                fallbackLabel="Experiencia"
+                datoDestacado={experience.datoDestacado}
+              />
+            ))}
+          </HomeCarousel>
+        ) : null}
         {relatedHighlightSpots.length > 0 ? (
           <HomeCarousel
             eyebrow="Destacados"
-            title="Imperdibles relacionados"
-            href="/imperdibles"
+            title="Imperdibles de este actor"
             variant="onDark"
           >
             {relatedHighlightSpots.map((spot) => (
@@ -649,31 +593,8 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
           </HomeCarousel>
         ) : null}
 
-        {relatedExperiences.length > 0 ? (
-          <HomeCarousel
-            eyebrow="Vivencias"
-            title="Experiencias relacionadas"
-            href="/explorar"
-            verTodosLabel="Ver todas"
-            variant="onDark"
-          >
-            {relatedExperiences.map((experience) => (
-              <RelatedCard
-                key={experience.slug}
-                href={`/explorar/${experience.slug}`}
-                eyebrow={`${experience.tag} - ${experience.duration}`}
-                title={experience.title}
-                subtitle={experience.description}
-                imageUrl={experience.imageUrl}
-                imageAlt={experience.title}
-                imageFocus={experience.imageFocus}
-                fallbackLabel="Experiencia"
-                datoDestacado={experience.datoDestacado}
-              />
-            ))}
-          </HomeCarousel>
-        ) : null}
       </div>
+      <SiteEndSections />
     </main>
   );
 }

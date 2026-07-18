@@ -10,10 +10,12 @@ import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
+import { BackButton } from "@/components/back-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { MetricsViewTracker } from "@/components/metrics-view-tracker";
 import { ShareButton } from "@/components/share-button";
+import { SiteEndSections } from "@/components/site-end-sections";
 
 type ProductDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -124,7 +126,7 @@ function ProductHeroInfo({
             {productMakers.map((actor) => (
               <Link
                 key={actor.slug}
-                href={`/artesanas/${actor.slug}`}
+                href={`/actores/${actor.slug}`}
                 className="group flex items-center gap-4"
               >
                 {actor.imageUrl ? (
@@ -191,7 +193,7 @@ function ProductHeroInfo({
 
 function RelatedActorCard({ actor }: { actor: Artisan }) {
   return (
-    <Link href={`/artesanas/${actor.slug}`} className="group block">
+    <Link href={`/actores/${actor.slug}`} className="group block">
       <article className="h-full rounded-[1.85rem] bg-[#efd4b0] p-5 text-[#0d314a] transition duration-200 group-hover:-translate-y-1 sm:p-6">
         <div className="flex items-center gap-4">
           {actor.imageUrl ? (
@@ -260,14 +262,14 @@ export default async function ProductDetailPage({
         entitySlug={product.slug}
         entityTitle={product.name}
       />
-      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-6 pt-10 sm:px-8 md:pb-8 md:pt-16 lg:px-10">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <Link
-            href="/productos"
+          <BackButton
+            fallbackHref="/productos"
             className="inline-flex rounded-full border border-[#efd4b0]/35 px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:-translate-y-0.5 hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
           >
-            {"<-"} Productos
-          </Link>
+            Volver
+          </BackButton>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <FavoriteButton
               item={{
@@ -332,6 +334,7 @@ export default async function ProductDetailPage({
           </section>
         ) : null}
       </div>
+      <SiteEndSections />
     </main>
   );
 }

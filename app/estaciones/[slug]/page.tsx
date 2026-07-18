@@ -8,6 +8,7 @@ import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
+import { BackButton } from "@/components/back-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
@@ -16,6 +17,7 @@ import { MetricsViewTracker } from "@/components/metrics-view-tracker";
 import { PbImage } from "@/components/pb-image";
 import { SatelliteMapButton } from "@/components/satellite-map-button";
 import { ShareButton } from "@/components/share-button";
+import { SiteEndSections } from "@/components/site-end-sections";
 import { StationDetailMap } from "@/components/station-detail-map";
 
 type StationDetailPageProps = {
@@ -63,12 +65,12 @@ function DetailActionLink({
   children: React.ReactNode;
 }) {
   return (
-    <Link
-      href={href}
+    <BackButton
+      fallbackHref={href}
       className="inline-flex rounded-full border border-[#efd4b0]/35 px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#efd4b0] transition hover:border-[#efd4b0] hover:bg-[#efd4b0] hover:text-[#123a55]"
     >
       {children}
-    </Link>
+    </BackButton>
   );
 }
 
@@ -165,9 +167,9 @@ export default async function StationDetailPage({
         entitySlug={station.slug}
         entityTitle={station.name}
       />
-      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-6 pt-10 sm:px-8 md:pb-8 md:pt-16 lg:px-10">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <DetailActionLink href="/estaciones">Volver a estaciones</DetailActionLink>
+          <DetailActionLink href="/estaciones">Volver</DetailActionLink>
           <div className="flex flex-wrap items-center gap-2">
             <FavoriteButton
               variant="onDark"
@@ -251,7 +253,11 @@ export default async function StationDetailPage({
                   Como llegar
                 </h2>
               </div>
-              <SatelliteMapButton point={station} />
+              <SatelliteMapButton
+                point={station}
+                action="directions"
+                label="Ver indicaciones"
+              />
             </div>
             <div className="overflow-hidden rounded-[1.35rem] border border-[#123a55]/20 shadow-sm">
               <StationDetailMap
@@ -277,14 +283,14 @@ export default async function StationDetailPage({
           <HomeCarousel
             eyebrow="Comunidad"
             title="Actores en esta estacion"
-            href="/artesanas"
+            href="/actores"
             verTodosLabel="Ver todos"
             variant="onDark"
           >
             {artisans.map((actor) => (
               <RelatedCard
                 key={actor.slug}
-                href={`/artesanas/${actor.slug}`}
+                href={`/actores/${actor.slug}`}
                 eyebrow={actor.actorType}
                 title={actor.name}
                 subtitle={actor.craft}
@@ -372,6 +378,7 @@ export default async function StationDetailPage({
           </HomeCarousel>
         ) : null}
       </div>
+      <SiteEndSections />
     </main>
   );
 }

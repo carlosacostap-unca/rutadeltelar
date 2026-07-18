@@ -19,6 +19,20 @@ if (pocketBaseUrl) {
 }
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/artesanas",
+        destination: "/actores",
+        permanent: true,
+      },
+      {
+        source: "/artesanas/:slug",
+        destination: "/actores/:slug",
+        permanent: true,
+      },
+    ];
+  },
   output: "standalone",
   images: {
     localPatterns: [

@@ -35,3 +35,13 @@ export function getSatelliteMapUrl(point: MapPoint, zoom = 18) {
 
   return `https://www.google.com/maps?q=${encodeURIComponent(query)}&t=k&z=${safeZoom}`;
 }
+
+export function getDirectionsMapUrl(point: MapPoint) {
+  if (!hasValidMapCoordinates(point)) {
+    return null;
+  }
+
+  const destination = `${point.latitude},${point.longitude}`;
+
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&dir_action=navigate`;
+}
