@@ -402,7 +402,7 @@ export function StationsTerritoryMap({
                     : "border-[#123a55]/35 text-[#123a55] hover:border-[#123a55] hover:bg-[#123a55] hover:text-[#efd4b0]"
                 }`}
               >
-                Solo estacion activa
+                Solo estación activa
               </button>
             </>
           ) : null}
@@ -618,7 +618,7 @@ export function StationsTerritoryMap({
                     ))
                   ) : (
                     <EmptyPanel>
-                      No hay actores vinculados a esta estacion. Volve y proba con otra estacion.
+                      No hay actores vinculados a esta estación. Volvé y probá con otra estación.
                     </EmptyPanel>
                   )}
                 </div>
@@ -644,7 +644,7 @@ export function StationsTerritoryMap({
                     ))
                   ) : (
                     <EmptyPanel>
-                      No hay imperdibles vinculados a esta estacion. Volve y proba con otra estacion.
+                      No hay imperdibles vinculados a esta estación. Volvé y probá con otra estación.
                     </EmptyPanel>
                   )}
                 </div>

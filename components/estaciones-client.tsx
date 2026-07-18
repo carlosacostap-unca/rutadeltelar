@@ -49,6 +49,10 @@ function normalizeLabel(value?: string) {
 }
 
 function getStationEyebrow(station: Station) {
+  if (station.department?.trim()) {
+    return station.department;
+  }
+
   const stationName = normalizeLabel(station.name.replace(/^Estaci[oó]n\s+/i, ""));
   const candidates = [station.department, formatStationLocation(station.locality)];
   const distinctLabel = candidates.find(
@@ -84,10 +88,10 @@ function DepartmentStationCard({
               quality={90}
               loading={eager ? "eager" : undefined}
               style={getImageFocusStyle(station.imageFocus)}
-              fallback={<MediaFallback label="Estacion" />}
+              fallback={<MediaFallback label="Estación" />}
             />
           ) : (
-            <MediaFallback label="Estacion" />
+            <MediaFallback label="Estación" />
           )}
           {station.hasInauguratedStation ? (
             <span className="absolute left-4 top-4 rounded-full bg-[#123a55] px-3 py-1 text-xs font-black uppercase leading-none tracking-normal text-[#efd4b0] shadow">

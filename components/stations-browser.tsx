@@ -70,7 +70,7 @@ export function StationsBrowser({
             <SectionHeading
               eyebrow="Seleccion"
               title={selectedStation.name}
-              description="El mapa y esta ficha quedan sincronizados para explorar una estacion a la vez."
+              description="El mapa y esta ficha quedan sincronizados para explorar una estación a la vez."
             />
             <SurfaceCard className="mt-6 soft-shadow">
               <p className="text-xs uppercase tracking-wider text-[color:var(--accent)]">
