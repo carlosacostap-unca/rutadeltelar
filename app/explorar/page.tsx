@@ -5,6 +5,7 @@ import {
 import { formatBrandFontText } from "@/app/lib/brand-font-text";
 import { ExperienciasClient } from "@/components/experiencias-client";
 import { DataSourceBadge } from "@/components/data-source-badge";
+import { SiteEndSections } from "@/components/site-end-sections";
 
 export default async function ExplorarPage() {
   const [experiencesResult, stationsResult] = await Promise.all([
@@ -33,7 +34,7 @@ export default async function ExplorarPage() {
 
   return (
     <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
-      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-6 sm:px-8 sm:pt-8 md:pb-28 md:pt-12 lg:px-10">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-6 pt-6 sm:px-8 sm:pt-8 md:pb-8 md:pt-12 lg:px-10">
         <header className="mb-8">
           <p className="text-xl font-black uppercase leading-none tracking-normal text-white">
             Experiencias
@@ -60,6 +61,7 @@ export default async function ExplorarPage() {
           durations={durations}
         />
       </div>
+      <SiteEndSections />
     </main>
   );
 }

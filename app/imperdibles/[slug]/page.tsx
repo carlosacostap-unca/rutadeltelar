@@ -12,6 +12,7 @@ import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
 import { DetailMediaGallery } from "@/components/detail-media-gallery";
+import { BackButton } from "@/components/back-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { HighlightedData } from "@/components/highlighted-data";
 import { HomeCarousel } from "@/components/home-carousel";
@@ -20,6 +21,7 @@ import { MetricsViewTracker } from "@/components/metrics-view-tracker";
 import { SatelliteMapButton } from "@/components/satellite-map-button";
 import { ShareButton } from "@/components/share-button";
 import { SurfaceCard } from "@/components/surface-card";
+import { SiteEndSections } from "@/components/site-end-sections";
 
 type HighlightSpotDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -93,14 +95,14 @@ export default async function HighlightSpotDetailPage({
         entitySlug={spot.slug}
         entityTitle={spot.title}
       />
-      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 md:pb-28 md:pt-16 lg:px-10">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-6 pt-10 sm:px-8 md:pb-8 md:pt-16 lg:px-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <Link
-            href="/imperdibles"
+          <BackButton
+            fallbackHref="/imperdibles"
             className="inline-flex rounded-full border border-[#efd4b0]/35 bg-[#efd4b0] px-4 py-2 text-sm font-black uppercase leading-none tracking-normal text-[#123a55] transition hover:-translate-y-0.5 hover:border-white hover:bg-white"
           >
-            {"<- Imperdibles"}
-          </Link>
+            Volver
+          </BackButton>
           <div className="flex items-center gap-2">
             <FavoriteButton
               item={{
@@ -320,14 +322,14 @@ export default async function HighlightSpotDetailPage({
           <HomeCarousel
             eyebrow="Comunidad"
             title="Actores relacionados"
-            href="/artesanas"
+            href="/actores"
             verTodosLabel="Ver todos"
             variant="onDark"
           >
             {relatedArtisans.map((actor) => (
               <Link
                 key={actor.slug}
-                href={`/artesanas/${actor.slug}`}
+                href={`/actores/${actor.slug}`}
                 className="group w-[200px] shrink-0 [scroll-snap-align:start]"
               >
                 <SurfaceCard className="h-full transition group-hover:border-[color:var(--accent)]">
@@ -478,6 +480,7 @@ export default async function HighlightSpotDetailPage({
           </HomeCarousel>
         ) : null}
       </div>
+      <SiteEndSections />
     </main>
   );
 }

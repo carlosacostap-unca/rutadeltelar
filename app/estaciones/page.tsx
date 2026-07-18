@@ -7,6 +7,7 @@ import { formatBrandFontText } from "@/app/lib/brand-font-text";
 import { Suspense } from "react";
 import { EstacionesClient } from "@/components/estaciones-client";
 import { DataSourceBadge } from "@/components/data-source-badge";
+import { SiteEndSections } from "@/components/site-end-sections";
 
 type EstacionesPageProps = {
   searchParams?: Promise<{
@@ -47,7 +48,7 @@ export default async function EstacionesPage({
 
   return (
     <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
-      <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-6 sm:px-8 sm:pt-8 md:pb-28 md:pt-12 lg:px-10">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-6 pt-6 sm:px-8 sm:pt-8 md:pb-8 md:pt-12 lg:px-10">
         <header className="mb-4">
           <p className="text-lg font-black uppercase leading-none tracking-normal text-white sm:text-xl">
             Estaciones
@@ -83,6 +84,7 @@ export default async function EstacionesPage({
           />
         </Suspense>
       </div>
+      <SiteEndSections />
     </main>
   );
 }

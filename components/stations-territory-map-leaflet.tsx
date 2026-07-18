@@ -714,7 +714,7 @@ export function StationsTerritoryMapLeaflet({
                   <div className="flex gap-1.5 sm:flex-col sm:gap-2">
                     <PopupAction
                       label="Abrir"
-                      onClick={() => router.push(`/artesanas/${artisan.slug}`)}
+                      onClick={() => router.push(`/actores/${artisan.slug}`)}
                       className="flex-1"
                     />
                     <SatelliteMapButton

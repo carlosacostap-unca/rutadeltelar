@@ -16,6 +16,9 @@ import {
   type Station,
 } from "@/app/lib/content";
 import { toValidIsoDate } from "@/app/lib/dates";
+import { productBelongsToActor } from "@/app/lib/actor-products";
+import { experienceBelongsToActor } from "@/app/lib/actor-experiences";
+import { highlightSpotBelongsToActor } from "@/app/lib/actor-highlight-spots";
 import { normalizeHighlightedData } from "@/app/lib/highlighted-data";
 import {
   getEntityCoverImageRef,
@@ -1097,35 +1100,16 @@ export async function getArtisanContextBySlug(slug: string) {
         : matchesStationTerritory(station, artisan.place)),
     ) ?? null;
 
-  const relatedExperiences = experiences.filter((experience) => {
-    const byResponsible =
-      sameRecordId(experience.responsibleRecordId, artisan.recordId) ||
-      (artisan.slug &&
-        experience.responsibleSlug &&
-        experience.responsibleSlug === artisan.slug);
-
-    const byTerritory = relatedStation
-      ? sameRecordId(experience.stationRecordId, relatedStation.recordId) ||
-        matchesStationTerritory(relatedStation, experience.location)
-      : normalizeText(experience.location).includes(normalizeText(artisan.place));
-
-    return byResponsible || byTerritory;
-  });
-
-  const relatedHighlightSpots = spots.filter((spot) =>
-    relatedStation
-      ? sameRecordId(spot.stationRecordId, relatedStation.recordId) ||
-        (artisan.recordId ? spot.relatedArtisanRecordIds?.includes(artisan.recordId) : false) ||
-        matchesStationTerritory(relatedStation, spot.location)
-      : normalizeText(spot.location).includes(normalizeText(artisan.place)),
+  const relatedExperiences = experiences.filter((experience) =>
+    experienceBelongsToActor(experience, artisan),
   );
 
-  const relatedProducts = products.filter((p) =>
-    (artisan.recordId && p.relatedActorRecordIds?.includes(artisan.recordId)) ||
-    (relatedStation
-      ? sameRecordId(p.stationRecordId, relatedStation.recordId) ||
-        (p.stationSlug ? p.stationSlug === relatedStation.slug : false)
-      : false),
+  const relatedHighlightSpots = spots.filter((spot) =>
+    highlightSpotBelongsToActor(spot.relatedArtisanRecordIds, artisan.recordId),
+  );
+
+  const relatedProducts = products.filter((product) =>
+    productBelongsToActor(product.relatedActorRecordIds, artisan.recordId),
   );
 
   return {
@@ -1163,7 +1147,7 @@ function buildJourneySteps(
     steps.push({
       title: `Encuentro con ${artisan.name}`,
       description: artisan.craft,
-      href: `/artesanas/${artisan.slug}`,
+      href: `/actores/${artisan.slug}`,
     });
   }
 

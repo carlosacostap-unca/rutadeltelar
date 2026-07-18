@@ -24,7 +24,7 @@ test.describe("global search", () => {
     await page.getByRole("searchbox").fill("nuevas tejedoras");
 
     await expect(page.getByRole("heading", { name: /Actores/i })).toBeVisible();
-    await expect(page.locator('a[href="/artesanas/juana-mamani"]')).toBeVisible();
+    await expect(page.locator('a[href="/actores/juana-mamani"]')).toBeVisible();
   });
 
   test("shows no-results state for unmatched terms", async ({ page }) => {

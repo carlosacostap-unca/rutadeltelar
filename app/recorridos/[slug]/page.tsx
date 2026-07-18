@@ -10,6 +10,7 @@ import {
 import { getImageFocusStyle } from "@/app/lib/image-focus";
 import { createPageMetadata } from "@/app/lib/metadata";
 import { withPocketBaseImageThumb } from "@/app/lib/pocketbase-images";
+import { BackButton } from "@/components/back-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { SectionHeading } from "@/components/section-heading";
 import { ShareButton } from "@/components/share-button";
@@ -62,12 +63,12 @@ export default async function SuggestedJourneyPage({
   return (
     <main className="flex flex-1 flex-col">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href="/recorridos"
+        <BackButton
+          fallbackHref="/recorridos"
           className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)] hover:-translate-y-0.5 hover:border-[color:var(--accent)]"
         >
-          Volver a recorridos
-        </Link>
+          Volver
+        </BackButton>
         <div className="flex items-center gap-2">
           <FavoriteButton
             item={{
@@ -252,7 +253,7 @@ export default async function SuggestedJourneyPage({
             </p>
             {journey.leadArtisan ? (
               <Link
-                href={`/artesanas/${journey.leadArtisan.slug}`}
+                href={`/actores/${journey.leadArtisan.slug}`}
                 className="mt-4 inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground)]"
               >
                 Ver actor

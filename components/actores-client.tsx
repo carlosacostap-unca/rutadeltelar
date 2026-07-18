@@ -20,7 +20,7 @@ type Props = {
   tipos: string[];
 };
 
-type SortOrder = "recommended" | "name" | "location";
+type SortOrder = "name" | "location";
 
 const PAGE_SIZE = 12;
 
@@ -354,7 +354,6 @@ function ActorCard({
   eager?: boolean;
 }) {
   const location = formatActorLocation(item.stationName ?? item.place);
-  const highlighted = item.datoDestacado?.trim();
   const specialty = item.craft.trim();
   const showSpecialty =
     specialty !== "" &&
@@ -362,7 +361,7 @@ function ActorCard({
       (item.actorType ?? "").trim().toLocaleLowerCase("es");
 
   return (
-    <Link href={`/artesanas/${item.slug}`} className="group block h-full">
+    <Link href={`/actores/${item.slug}`} className="group block h-full">
       <article className="grid h-full min-h-[13.5rem] grid-cols-[7.75rem_minmax(0,1fr)] overflow-hidden rounded-[1.65rem] bg-[#efd4b0] text-[#0d314a] shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-xl sm:block sm:min-h-0">
         <div
           data-testid="actor-media"
@@ -430,26 +429,6 @@ function ActorCard({
             </p>
           ) : null}
 
-          {highlighted ? (
-            <div className="mt-3 border-l-2 border-[#8a452b] pl-2.5">
-              <p className="text-[0.58rem] font-black uppercase leading-none text-[#8a452b]">
-                Dato destacado
-              </p>
-              <p className="mt-1 line-clamp-2 text-[0.68rem] font-semibold leading-tight text-[#123a55]/80">
-                {highlighted}
-              </p>
-            </div>
-          ) : null}
-
-          <span className="mt-auto flex items-center gap-1 pt-3 text-xs font-black uppercase text-[#8a452b]">
-            Ver perfil
-            <span
-              aria-hidden="true"
-              className="transition-transform group-hover:translate-x-1"
-            >
-              →
-            </span>
-          </span>
         </div>
       </article>
     </Link>
@@ -461,7 +440,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
   const [tipo, setTipo] = useState("todos");
   const [department, setDepartment] = useState("todas");
   const [stationSlug, setStationSlug] = useState("todas");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("recommended");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("name");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draftTipo, setDraftTipo] = useState("todos");
@@ -781,9 +760,7 @@ export function ActoresClient({ artisans, stations, tipos }: Props) {
               }
               className="min-h-10 appearance-none rounded-full border border-[#efd4b0]/25 bg-[#efd4b0]/10 py-2 pl-4 pr-9 text-xs font-black text-[#efd4b0] focus:outline-none"
             >
-              <option value="recommended" className="text-[#123a55]">
-                Recomendados
-              </option>
+
               <option value="name" className="text-[#123a55]">
                 Nombre A–Z
               </option>

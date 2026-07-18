@@ -1,24 +1,32 @@
 "use client";
 
-import { getSatelliteMapUrl } from "@/app/lib/map-links";
+import { getDirectionsMapUrl, getSatelliteMapUrl } from "@/app/lib/map-links";
 import type { GeoPoint } from "@/app/lib/geo";
 import { useExpoMode } from "@/components/expo-mode-provider";
 
 type SatelliteMapButtonProps = {
   point: GeoPoint;
   label?: string;
+  action?: "satellite" | "directions";
   compact?: boolean;
   className?: string;
 };
 
 export function SatelliteMapButton({
   point,
-  label = "Ver en mapa satelital",
+  label,
+  action = "satellite",
   compact = false,
   className = "",
 }: SatelliteMapButtonProps) {
   const { expoOffline } = useExpoMode();
-  const href = getSatelliteMapUrl(point);
+  const href =
+    action === "directions"
+      ? getDirectionsMapUrl(point)
+      : getSatelliteMapUrl(point);
+  const visibleLabel =
+    label ??
+    (action === "directions" ? "Ver indicaciones" : "Ver en mapa satelital");
 
   if (!href) {
     return null;
@@ -41,7 +49,7 @@ export function SatelliteMapButton({
         compact ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm"
       } ${className}`}
     >
-      {label}
+      {visibleLabel}
     </a>
   );
 }
