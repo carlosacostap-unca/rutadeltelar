@@ -8,6 +8,7 @@ type HomeCarouselProps = {
   title: string;
   href?: string;
   verTodosLabel?: string;
+  linkPlacement?: "end" | "afterTitle";
   variant?: "default" | "onDark";
   children: ReactNode;
 };
@@ -56,6 +57,7 @@ export function HomeCarousel({
   title,
   href,
   verTodosLabel = "Ver todos",
+  linkPlacement = "end",
   variant = "default",
   children,
 }: HomeCarouselProps) {
@@ -105,7 +107,13 @@ export function HomeCarousel({
 
   return (
     <section className="mb-12">
-      <div className="mb-5 flex items-end justify-between gap-3">
+      <div
+        className={
+          linkPlacement === "afterTitle"
+            ? "mb-5"
+            : "mb-5 flex items-end justify-between gap-3"
+        }
+      >
         <div>
           <p
             className={`text-xs font-semibold uppercase tracking-wider ${
@@ -114,15 +122,37 @@ export function HomeCarousel({
           >
             {eyebrow}
           </p>
-          <h2
-            className={`display-font mt-1 text-2xl leading-tight ${
-              onDark ? "text-[#f3d7b4]" : "text-[color:var(--foreground)]"
-            }`}
+          <div
+            className={
+              linkPlacement === "afterTitle"
+                ? "mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1"
+                : ""
+            }
           >
-            {title}
-          </h2>
+            <h2
+              className={`display-font text-2xl leading-tight ${
+                linkPlacement === "afterTitle" ? "" : "mt-1"
+              } ${
+                onDark ? "text-[#f3d7b4]" : "text-[color:var(--foreground)]"
+              }`}
+            >
+              {title}
+            </h2>
+            {href && linkPlacement === "afterTitle" ? (
+              <Link
+                href={href}
+                className={`inline-flex min-h-8 shrink-0 items-center rounded-full border px-3 py-1 text-xs font-black uppercase leading-none shadow-sm transition hover:-translate-y-0.5 ${
+                  onDark
+                    ? "border-[#efd4b0] bg-[#efd4b0] text-[#123a55] hover:bg-white"
+                    : "border-[color:var(--accent)] bg-[color:var(--accent)] text-white hover:opacity-90"
+                }`}
+              >
+                {verTodosLabel}
+              </Link>
+            ) : null}
+          </div>
         </div>
-        {href ? (
+        {href && linkPlacement === "end" ? (
           <Link
             href={href}
             className={`shrink-0 text-sm font-semibold transition hover:underline ${
@@ -132,8 +162,7 @@ export function HomeCarousel({
             {verTodosLabel} -&gt;
           </Link>
         ) : null}
-      </div>
-      <div className="relative">
+      </div>      <div className="relative">
         {canScrollLeft ? (
           <CarouselArrow direction="left" onClick={() => scroll("left")} />
         ) : null}
