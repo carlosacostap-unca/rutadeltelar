@@ -38,7 +38,7 @@ export async function generateMetadata({
 
   if (!context) {
     return createPageMetadata({
-      title: "Estacion no encontrada",
+      title: "Estación no encontrada",
       path: `/estaciones/${slug}`,
     });
   }
@@ -54,7 +54,7 @@ export async function generateMetadata({
 }
 
 function formatStationTitle(value: string) {
-  return value.replace(/^Estaci[oó]n\s+/i, "");
+  return value.replace(/^Estaci[oó]n\s+/i, "").replace(/,\s*Catamarca\.?$/i, "");
 }
 
 function DetailActionLink({
@@ -83,7 +83,6 @@ function RelatedCard({
   imageAlt,
   imageFocus,
   fallbackLabel,
-  datoDestacado,
 }: {
   href: string;
   eyebrow?: string;
@@ -93,7 +92,6 @@ function RelatedCard({
   imageAlt: string;
   imageFocus?: Parameters<typeof getImageFocusStyle>[0];
   fallbackLabel: string;
-  datoDestacado?: string;
 }) {
   return (
     <Link
@@ -130,11 +128,7 @@ function RelatedCard({
               {subtitle}
             </p>
           ) : null}
-          <HighlightedData
-            value={datoDestacado}
-            compact
-            className="mt-3 border-[#123a55]/20 bg-[#123a55]/5"
-          />
+
         </div>
       </article>
     </Link>
@@ -158,6 +152,7 @@ export default async function StationDetailPage({
 
   const { station, artisans, products, experiences, highlightSpots } = context;
   const stationTitle = formatStationTitle(station.locality || station.name);
+  const stationLocation = formatStationTitle(station.locality);
 
   return (
     <main className="relative left-1/2 -mb-28 -mt-6 flex w-screen -translate-x-1/2 flex-1 flex-col overflow-x-clip bg-[#123a55] text-white md:-mb-12">
@@ -177,7 +172,7 @@ export default async function StationDetailPage({
                 type: "estacion",
                 slug: station.slug,
                 title: station.name,
-                subtitle: station.locality,
+                subtitle: stationLocation,
                 href: `/estaciones/${station.slug}`,
                 imageUrl: station.imageUrl,
                 imageFocus: station.imageFocus,
@@ -230,7 +225,7 @@ export default async function StationDetailPage({
           <div className="order-first lg:order-none">
             <DetailMediaGallery
               title={station.name}
-              fallbackLabel="Estacion"
+              fallbackLabel="Estación"
               coverUrl={station.imageUrl}
               galleryUrls={station.galleryUrls}
               coverFocus={station.imageFocus}
@@ -247,16 +242,17 @@ export default async function StationDetailPage({
             <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-sm font-black uppercase leading-none tracking-normal text-[#123a55]">
-                  Ubicacion
+                  Ubicación
                 </p>
                 <h2 className="mt-2 text-[1.75rem] font-black leading-[0.95] tracking-normal text-[#082d49] sm:text-[2.25rem]">
-                  Como llegar
+                  Cómo llegar
                 </h2>
               </div>
               <SatelliteMapButton
                 point={station}
                 action="directions"
                 label="Ver indicaciones"
+                variant="brand"
               />
             </div>
             <div className="overflow-hidden rounded-[1.35rem] border border-[#123a55]/20 shadow-sm">
@@ -271,7 +267,7 @@ export default async function StationDetailPage({
         ) : (
           <section className="mb-12 rounded-[1.85rem] bg-[#efd4b0] p-6 text-[#123a55]">
             <p className="text-sm font-black uppercase leading-none tracking-normal">
-              Ubicacion
+              Ubicación
             </p>
             <p className="mt-2 text-sm font-medium">
               Coordenadas no disponibles aun.
@@ -282,8 +278,9 @@ export default async function StationDetailPage({
         {artisans.length > 0 ? (
           <HomeCarousel
             eyebrow="Comunidad"
-            title="Actores en esta estacion"
+            title="Actores en esta estación"
             href="/actores"
+            linkPlacement="afterTitle"
             verTodosLabel="Ver todos"
             variant="onDark"
           >
@@ -298,7 +295,6 @@ export default async function StationDetailPage({
                 imageAlt={actor.name}
                 imageFocus={actor.imageFocus}
                 fallbackLabel="Actor"
-                datoDestacado={actor.datoDestacado}
               />
             ))}
           </HomeCarousel>
@@ -306,9 +302,10 @@ export default async function StationDetailPage({
 
         {products.length > 0 ? (
           <HomeCarousel
-            eyebrow="Artesania"
-            title="Productos de la estacion"
+            eyebrow="Artesanía"
+            title="Productos de la estación"
             href="/productos"
+            linkPlacement="afterTitle"
             verTodosLabel="Ver todos"
             variant="onDark"
           >
@@ -323,7 +320,6 @@ export default async function StationDetailPage({
                 imageAlt={product.name}
                 imageFocus={product.imageFocus}
                 fallbackLabel="Producto"
-                datoDestacado={product.datoDestacado}
               />
             ))}
           </HomeCarousel>
@@ -334,6 +330,7 @@ export default async function StationDetailPage({
             eyebrow="Vivencias"
             title="Experiencias disponibles"
             href="/explorar"
+            linkPlacement="afterTitle"
             verTodosLabel="Ver todas"
             variant="onDark"
           >
@@ -348,7 +345,6 @@ export default async function StationDetailPage({
                 imageAlt={experience.title}
                 imageFocus={experience.imageFocus}
                 fallbackLabel="Experiencia"
-                datoDestacado={experience.datoDestacado}
               />
             ))}
           </HomeCarousel>
@@ -357,8 +353,9 @@ export default async function StationDetailPage({
         {highlightSpots.length > 0 ? (
           <HomeCarousel
             eyebrow="Destacados"
-            title="Imperdibles de la estacion"
+            title="Imperdibles de la estación"
             href="/imperdibles"
+            linkPlacement="afterTitle"
             variant="onDark"
           >
             {highlightSpots.map((spot) => (
@@ -372,7 +369,6 @@ export default async function StationDetailPage({
                 imageAlt={spot.title}
                 imageFocus={spot.imageFocus}
                 fallbackLabel="Imperdible"
-                datoDestacado={spot.datoDestacado}
               />
             ))}
           </HomeCarousel>

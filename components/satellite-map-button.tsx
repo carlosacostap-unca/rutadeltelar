@@ -8,6 +8,7 @@ type SatelliteMapButtonProps = {
   point: GeoPoint;
   label?: string;
   action?: "satellite" | "directions";
+  variant?: "default" | "brand";
   compact?: boolean;
   className?: string;
 };
@@ -16,6 +17,7 @@ export function SatelliteMapButton({
   point,
   label,
   action = "satellite",
+  variant = "default",
   compact = false,
   className = "",
 }: SatelliteMapButtonProps) {
@@ -27,6 +29,10 @@ export function SatelliteMapButton({
   const visibleLabel =
     label ??
     (action === "directions" ? "Ver indicaciones" : "Ver en mapa satelital");
+  const variantClass =
+    variant === "brand"
+      ? "border-[#123a55] bg-[#123a55] text-[#efd4b0] shadow-sm hover:border-[#082d49] hover:bg-[#082d49] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123a55]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#efd4b0]"
+      : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]";
 
   if (!href) {
     return null;
@@ -45,7 +51,7 @@ export function SatelliteMapButton({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] font-semibold text-[color:var(--foreground)] transition hover:-translate-y-0.5 hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] ${
+      className={`inline-flex items-center justify-center rounded-full border font-semibold transition hover:-translate-y-0.5 ${variantClass} ${
         compact ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm"
       } ${className}`}
     >

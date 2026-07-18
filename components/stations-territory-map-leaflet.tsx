@@ -133,7 +133,7 @@ function getMapEntityIcon({
   const config = {
     station: {
       className: "station",
-      title: "Estacion",
+      title: "Estación",
       icon:
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg>',
     },
@@ -637,7 +637,7 @@ export function StationsTerritoryMapLeaflet({
                 <div className="w-[180px] space-y-2 sm:min-w-[210px] sm:w-auto sm:space-y-3">
                   <PopupImage src={station.imageUrl} alt={station.name} focus={station.imageFocus} />
                   <div className="space-y-1">
-                    <PopupEyebrow>Estacion de la ruta</PopupEyebrow>
+                    <PopupEyebrow>Estación de la ruta</PopupEyebrow>
                     <p className="text-sm font-black leading-tight text-[#082d49] sm:text-base">
                       {formatStationMapLabel(station)}
                     </p>
@@ -708,7 +708,7 @@ export function StationsTerritoryMapLeaflet({
                   </div>
                   {shouldShowStation ? (
                     <p className="hidden text-xs text-[#725a49] sm:block">
-                      Estacion: {artisan.stationName}
+                      Estación: {artisan.stationName}
                     </p>
                   ) : null}
                   <div className="flex gap-1.5 sm:flex-col sm:gap-2">
@@ -763,7 +763,7 @@ export function StationsTerritoryMapLeaflet({
                 </div>
                 {spot.stationName ? (
                   <p className="hidden text-xs text-[#725a49] sm:block">
-                    Estacion: {spot.stationName}
+                    Estación: {spot.stationName}
                   </p>
                 ) : null}
                 <div className="flex gap-1.5 sm:flex-col sm:gap-2">
