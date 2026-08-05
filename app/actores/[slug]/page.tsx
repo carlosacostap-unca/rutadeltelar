@@ -367,9 +367,14 @@ export default async function ArtisanDetailPage({ params, searchParams }: Artisa
   const locationLabel =
     relatedStation?.name ?? artisan.stationName ?? artisan.place;
   const hasCoordinates = hasValidCoordinates(artisan);
+  const normalizedCraft = normalizeLabel(artisan.craft);
+  const normalizedTechniqueSummary = normalizeLabel(
+    artisan.techniques.slice(0, 2).join(" • "),
+  );
   const showCraft =
     !!artisan.craft &&
-    normalizeLabel(artisan.craft) !== normalizeLabel(artisan.actorType);
+    normalizedCraft !== normalizeLabel(artisan.actorType) &&
+    normalizedCraft !== normalizedTechniqueSummary;
   const promoCapture = Array.isArray(resolvedSearchParams?.promoCapture)
     ? resolvedSearchParams.promoCapture.includes("1")
     : resolvedSearchParams?.promoCapture === "1";
