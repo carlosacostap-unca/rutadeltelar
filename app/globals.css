@@ -238,6 +238,28 @@ textarea:focus-visible {
   filter: saturate(0.78) sepia(0.18) contrast(0.92) brightness(1.04);
 }
 
+.leaflet-container .detail-map-marker-icon {
+  border: 0;
+  background: transparent;
+  filter: drop-shadow(0 2px 4px rgba(8, 20, 30, 0.42));
+}
+
+.leaflet-container .detail-map-marker-icon svg {
+  display: block;
+  width: 30px;
+  height: 42px;
+}
+
+.leaflet-container .detail-map-marker-icon path {
+  fill: #00d4ff;
+  stroke: #10283b;
+  stroke-width: 2;
+}
+
+.leaflet-container .detail-map-marker-icon circle {
+  fill: #10283b;
+}
+
 .leaflet-container .territory-marker {
   display: grid;
   place-items: center;
