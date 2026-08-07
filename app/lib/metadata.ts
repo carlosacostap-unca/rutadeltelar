@@ -3,6 +3,13 @@ import type { Metadata } from "next";
 const SITE_NAME = "Ruta del Telar";
 const DEFAULT_DESCRIPTION =
   "Descubri estaciones, experiencias, talleres y comunidades textiles de Catamarca.";
+export const DEFAULT_SOCIAL_IMAGE_PATH =
+  "/images/social/ruta-del-telar-social.png";
+
+type SocialImageInput = {
+  imageUrl?: string;
+  alt?: string;
+};
 
 type PageMetadataInput = {
   title: string;
@@ -13,6 +20,27 @@ type PageMetadataInput = {
 
 export function getSiteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "https://rutadeltelar.catamarca.gob.ar";
+}
+
+export function createSocialImageMetadata({
+  imageUrl,
+  alt = SITE_NAME,
+}: SocialImageInput) {
+  const explicitImageUrl = imageUrl?.trim();
+  const url = new URL(
+    explicitImageUrl || DEFAULT_SOCIAL_IMAGE_PATH,
+    getSiteUrl(),
+  ).toString();
+  const image = { url, alt };
+
+  return explicitImageUrl
+    ? image
+    : {
+        ...image,
+        width: 1200,
+        height: 630,
+        type: "image/png" as const,
+      };
 }
 
 function clampDescription(value?: string) {
@@ -31,7 +59,7 @@ export function createPageMetadata({
 }: PageMetadataInput): Metadata {
   const cleanDescription = clampDescription(description);
   const url = new URL(path, getSiteUrl()).toString();
-  const images = imageUrl ? [{ url: imageUrl, alt: title }] : undefined;
+  const socialImage = createSocialImageMetadata({ imageUrl, alt: title });
 
   return {
     title,
@@ -44,13 +72,13 @@ export function createPageMetadata({
       siteName: SITE_NAME,
       locale: "es_AR",
       type: "article",
-      images,
+      images: [socialImage],
     },
     twitter: {
-      card: imageUrl ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title,
       description: cleanDescription,
-      images: imageUrl ? [imageUrl] : undefined,
+      images: [socialImage.url],
     },
   };
 }

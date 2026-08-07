@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { getPublicRuntimeMode } from "@/app/lib/expo-config";
-import { getSiteUrl } from "@/app/lib/metadata";
+import {
+  createSocialImageMetadata,
+  getSiteUrl,
+} from "@/app/lib/metadata";
 import { AppShell } from "@/components/app-shell";
 import { ExpoModeProvider } from "@/components/expo-mode-provider";
 import "./globals.css";
@@ -78,14 +81,19 @@ const neueHaasDisplay = localFont({
   ],
 });
 
+const rootDescription =
+  "Descubri estaciones, experiencias, talleres y comunidades textiles de Catamarca.";
+const rootSocialImage = createSocialImageMetadata({
+  alt: "Ruta del Telar, Catamarca",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
     default: "Ruta del Telar",
     template: "%s | Ruta del Telar",
   },
-  description:
-    "Descubri estaciones, experiencias, talleres y comunidades textiles de Catamarca.",
+  description: rootDescription,
   applicationName: "Ruta del Telar",
   appleWebApp: {
     capable: true,
@@ -98,11 +106,18 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Ruta del Telar",
-    description:
-      "Descubri estaciones, experiencias, talleres y comunidades textiles de Catamarca.",
+    description: rootDescription,
+    url: getSiteUrl(),
     locale: "es_AR",
     siteName: "Ruta del Telar",
     type: "website",
+    images: [rootSocialImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ruta del Telar",
+    description: rootDescription,
+    images: [rootSocialImage.url],
   },
 };
 

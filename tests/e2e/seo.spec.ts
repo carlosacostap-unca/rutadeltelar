@@ -29,4 +29,31 @@ test.describe("technical SEO files", () => {
     expect(body).not.toContain("/favoritos");
     expect(body).not.toContain("/buscar");
   });
+
+  test("renders an institutional social preview for a detail without a cover", async ({
+    page,
+  }) => {
+    await page.goto("/explorar/camino-del-hilado");
+
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      "content",
+      "Camino del hilado",
+    );
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      "content",
+      "https://rutadeltelar.catamarca.gob.ar/images/social/ruta-del-telar-social.png",
+    );
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      "content",
+      "Camino del hilado",
+    );
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+      "content",
+      "summary_large_image",
+    );
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
+      "content",
+      "https://rutadeltelar.catamarca.gob.ar/images/social/ruta-del-telar-social.png",
+    );
+  });
 });
