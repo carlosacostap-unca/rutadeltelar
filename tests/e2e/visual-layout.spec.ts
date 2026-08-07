@@ -79,7 +79,10 @@ test.describe("visual layout smoke", () => {
       expect(cardBox.y).toBeLessThan(760);
     }
 
-    await expect(page.getByText("Ver perfil").first()).toBeVisible();
+    await expect(firstCard.getByRole("link")).toHaveAttribute(
+      "href",
+      /^\/actores\//,
+    );
     await expectNoDocumentOverflow(page);
   });
 
@@ -97,6 +100,9 @@ test.describe("visual layout smoke", () => {
     }
 
     await expect(firstCard.getByRole("heading")).toBeVisible();
-    await expect(firstCard.getByText("Ver perfil")).toBeVisible();
+    await expect(firstCard.getByRole("link")).toHaveAttribute(
+      "href",
+      /^\/actores\//,
+    );
   });
 });

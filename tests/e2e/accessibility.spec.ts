@@ -18,21 +18,38 @@ test.describe("basic accessibility", () => {
 
     await page
       .getByRole("searchbox", {
-        name: /Buscar productos por nombre, tecnica o descripcion/i,
+        name: /Buscar productos por nombre, técnica, material o localidad/i,
       })
       .fill("alfombra");
 
     await expect(page.getByRole("status")).toContainText("1 producto");
   });
 
-  test("exposes pressed state on filters and keeps map controls minimal", async ({ page }) => {
+  test("exposes selected filter state and keeps map controls minimal", async ({ page }) => {
     await page.goto("/explorar");
 
-    const duration = page.getByRole("button", { name: "2 h" });
-    await expect(duration).toHaveAttribute("aria-pressed", "false");
+    const filtersButton = page.getByRole("button", { name: "Filtros" });
 
-    await duration.click();
-    await expect(duration).toHaveAttribute("aria-pressed", "true");
+    if (await filtersButton.isVisible()) {
+      await filtersButton.click();
+      const dialog = page.getByRole("dialog", { name: "Filtros" });
+      const duration = dialog.getByRole("combobox", { name: "Duración" });
+
+      await expect(duration).toHaveValue("todas");
+      await duration.selectOption({ label: "2 h" });
+      await dialog.getByRole("button", { name: /Ver \d+ resultados?/ }).click();
+      await expect(dialog).toBeHidden();
+    } else {
+      const duration = page.getByRole("combobox", { name: "Duración" });
+
+      await expect(duration).toHaveValue("todas");
+      await duration.selectOption({ label: "2 h" });
+      await expect(duration).toHaveValue("2 h");
+    }
+
+    await expect(
+      page.getByRole("button", { name: "Quitar filtro: 2 h" }),
+    ).toBeVisible();
 
     await page.goto("/mapa");
 

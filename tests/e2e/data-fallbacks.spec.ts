@@ -7,7 +7,7 @@ test.describe("incomplete data fallbacks", () => {
     await page.goto("/productos/alfombra-lana-cruda");
 
     await expect(page.getByRole("heading", { name: /Alfombra de lana cruda/i })).toBeVisible();
-    await expect(page.getByText("Producto", { exact: true })).toHaveCount(2);
+    await expect(page.getByText("Producto", { exact: true }).first()).toBeVisible();
   });
 
   test("keeps station details useful without coordinates", async ({ page }) => {

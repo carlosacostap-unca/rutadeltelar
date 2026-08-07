@@ -112,7 +112,22 @@ test.describe("public catalogs", () => {
 
     await expect(page.getByRole("heading", { name: /Quiero hacer algo/i })).toBeVisible();
 
-    await page.getByRole("button", { name: "2 h" }).click();
+    const filtersButton = page.getByRole("button", { name: "Filtros" });
+
+    if (await filtersButton.isVisible()) {
+      await filtersButton.click();
+      const dialog = page.getByRole("dialog", { name: "Filtros" });
+
+      await dialog
+        .getByRole("combobox", { name: "Duración" })
+        .selectOption({ label: "2 h" });
+      await dialog.getByRole("button", { name: /Ver \d+ resultados?/ }).click();
+      await expect(dialog).toBeHidden();
+    } else {
+      await page
+        .getByRole("combobox", { name: "Duración" })
+        .selectOption({ label: "2 h" });
+    }
 
     await expect(page.locator('a[href="/explorar/tarde-de-telar-vivo"]')).toBeVisible();
     await expect(page.locator('a[href="/explorar/camino-del-hilado"]')).toHaveCount(0);
