@@ -4,7 +4,7 @@ const SITE_NAME = "Ruta del Telar";
 const DEFAULT_DESCRIPTION =
   "Descubri estaciones, experiencias, talleres y comunidades textiles de Catamarca.";
 export const DEFAULT_SOCIAL_IMAGE_PATH =
-  "/images/social/ruta-del-telar-social.png";
+  "/images/social/ruta-del-telar-social-whatsapp.jpg";
 const SOCIAL_IMAGE_WIDTH = 1200;
 const SOCIAL_IMAGE_HEIGHT = 630;
 
@@ -75,7 +75,7 @@ export function createSocialImageMetadata({
         ...image,
         width: SOCIAL_IMAGE_WIDTH,
         height: SOCIAL_IMAGE_HEIGHT,
-        type: "image/png" as const,
+        type: "image/jpeg" as const,
       };
 }
 

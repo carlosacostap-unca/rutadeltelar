@@ -1,6 +1,33 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("technical SEO files", () => {
+  test("renders a lightweight institutional preview for the home page", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      "content",
+      "Ruta del Telar",
+    );
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      "content",
+      "https://rutadeltelar.catamarca.gob.ar/images/social/ruta-del-telar-social-whatsapp.jpg",
+    );
+    await expect(page.locator('meta[property="og:image:type"]')).toHaveAttribute(
+      "content",
+      "image/jpeg",
+    );
+    await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute(
+      "content",
+      "1200",
+    );
+    await expect(page.locator('meta[property="og:image:height"]')).toHaveAttribute(
+      "content",
+      "630",
+    );
+  });
+
   test("serves robots.txt with sitemap and private client routes excluded", async ({
     request,
   }) => {
@@ -41,7 +68,7 @@ test.describe("technical SEO files", () => {
     );
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",
-      "https://rutadeltelar.catamarca.gob.ar/images/social/ruta-del-telar-social.png",
+      "https://rutadeltelar.catamarca.gob.ar/images/social/ruta-del-telar-social-whatsapp.jpg",
     );
     await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
       "content",
@@ -53,7 +80,7 @@ test.describe("technical SEO files", () => {
     );
     await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
       "content",
-      "https://rutadeltelar.catamarca.gob.ar/images/social/ruta-del-telar-social.png",
+      "https://rutadeltelar.catamarca.gob.ar/images/social/ruta-del-telar-social-whatsapp.jpg",
     );
   });
 });

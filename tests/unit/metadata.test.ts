@@ -87,7 +87,7 @@ describe("social metadata helpers", () => {
       alt: "Ruta del Telar",
       width: 1200,
       height: 630,
-      type: "image/png",
+      type: "image/jpeg",
     });
   });
 
