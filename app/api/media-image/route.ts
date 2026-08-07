@@ -1,10 +1,12 @@
-import { getPocketBaseConfig } from "@/app/lib/pocketbase";
+import { isPocketBaseFileUrl } from "@/app/lib/pocketbase";
 import sharp from "sharp";
 
 export const runtime = "nodejs";
 
 const MIN_WIDTH = 64;
 const MAX_WIDTH = 1600;
+const MIN_HEIGHT = 64;
+const MAX_HEIGHT = 1600;
 const DEFAULT_WIDTH = 640;
 const DEFAULT_QUALITY = 82;
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -17,22 +19,6 @@ function clampNumber(value: string | null, fallback: number, min: number, max: n
   }
 
   return Math.min(Math.max(Math.round(parsed), min), max);
-}
-
-function isAllowedPocketBaseImage(src: URL) {
-  const baseUrl = getPocketBaseConfig().baseUrl;
-
-  if (!baseUrl) {
-    return false;
-  }
-
-  const allowed = new URL(baseUrl);
-
-  return (
-    src.protocol === allowed.protocol &&
-    src.host === allowed.host &&
-    src.pathname.startsWith("/api/files/")
-  );
 }
 
 export async function GET(request: Request) {
@@ -51,11 +37,15 @@ export async function GET(request: Request) {
     return new Response("Invalid src", { status: 400 });
   }
 
-  if (!isAllowedPocketBaseImage(src)) {
+  if (!isPocketBaseFileUrl(src)) {
     return new Response("Image source not allowed", { status: 400 });
   }
 
   const width = clampNumber(requestUrl.searchParams.get("w"), DEFAULT_WIDTH, MIN_WIDTH, MAX_WIDTH);
+  const heightParam = requestUrl.searchParams.get("h");
+  const height = heightParam
+    ? clampNumber(heightParam, 630, MIN_HEIGHT, MAX_HEIGHT)
+    : undefined;
   const quality = clampNumber(requestUrl.searchParams.get("q"), DEFAULT_QUALITY, 50, 92);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 60_000);
@@ -90,7 +80,13 @@ export async function GET(request: Request) {
 
     const image = await sharp(sourceBuffer)
       .rotate()
-      .resize({ width, withoutEnlargement: true })
+      .resize({
+        width,
+        height,
+        fit: height ? "cover" : "inside",
+        position: height ? "attention" : "centre",
+        withoutEnlargement: !height,
+      })
       .jpeg({ quality, mozjpeg: true })
       .toBuffer();
 

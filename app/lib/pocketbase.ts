@@ -73,6 +73,22 @@ export function isPocketBaseConfigured(key: PocketBaseCollectionKey) {
   return Boolean(config.baseUrl && config.collections[key]);
 }
 
+export function isPocketBaseFileUrl(url: URL) {
+  const baseUrl = getPocketBaseConfig().baseUrl;
+
+  if (!baseUrl) {
+    return false;
+  }
+
+  const allowed = new URL(baseUrl);
+
+  return (
+    url.protocol === allowed.protocol &&
+    url.host === allowed.host &&
+    url.pathname.startsWith("/api/files/")
+  );
+}
+
 export async function getPocketBaseList(
   key: PocketBaseCollectionKey,
   options: ListOptions = {},

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createShareUrl } from "@/app/lib/share-url";
 
 type ShareButtonProps = {
   title: string;
@@ -21,7 +22,10 @@ export function ShareButton({
   const onDark = variant === "onDark";
 
   async function handleShare() {
-    const shareUrl = url ?? window.location.href;
+    const shareUrl = createShareUrl(
+      url ?? window.location.href,
+      window.location.origin,
+    );
 
     if (typeof navigator !== "undefined" && navigator.share) {
       try {

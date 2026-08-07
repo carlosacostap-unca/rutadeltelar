@@ -7,10 +7,13 @@ import {
 } from "../../app/lib/metadata.ts";
 
 const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+const originalPocketBaseUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL;
 const siteUrl = "https://ruta.example";
+const pocketBaseUrl = "https://media.example";
 
 beforeEach(() => {
   process.env.NEXT_PUBLIC_SITE_URL = siteUrl;
+  process.env.NEXT_PUBLIC_POCKETBASE_URL = pocketBaseUrl;
 });
 
 afterEach(() => {
@@ -19,17 +22,47 @@ afterEach(() => {
   } else {
     process.env.NEXT_PUBLIC_SITE_URL = originalSiteUrl;
   }
+
+  if (originalPocketBaseUrl === undefined) {
+    delete process.env.NEXT_PUBLIC_POCKETBASE_URL;
+  } else {
+    process.env.NEXT_PUBLIC_POCKETBASE_URL = originalPocketBaseUrl;
+  }
 });
 
 describe("social metadata helpers", () => {
-  it("keeps an absolute entity image URL", () => {
+  it("proxies a PocketBase entity image with WhatsApp-friendly dimensions", () => {
     const image = createSocialImageMetadata({
-      imageUrl: "https://media.example/entity-cover.jpg",
+      imageUrl: "https://media.example/api/files/actors/1/entity-cover.jpg?thumb=1280x0",
+      alt: "Entidad",
+    });
+
+    const expectedUrl = new URL("/api/media-image", siteUrl);
+    expectedUrl.searchParams.set(
+      "src",
+      "https://media.example/api/files/actors/1/entity-cover.jpg?thumb=1280x0",
+    );
+    expectedUrl.searchParams.set("w", "1200");
+    expectedUrl.searchParams.set("h", "630");
+    expectedUrl.searchParams.set("q", "78");
+
+    assert.deepEqual(image, {
+      url: expectedUrl.toString(),
+      alt: "Entidad",
+      width: 1200,
+      height: 630,
+      type: "image/jpeg",
+    });
+  });
+
+  it("keeps a non-PocketBase absolute entity image URL", () => {
+    const image = createSocialImageMetadata({
+      imageUrl: "https://cdn.example/entity-cover.jpg",
       alt: "Entidad",
     });
 
     assert.deepEqual(image, {
-      url: "https://media.example/entity-cover.jpg",
+      url: "https://cdn.example/entity-cover.jpg",
       alt: "Entidad",
     });
   });
