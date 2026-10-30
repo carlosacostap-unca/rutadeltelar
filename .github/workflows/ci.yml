@@ -8,7 +8,7 @@ on:
 jobs:
   quality:
     name: Lint, build, and e2e
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       POCKETBASE_URL: ""
